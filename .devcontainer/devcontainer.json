@@ -1,0 +1,17 @@
+{
+	"build": { 
+		"dockerfile": "Dockerfile"
+	},
+  "customizations": {
+    "vscode": {
+	    "extensions": [
+	    	"denoland.vscode-deno" 
+	    ]
+    }
+  },
+	"containerEnv": { "DENO_AUTH_TOKENS": "${localEnv:GITHUB_TOKEN}@raw.githubusercontent.com" },
+	"runArgs": [
+		"--name=rendering",
+		"--hostname=rendering"
+	]
+}

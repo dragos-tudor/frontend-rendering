@@ -1,0 +1,17 @@
+{
+  "importMap": "./deps.map.json",
+  "tasks": {
+    "bundle": "deno run --allow-all --no-check ./bundling.js",
+    "test": "deno test --allow-all --no-check --parallel"
+  },
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "deno.unstable",
+      "dom",
+      "dom.iterable"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "/jsx"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "/asserts.ts": "https://deno.land/std@0.204.0/assert/mod.ts",
+    "/mock.ts": "https://deno.land/std@0.204.0/testing/mock.ts",
+    "/emit.ts": "https://deno.land/x/emit@0.31.2/mod.ts",
+    "/jsx/jsx-runtime": "./rendering-jsx/public.js",
+
+    "/react.js": "https://esm.sh/react@18.2.0?dev",
+    "/react-dom.js": "https://esm.sh/react-dom@18.2.0/client?dev",
+    "/react/jsx-runtime": "https://esm.sh/react@18.2.0/jsx-runtime"
+  }
+}

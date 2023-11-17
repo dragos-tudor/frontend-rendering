@@ -1,0 +1,2 @@
+
+export const getJsxFragmentName = () => "fragment"
