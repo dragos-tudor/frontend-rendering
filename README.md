@@ -40,7 +40,7 @@ render(<App></App>, document.body)
   - there is no virtual DOM.
 - Other remarks:
   - the async effects run immediately after all html tree elements are rendered or updated.
-  - the sync/layouts effects run immediately without to wait for children to be renderedd, updated.
+  - the sync/layouts effects run immediately without to wait for children to be rendered, updated.
 - Performace:
   - rendering and updating operations have similar performances.
   - unrendering operation is 2-times slower [`rendering` library remove each tree element].
