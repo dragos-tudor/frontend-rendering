@@ -1,13 +1,55 @@
 ## Frontend UI rendering library
+- simplified React-like library.
 - Deno-based rendering library [Node-free].
 - functional-style library [OOP-free].
-- simplified React library version.
+
+### Usage
+```javascript
+import {render, update, getEffects, getStates, useEffect, useState} from "/scripts/rendering.js"
+
+export const App = (props, elem) => {
+  const states = getStates(elem)
+  const effects = getEffects(elem)
+  const [data, setData] = useState(states, "data", [], [])
+
+  const loadData = async () => {
+    const response = await fetch("/api/data", { method: "GET" });
+    const data = await response.json()
+    setData(data)
+    update(elem)
+  }
+
+  const renderData = (data) =>
+    data.map(item => (<div>{item}</div>))
+
+  useEffect(effects, "load data", loadData, [])
+  return (
+    <main>
+      {renderData(data)}
+    </main>
+  )
+}
+
+render(<App></App>, document.body)
+```
+
+### Remarks
+- Some differences between `rendering` library and Facebook `React`.
+  - the html element is already created when jsx factory run [elem parameter].
+  - the update is manually invoked by programmer [the states could be modified in batches].
+  - there is no virtual DOM.
+- Other remarks:
+  - the async effects run immediately after all html tree elements are rendered or updated.
+  - the sync/layouts effects run immediately without to wait for children to be renderedd, updated.
+- Performace:
+  - rendering and updating operations have similar performances.
+  - unrendering operation is 2-times slower [`rendering` library remove each tree element].
 
 ### Modules
-- high-level: rendering (engine), rendering-elements, rendering-components.
-- low-level: rendering-html, rendering-jsx, rendering-effects, rendering-states, support-*.
+- main modules: rendering (engine), rendering-elements, rendering-components.
+- support modules: rendering-\*, support-\*.
 
-### [Rendering module](./rendering/)
+### [Rendering](./rendering/)
 - main functionality: rendering engine transform jsx elements to html elements.
 - render components/elements (`renderElements`):
   - create html root element and descendants from jsx factory.
@@ -23,13 +65,13 @@
   - remove and clear html root element and descendants.
 - handle errors [log, dispatch rethrow].
 
-### [Rendering elements module](./rendering-elements/)
+### [Rendering elements](./rendering-elements/)
 - main functionality: manage html elements and html text nodes.
 - implement rending, updating, replacing, unrending, logging html elements.
 - implement rendering, updating, replacing, unrendering, logging html text nodes.
 - implement ordering html elements with keys.
 
-### [Rendering components module](./rendering-components/)
+### [Rendering components](./rendering-components/)
 - UI components library.
 - context component: used to shared data between components.
   - `getContexts` get html element contexts.
@@ -42,7 +84,7 @@
 - services component: used on testing to mock services.
 - suspense component: used to toggle fallback/section on suspense/unsuspense events.
 
-### [Rendering html module](./rendering-html/)
+### [Rendering html](./rendering-html/)
 - main functionality: manage html elements.
 - implement parsing, creating, setting properties, registering event handlers for html elements.
 - implement parsing, creating html text nodes.
@@ -55,7 +97,7 @@
   - encode js content.
   - encode html content.
 
-### [Rendering jsx module](./rendering-jsx/)
+### [Rendering jsx](./rendering-jsx/)
 - main functionality: compile jsx expressions.
 - contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
 - contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `createElement` and register `React.createElement`).
@@ -64,7 +106,7 @@
   - replace html fragments.
   - skip boolean, null, undefined values.
 
-### [Rendering effects module](./rendering-effects/)
+### [Rendering effects](./rendering-effects/)
 - implement `getEffects`,`useEffect`, `setInitialEffect` functions.
 - `useEffect` func:
   - run effect func immediately!
@@ -75,6 +117,6 @@
   - initial func will run at next render before effect func.
 
 
-### [Rendering states module](./rendering-states/)
+### [Rendering states](./rendering-states/)
 - implement `getStates`, `useStates`, `useMemo` functions.
 
