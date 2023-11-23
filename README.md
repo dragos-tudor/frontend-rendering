@@ -5,24 +5,30 @@
 
 ### Usage
 ```javascript
-import {render, update, getEffects, getStates, useEffect, useState} from "/scripts/rendering.js"
+import {render, update, getEffects, getStates, useEffect, useState} 
+  from "/scripts/rendering.js"
 
-export const App = (props, elem) => {
+const getData = async () => {
+  const response = await fetch("/api/data.json", { method: "GET" });
+  return await response.json()
+}
+
+const loadData = async (elem, setData) => { 
+  const data = await getData(elem, setData)
+  setData(data)
+  return update(elem)
+}
+
+const renderData = (data) =>
+  data.map(item => (<div>{item.value}</div>))
+
+export const App = (_, elem) => {
   const states = getStates(elem)
   const effects = getEffects(elem)
+
   const [data, setData] = useState(states, "data", [], [])
+  useEffect(effects, "load data", () => loadData(elem, setData), [])
 
-  const loadData = async () => {
-    const response = await fetch("/api/data", { method: "GET" });
-    const data = await response.json()
-    setData(data)
-    update(elem)
-  }
-
-  const renderData = (data) =>
-    data.map(item => (<div>{item}</div>))
-
-  useEffect(effects, "load data", loadData, [])
   return (
     <main>
       {renderData(data)}
