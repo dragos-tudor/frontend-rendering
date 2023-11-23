@@ -103,7 +103,6 @@ const unsetEventHandler = (elem, handlerName)=>{
 const unsetEventHandlers = (elem, props)=>getValidEventHandlerNames(props).map((handlerName)=>unsetEventHandler(elem, handlerName));
 const setEventHandler = (elem, handlerName, handler)=>{
     unsetEventHandler(elem, handlerName);
-    elem.addEventListener(getEventName(handlerName), handler);
     storeEventHandler(elem, handlerName, handler);
     return handlerName;
 };
@@ -505,7 +504,13 @@ const updateHtmlText = (text, $elem)=>{
 const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
 const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
 const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
-const storeFunc = (elem, name, action)=>elem.ownerDocument[`__${name}`] = action;
+const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
+const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
+const equalElementTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
+const isStyleElement = (elem)=>getHtmlName(elem) === "style";
+const isUpdatedElement = ($elem)=>isHtmlElement($elem);
+const shouldRenderChildren = ($elem)=>!isStyleElement($elem) && !isIgnoredElement($elem) && !isHtmlText($elem);
+const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
 const renderHtmlElement = (elem, $parent)=>{
     throwError(validateHtmlTagName(getJsxName(elem)));
     const document = getHtmlOwnerDocument($parent);
@@ -521,15 +526,6 @@ const renderHtmlElement = (elem, $parent)=>{
     return $elem;
 };
 const renderElement = (elem, $parent)=>(isJsxText(elem) ? renderHtmlText : renderHtmlElement)(elem, $parent);
-const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
-const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
-const equalElementTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
-const isStyleElement = (elem)=>getHtmlName(elem) === "style";
-const isUpdatedElement = ($elem)=>isHtmlElement($elem);
-const shouldRenderChildren = ($elem)=>!isStyleElement($elem) && !isIgnoredElement($elem) && !isHtmlText($elem);
-const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
-const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
-const shouldRenderElement = ($elem)=>!existsElement($elem);
 const renderElements = (elem, $parent = parseHtml("<main></main>"))=>{
     isJsxText(elem) || throwError(validateHtmlElement($parent));
     isJsxText(elem) || throwError(validateJsxElement(elem));
@@ -542,6 +538,8 @@ const renderElements = (elem, $parent = parseHtml("<main></main>"))=>{
     }
     return rendered;
 };
+const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
+const shouldRenderElement = ($elem)=>!existsElement($elem);
 const shouldReplaceElement = (elem, $elem)=>!equalElementNames(elem, $elem);
 const shouldUnrenderElement = (elem)=>!existsElement(elem);
 const unrenderElement = ($elem)=>(logElement($elem, "unrender"), isHtmlText($elem) ? unrenderHtmlText($elem) : (runInitialEffects(getEffects($elem)), unrenderHtmlElement($elem)));
@@ -573,6 +571,12 @@ const updateElements = ($elem, elem = getJsxElement($elem))=>{
         getMaxLengthElements(children, $children).map((_, index)=>reconcileElement(children[index], $children[index], $elem)).filter(($elem)=>isUpdatedElement($elem)).forEach(($elem)=>updated.push($elem));
     }
     return updated;
+};
+const render = (elem, $parent = parseHtml("<main></main>"))=>{
+    $parent.ownerDocument.__render = $parent.ownerDocument.__render || renderElements;
+    $parent.ownerDocument.__update = $parent.ownerDocument.__update || updateElements;
+    $parent.ownerDocument.__unrender = $parent.ownerDocument.__unrender || unrenderElements;
+    return renderElements(elem, $parent)[0];
 };
 const updateConsumerContext = (name, value, elem)=>{
     const contexts = getContexts(elem);
@@ -642,12 +646,6 @@ const toggleSuspense = (elem, suspending)=>{
 };
 const suspense = (elem)=>toggleSuspense(elem, true);
 const unsuspense = (elem)=>toggleSuspense(elem, false);
-const render = (elem, $parent = parseHtml("<main></main>"))=>{
-    storeFunc($parent, "render", renderElements);
-    storeFunc($parent, "update", updateElements);
-    storeFunc($parent, "unrender", unrenderElements);
-    return renderElements(elem, $parent)[0];
-};
 const Lazy = (props, elem)=>{
     throwError(validateHtmlElement(elem));
     throwError(validateLazyLoader(props.loader));
