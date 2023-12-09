@@ -1,17 +1,24 @@
 {
-	"build": { 
-		"dockerfile": "Dockerfile"
-	},
+	"image": "ubuntu:22.04",
   "customizations": {
     "vscode": {
 	    "extensions": [
-	    	"denoland.vscode-deno" 
+	    	"denoland.vscode-deno"
 	    ]
     }
   },
+  "features": {
+  	"ghcr.io/dragos-tudor/devcontainer-features/debian-packages": "",
+  	"ghcr.io/dragos-tudor/devcontainer-features/debian-user-group": "",
+  	"ghcr.io/dragos-tudor/devcontainer-features/debian-deno": ""
+  },
 	"containerEnv": { "DENO_AUTH_TOKENS": "${localEnv:GITHUB_TOKEN}@raw.githubusercontent.com" },
+  "mounts": [
+  			"source=deno,target=/home/vscode/.deno"
+  ],
 	"runArgs": [
 		"--name=rendering",
 		"--hostname=rendering"
-	]
+	],
+	"remoteUser": "vscode"
 }
