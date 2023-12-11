@@ -14,10 +14,10 @@
   },
 	"containerEnv": { "DENO_AUTH_TOKENS": "${localEnv:GITHUB_TOKEN}@raw.githubusercontent.com" },
   "mounts": [
-  			"source=deno,target=/home/vscode/.deno"
-  ],
+  			"source=deno-cache,target=/home/vscode/.deno-cache"
+  ],	
 	"runArgs": [
-		"--name=rendering",
+		"--name=frontend-rendering",
 		"--hostname=rendering"
 	],
 	"remoteUser": "vscode"
