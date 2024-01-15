@@ -47,7 +47,7 @@ render(<App></App>, document.body)
 - Other remarks:
   - the async effects run immediately after all html tree elements are rendered or updated.
   - the sync/layouts effects run immediately without to wait for children to be rendered, updated.
-- Performace:
+- Performance:
   - rendering and updating operations have similar performances.
   - unrendering operation is 2-times slower [`rendering` library remove each tree element].
 
@@ -78,7 +78,7 @@ render(<App></App>, document.body)
 - implement ordering html elements with keys.
 
 ### [Rendering components](./rendering-components/)
-- UI components library.
+- Built-in components library.
 - context component: used to shared data between components.
   - `getContexts` get html element contexts.
   - `useContext` set context function set context values for producers and consumers.
