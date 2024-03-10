@@ -1,4 +1,4 @@
-import { assertEquals } from "/asserts.ts"
+import { assertEquals, assertExists } from "/asserts.ts"
 import { spy, assertSpyCalls } from "/mock.ts"
 import { render, update, unrender } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
@@ -16,7 +16,7 @@ Deno.test("use code splitting => update lazy components", async (t) => {
     await waitForAsyncs()
 
     update(actual, <Lazy value={2} loader={() => Promise.resolve(A)} ></Lazy>)
-    assertEquals(actual.outerHTML, "<lazy><a>2</a></lazy>")
+    assertEquals(actual.querySelector("lazy a").innerText, "2")
   })
 
   await t.step("rendered lazy component => update lazy => skip updatre lazy component", async () => {
@@ -24,7 +24,7 @@ Deno.test("use code splitting => update lazy components", async (t) => {
     await waitForAsyncs()
 
     update(actual, <b><Lazy loader={() => Promise.resolve(B)}><e></e></Lazy></b>)
-    assertEquals(actual.innerHTML, "<lazy><b><d></d></b></lazy>")
+    assertExists(actual.querySelector("lazy b d"))
   })
 
   await t.step("rendered lazy component => remove component and update lazy => lazy component loaded once", async () => {

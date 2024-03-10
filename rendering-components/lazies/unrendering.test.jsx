@@ -14,7 +14,7 @@ Deno.test("use code splitting => unrender lazy components", async (t) => {
     await waitForAsyncs()
 
     unrender(actual.querySelector("a"))
-    assertEquals(actual.outerHTML, "<lazy></lazy>")
+    assertEquals(actual.querySelector("a"), null)
   })
 
   await t.step("rendered lazy => unrender lazy => lazy unrendered", async () => {

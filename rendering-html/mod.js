@@ -1,4 +1,4 @@
-export { createHtmlElement } from "./elements/creating.js"
+export { createHtmlElement, createHtmlElementNS } from "./elements/creating.js"
 export { getHtmlName, getHtmlParentElement, getHtmlOwnerDocument } from "./elements/getting.js"
 export { findHtmlAscendant, findHtmlDescendants } from "./elements/finding.js"
 export { parseHtml } from "./parsers/parsing.js"

@@ -1,12 +1,15 @@
+import { setAttribute } from "../attributes/setting.js"
 import { getValidPropNames } from "../props-names/getting.js"
 import { mapPropName } from "../props-names/mapping.js"
 import { resolvePropValue } from "../props-values/resolving.js"
-import { isHtmlPropName } from "./verifying.js"
+import { isHtmlPropName, isWritableHtmlProp } from "./verifying.js"
 
 const setHtmlProperty = (props) => (elem, propName) => {
   const htmlPropName = mapPropName(propName)
-  if(isHtmlPropName(elem, htmlPropName))
-    elem[htmlPropName] = resolvePropValue(props, propName)
+  const htmlPropValue = resolvePropValue(props, propName)
+  isHtmlPropName(elem, htmlPropName) && isWritableHtmlProp(elem, propName)?
+    (elem[htmlPropName] = htmlPropValue):
+    setAttribute(elem, htmlPropName, htmlPropValue);
   return elem
 }
 

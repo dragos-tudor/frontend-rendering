@@ -60,10 +60,10 @@ Deno.test("use elements => update html elements", async (t) => {
     assertEquals(updateHtml(<A><b></b></A>, <A></A>), "<a></a>")
     assertEquals(updateHtml(<A><C></C></A>, <A></A>), "<a></a>")
     assertEquals(updateHtml(<b><A><c></c></A></b>, <b><A><d></d></A></b>), "<b><a><c></c></a></b>")
-    assertEquals(updateHtml(<b><A prop={1}><c></c></A></b>, <b><A prop={1}><d></d></A></b>), "<b><a><c></c></a></b>")
-    assertEquals(updateHtml(<b><A prop={1}><c></c></A></b>, <b><A prop={2}><d></d></A></b>), "<b><a><d></d></a></b>")
-    assertEquals(updateHtml(<b><A prop={1}></A></b>, <b><A prop={2}><C></C></A></b>), "<b><a><c></c></a></b>")
-    assertEquals(updateHtml(<b><A prop={1}><C></C></A></b>, <b><A prop={2}></A></b>), "<b><a></a></b>")
+    assertEquals(updateHtml(<b><A prop={1}><c></c></A></b>, <b><A prop={1}><d></d></A></b>), "<b><a prop=\"1\"><c></c></a></b>")
+    assertEquals(updateHtml(<b><A prop={1}><c></c></A></b>, <b><A prop={2}><d></d></A></b>), "<b><a prop=\"2\"><d></d></a></b>")
+    assertEquals(updateHtml(<b><A prop={1}></A></b>, <b><A prop={2}><C></C></A></b>), "<b><a prop=\"2\"><c></c></a></b>")
+    assertEquals(updateHtml(<b><A prop={1}><C></C></A></b>, <b><A prop={2}></A></b>), "<b><a prop=\"2\"></a></b>")
   })
 
   await t.step("key-factories => update factories => updated html", () => {
