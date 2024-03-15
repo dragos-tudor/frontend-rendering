@@ -14,7 +14,7 @@ catch(error) {
 
 export * from "./rendering/mod.js"
 export * from "./rendering-components/mod.js"
-export * from "./rendering-effects/mod.js"
 export * from "./rendering-html/public.js"
 export * from "./rendering-jsx/public.js"
-export * from "./rendering-states/mod.js"
+export { useEffect, getEffects } from "./rendering-effects/mod.js"
+export { useMemo, useState, getStates } from "./rendering-states/mod.js"
