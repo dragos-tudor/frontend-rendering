@@ -1,5 +1,4 @@
 // deno-lint-ignore-file no-control-regex
-/// <reference types="./index.d.ts"/>
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);
 const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
 const getHtmlName = (elem)=>elem.tagName?.toLowerCase() || "text";
@@ -130,7 +129,7 @@ const mapPropName = (propName)=>isSpecialPropName(propName) && SpecialPropMappin
 const EncodingCharsRegex = /[^\w. ]/gi;
 const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
 const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
-const togglePropNames = Object.freeze([
+const TogglePropNames = Object.freeze([
     "checked",
     "disabled",
     "hidden",
@@ -139,7 +138,7 @@ const togglePropNames = Object.freeze([
 ]);
 const isDangerouslyHtmlPropName = (propName)=>propName === "html";
 const isEmptyPropValue = (propValue)=>propValue == undefined || propValue === "";
-const isTogglePropName = (propName)=>togglePropNames.includes(propName);
+const isTogglePropName = (propName)=>TogglePropNames.includes(propName);
 const getTogglePropValue = (propValue)=>isEmptyPropValue(propValue) || propValue;
 const resolvePropValue = (props, propName)=>isDangerouslyHtmlPropName(propName) && encodeHtml(props[propName]) || isTogglePropName(propName, props[propName]) && getTogglePropValue(props[propName]) || props[propName];
 const isSVGPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
