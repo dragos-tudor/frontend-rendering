@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "/asserts.ts"
-import { render, update, getStates, useState, getEffects, useEffect } from "./mod.js"
+import { render, update, setStates, useState, setEffects, useEffect } from "./mod.js"
 
 Deno.test("use components => safely render components", async (t) => {
 
@@ -28,11 +28,8 @@ Deno.test("use components => safely update components", async (t) => {
 
   await t.step("unsafe event handler => update component => event handler not updated", () => {
     const A = (_, elem) => {
-      const effects = getEffects(elem)
-      const states = getStates(elem)
-
-      const state = useState(states, "")
-      useEffect(effects, "", () => update(elem), [])
+      const state = useState(setStates(elem), "")
+      useEffect(setEffects(elem), "", () => update(elem), [])
 
       return <nested onevent={state}></nested>
     }
@@ -43,11 +40,8 @@ Deno.test("use components => safely update components", async (t) => {
 
   await t.step("unsafe url value => update component => property not updated", () => {
     const A = (_, elem) => {
-      const effects = getEffects(elem)
-      const states = getStates(elem)
-
-      const [state, setState] = useState(states, "")
-      useEffect(effects, "", () => { setState("javascript:"); update(elem) }, [])
+      const [state, setState] = useState(setStates(elem), "")
+      useEffect(setEffects(elem), "", () => { setState("javascript:"); update(elem) }, [])
 
       return <nested src={state}></nested>
     }
@@ -58,11 +52,8 @@ Deno.test("use components => safely update components", async (t) => {
 
   await t.step("unsafe property => update component => property not updated", () => {
     const A = (_, elem) => {
-      const effects = getEffects(elem)
-      const states = getStates(elem)
-
-      const [state, setState] = useState(states, "")
-      useEffect(effects, "", () => { setState("xss"); update(elem) }, [])
+      const [state, setState] = useState(setStates(elem), "")
+      useEffect(setEffects(elem), "", () => { setState("xss"); update(elem) }, [])
 
       return <nested innerHTML={state}></nested>
     }

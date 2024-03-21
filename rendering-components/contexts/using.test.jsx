@@ -3,6 +3,7 @@ import { render, update } from "../../rendering/mod.js"
 import { registerDOMParser, setEventHandler, dispatchEvent } from "../../rendering-html/mod.js"
 import { Context as Producer } from "./Context.js"
 import { getContexts } from "./getting.js"
+import { setContexts } from "./setting.js"
 import { useContext } from "./using.js"
 
 
@@ -50,7 +51,7 @@ Deno.test("use shared data => set contexts", async (t) => {
 })
 
 const Consumer = (props, elem) => {
-  const contexts = getContexts(elem)
+  const contexts = setContexts(elem)
   const [, setContext] = useContext(contexts, props.context, "fallback", elem)
 
   setEventHandler(elem, "onclick", (event) => setContext(event.detail))

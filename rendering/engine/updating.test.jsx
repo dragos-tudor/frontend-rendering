@@ -3,7 +3,7 @@ import { assertSpyCallArgs, assertSpyCalls, spy } from "/mock.ts"
 import { getHtmlName, registerDOMParser } from "../../rendering-html/mod.js"
 import { renderElements } from "./rendering.js"
 import { updateElements } from "./updating.js"
-import { getEffects, useEffect, setInitialEffect } from "../../rendering-effects/mod.js";
+import { setEffects, useEffect, setInitialEffect } from "../../rendering-effects/mod.js";
 
 await registerDOMParser()
 
@@ -115,7 +115,7 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("factory effect => update factory => run effect", async () => {
     const effectSpy = spy(() => {})
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "", async () => { await Promise.resolve(); isUpdate && effectSpy() })
       return <b></b>
@@ -132,7 +132,7 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("factory effect => update factory => run async effect after all children updated", async () => {
     const effectSpy = spy(() => {})
     const A = (props, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "", async () => { await Promise.resolve(); isUpdate && effectSpy(elem.outerHTML) })
       return props.children
@@ -149,13 +149,13 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("factories effects => update factories => run effects descending", () => {
     const effectSpy = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "", () => isUpdate && effectSpy("b"))
       return <c></c>
     }
     const A = (props, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "", () => isUpdate && effectSpy("a"))
       return <B {...props}></B>
@@ -170,7 +170,7 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("factory sync and async effects => update factory => run sync effects before async effects", async () => {
     const effectSpy = spy(() => {})
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "a", async () => { await Promise.resolve(); isUpdate && effectSpy("b") })
       useEffect(effects, "b", () => isUpdate && effectSpy("a"))
@@ -189,7 +189,7 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("factories effects => update factories => run pre effect funcs first", () => {
     const effectSpy = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => (effectSpy("a"), setInitialEffect(effects, "", () => effectSpy("b")) ), [])
       return <d></d>
     }
@@ -216,7 +216,7 @@ Deno.test("use elements => update html elements", async (t) => {
   await t.step("element with throw error effect => update element => error dispatched", () => {
     const handler = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       const isUpdate = elem.children.length
       useEffect(effects, "", () => { if(isUpdate) throw new Error('error') })
       return <c></c>

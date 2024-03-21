@@ -1,7 +1,7 @@
 import { assertEquals, assertNotStrictEquals, assertStrictEquals } from "/asserts.ts"
 import { assertSpyCalls, assertSpyCallArgs, spy } from "/mock.ts"
 import { dispatchEvent, registerDOMParser } from "../../rendering-html/mod.js"
-import { getEffects, useEffect } from "../../rendering-effects/mod.js"
+import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { getHtmlName } from "../../rendering-html/mod.js"
 import { renderElements } from "./rendering.js"
 
@@ -58,7 +58,7 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("factory effect => render factory => run effect", async () => {
     const effectSpy = spy(() => {})
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => Promise.resolve(effectSpy()))
       return <b></b>
     }
@@ -71,12 +71,12 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("factories effects => render factories => run effects descending", async () => {
     const effectSpy = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => Promise.resolve(effectSpy("b")) )
       return <c></c>
     }
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => Promise.resolve(effectSpy("a")) )
       return <B></B>
     }
@@ -91,7 +91,7 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("factory effect => render factory => run async effect after all children rendered", async () => {
     const effectSpy = spy(() => {})
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => runAsync(() => effectSpy(elem.outerHTML)))
       return <b><c></c></b>
     }
@@ -104,12 +104,12 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("factories effects => render factories => run effects descending", () => {
     const effectSpy = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => effectSpy("b"))
       return <c></c>
     }
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => effectSpy("a"))
       return <B></B>
     }
@@ -123,7 +123,7 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("factory sync and async effect => render factory => run sync effect before async effect", async () => {
     const effectSpy = spy(() => {})
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "b", async () => { await Promise.resolve(); effectSpy("b") })
       useEffect(effects, "a", () => effectSpy("a"))
       return <b></b>
@@ -173,7 +173,7 @@ Deno.test("use elements => render jsx elements", async (t) => {
   await t.step("element with effect throw error => render element => error dispatched", () => {
     const handler = spy(() => {})
     const B = (_, elem) => {
-      const effects = getEffects(elem, 1)
+      const effects = setEffects(elem, 1)
       setEffect(effects[0], () => { throw new Error('error') })
     }
 

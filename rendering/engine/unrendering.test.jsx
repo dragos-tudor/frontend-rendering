@@ -1,10 +1,9 @@
 import { assertEquals } from "/asserts.ts"
 import { registerDOMParser } from "../../rendering-html/mod.js"
 import { getHtmlName } from "../../rendering-html/mod.js"
-import { getEffects, useEffect } from "../../rendering-effects/mod.js"
+import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { renderElements } from "./rendering.js"
 import { unrenderElements } from "./unrendering.js"
-import { getStates, useMemo } from "../../rendering-states/mod.js"
 
 await registerDOMParser()
 
@@ -58,7 +57,7 @@ Deno.test("use elements => unrender html elements", async (t) => {
   await t.step("factory subcribing effects => unrender factory => run unsubcribe effect", async () => {
     const spies = []
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
 
       useEffect(effects, "a", () => Promise.resolve(spies.push("a")).then(() => spies.push("b")), [])
       return <b></b>
@@ -75,12 +74,12 @@ Deno.test("use elements => unrender html elements", async (t) => {
   await t.step("factories effects => unrender factories => run effects descending", () => {
     const spies = []
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "b", () => spies.push("b"))
       return <c></c>
     }
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "a", () => spies.push("a"))
       return <B></B>
     }

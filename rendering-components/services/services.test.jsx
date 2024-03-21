@@ -1,7 +1,7 @@
 import { spy, assertSpyCalls, assertSpyCallArgs } from "/mock.ts"
 import { render } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { getEffects, useEffect } from "../../rendering-effects/mod.js"
+import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { getService } from "./getting.js"
 import { Services } from "./Services.js"
 
@@ -13,7 +13,7 @@ Deno.test("mock component services => use services", async (t) => {
     const spyService = spy(() => {})
     const A = (_, elem) => {
       const service = getService(elem, "service")
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => service("data"), [])
     }
     render(<Services service={spyService}><A></A></Services>)
@@ -26,7 +26,7 @@ Deno.test("mock component services => use services", async (t) => {
     const spyService = spy(() => {})
     const A = (_, elem) => {
       const service = getService(elem, "service", spyService)
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => service("data"), [])
     }
     render(<Services><A></A></Services>)
@@ -39,7 +39,7 @@ Deno.test("mock component services => use services", async (t) => {
     const spyService = spy(() => {})
     const A = (_, elem) => {
       const service = getService(elem, "service", spyService)
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => service("data"), [])
     }
     render(<A></A>)

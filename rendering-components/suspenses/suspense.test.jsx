@@ -1,6 +1,6 @@
 import { assertExists } from "/asserts.ts"
 import { render } from "../../rendering/mod.js"
-import { getEffects, useEffect } from "../../rendering-effects/mod.js"
+import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
 import { Suspense } from "./Suspense.js"
 import { suspense, unsuspense } from "./suspending.jsx"
@@ -23,7 +23,7 @@ Deno.test("watch operations progress => use suspenses", async (t) => {
 
   await t.step("suspense from descendant => render suspense => fallback rendered", () => {
     const A = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => suspense(elem))
       return <></>
     }
@@ -35,7 +35,7 @@ Deno.test("watch operations progress => use suspenses", async (t) => {
   await t.step("unsuspense from descendant => render suspense => fallback not rendered", () => {
     const A = () => <></>
     const B = (_, elem) => {
-      const effects = getEffects(elem)
+      const effects = setEffects(elem)
       useEffect(effects, "", () => unsuspense(elem));
       return <></> }
     const actual = render(<Suspense suspending={true} fallback={<B></B>}><A></A></Suspense>)
