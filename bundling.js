@@ -6,5 +6,5 @@ const bundleResult = await bundle(indexUrl, bundleOptions)
 
 const { code } = bundleResult
 const lintNonControlRegex = "// deno-lint-ignore-file no-control-regex\n"
-const typesReference = '/// <reference types="./index.d.ts"/>\n'
-Deno.writeTextFileSync("./index.js", lintNonControlRegex + typesReference + code)
+// const typesReference = '/// <reference types="./index.d.ts"/>\n'
+Deno.writeTextFileSync("./index.js", lintNonControlRegex + code)
