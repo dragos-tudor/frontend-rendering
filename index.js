@@ -396,7 +396,7 @@ const equalObjectsProp = (obj1, obj2, propName)=>isReservedObjectPropName(propNa
 const equalObjectsProps = (obj1, obj2)=>getObjectPropNames(obj1).every((propName)=>equalObjectsProp(obj1, obj2, propName));
 const equalObjects = (obj1, obj2)=>(!existsObjects(obj1, obj2) && equalPrimitives || !equalObjectsPropsCount(obj1, obj2) && falsy || equalObjectsProps)(obj1, obj2);
 const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
-const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
+const equalElementProps = (elem, $elem)=>!getJsxElementProps(elem)["no-skip"] && equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
 const equalElementTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
 const isStyleElement = (elem)=>getHtmlName(elem) === "style";
 const isUpdatedElement = ($elem)=>isHtmlElement($elem);
