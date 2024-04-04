@@ -1,46 +1,48 @@
-import { assertExists } from "/asserts.ts"
-import { render } from "../../rendering/mod.js"
-import { setEffects, useEffect } from "../../rendering-effects/mod.js"
+import { assertEquals } from "/asserts.ts"
+import { render, update } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { Suspense } from "./Suspense.js"
-import { suspense, unsuspense } from "./suspending.jsx"
+import { Suspense } from "./Suspense.jsx"
 
 await registerDOMParser()
 
-Deno.test("watch operations progress => use suspenses", async (t) => {
+Deno.test("watch operations progress => use suspenses", async (t) =>
+{
+  await t.step("unsuspending state => render suspense => children visible", () => {
+    const actual = render(<Suspense suspending={false} fallback={<fbk></fbk>}><child></child></Suspense>)
 
-  await t.step("unsuspended elem => render suspense => fallback not rendered", () => {
-    const actual = render(<Suspense suspending={false} fallback={<b></b>}><a></a></Suspense>)
-
-    assertExists(actual.querySelector("a"))
+    assertEquals(actual.querySelector("child").hasAttribute("hidden"), false)
   })
 
-  await t.step("suspended elem => render suspense => fallback rendered", () => {
-    const actual = render(<Suspense suspending={true} fallback={<b></b>}><a></a></Suspense>)
+  await t.step("unsuspending state => render suspense => fallback hidden", () => {
+    const actual = render(<Suspense suspending={false} fallback={<fbk></fbk>}><child></child></Suspense>)
 
-    assertExists(actual.querySelector("b"))
+    assertEquals(actual.querySelector("fbk").hasAttribute("hidden"), true)
   })
 
-  await t.step("suspense from descendant => render suspense => fallback rendered", () => {
-    const A = (_, elem) => {
-      const effects = setEffects(elem)
-      useEffect(effects, "", () => suspense(elem))
-      return <></>
-    }
-    const actual = render(<Suspense suspending={false} fallback={<b></b>}><A></A></Suspense>)
+  await t.step("suspending state => render suspense => children hidden", () => {
+    const actual = render(<Suspense suspending={true} fallback={<fbk></fbk>}><child></child></Suspense>)
 
-    assertExists(actual.querySelector("b"))
+    assertEquals(actual.querySelector("child").hasAttribute("hidden"), true)
   })
 
-  await t.step("unsuspense from descendant => render suspense => fallback not rendered", () => {
-    const A = () => <></>
-    const B = (_, elem) => {
-      const effects = setEffects(elem)
-      useEffect(effects, "", () => unsuspense(elem));
-      return <></> }
-    const actual = render(<Suspense suspending={true} fallback={<B></B>}><A></A></Suspense>)
+  await t.step("suspending state => render suspense => fallback visible", () => {
+    const actual = render(<Suspense suspending={true} fallback={<fbk></fbk>}><child></child></Suspense>)
 
-    assertExists(actual.querySelector("a"))
+    assertEquals(actual.querySelector("fbk").hasAttribute("hidden"), false)
+  })
+
+  await t.step("unsuspending state => update suspended suspense => children visible", () => {
+    const actual = render(<Suspense suspending={true} fallback={<fbk></fbk>}><child></child></Suspense>)
+    update(actual, <Suspense suspending={false} fallback={<fbk></fbk>}><child></child></Suspense>)
+
+    assertEquals(actual.querySelector("child").hasAttribute("hidden"), false)
+  })
+
+  await t.step("unsuspending state => update suspended suspense => fallback hidden", () => {
+    const actual = render(<Suspense suspending={true} fallback={<fbk></fbk>}><child></child></Suspense>)
+    update(actual, <Suspense suspending={false} fallback={<fbk></fbk>}><child></child></Suspense>)
+
+    assertEquals(actual.querySelector("fbk").hasAttribute("hidden"), true)
   })
 
 })
