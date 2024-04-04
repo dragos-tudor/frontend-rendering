@@ -18,7 +18,7 @@ export const isStyleElement = (elem) => getHtmlName(elem) === "style"
 export const isUpdatedElement = ($elem) => isHtmlElement($elem)
 
 
-export const shouldRenderChildren = ($elem) => !isStyleElement($elem) && !isIgnoredElement($elem) && !isHtmlText($elem)
+export const shouldSkipElement = ($elem) => isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem)
 
 export const shouldRenderElement = ($elem) => !existsElement($elem)
 

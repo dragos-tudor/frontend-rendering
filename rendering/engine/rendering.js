@@ -4,7 +4,7 @@ import { getJsxElement, isJsxText, validateJsxElement } from "../../rendering-js
 import { logElement, renderHtmlElement, renderHtmlText } from "../../rendering-elements/mod.js"
 import { handleError } from "../../support-errors/errors/handling.js"
 import { resolveJsxChildren } from "./resolving.js"
-import { shouldRenderChildren } from "./verifying.js"
+import { shouldSkipElement } from "./verifying.js"
 
 const renderElement = (elem, $parent) =>
   (isJsxText(elem)?
@@ -19,7 +19,7 @@ export const renderElements = (elem, $parent = parseHtml("<main></main>")) => {
 
   for (const $elem of rendered) {
     logElement($elem, "render")
-    shouldRenderChildren($elem) &&
+    shouldSkipElement($elem) ||
     handleError(() => resolveJsxChildren(getJsxElement($elem), $elem), $elem)
       .forEach(child => rendered.push(renderElement(child, $elem)))
   }

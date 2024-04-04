@@ -6,7 +6,7 @@ import { handleError } from "../../support-errors/errors/handling.js"
 import { resolveHtmlChildren, resolveJsxChildren } from "./resolving.js"
 import { getMaxLengthElements } from "./getting.js"
 import { reconcileElement } from "./reconciliating.js"
-import { shouldRenderChildren, isUpdatedElement } from "./verifying.js"
+import { shouldSkipElement, isUpdatedElement } from "./verifying.js"
 
 export const updateElement = (elem, $elem) => (
   logElement($elem, "update"), (
@@ -21,7 +21,7 @@ export const updateElements = ($elem, elem = getJsxElement($elem)) => {
   const updated = [updateElement(elem, $elem)]
 
   for(const $elem of updated) {
-    if(!shouldRenderChildren($elem)) continue
+    if(shouldSkipElement($elem)) continue
     const children = handleError(() => resolveJsxChildren(getJsxElement($elem), $elem), $elem)
     const $children = resolveHtmlChildren($elem, children)
 
