@@ -5,7 +5,7 @@
 
 ### Usage
 ```javascript
-import {render, update, getEffects, getStates, useEffect, useState} 
+import {render, update, getEffects, getStates, useEffect, useState}
   from "/scripts/rendering.js"
 
 const getData = async () => {
@@ -13,7 +13,7 @@ const getData = async () => {
   return await response.json()
 }
 
-const loadData = async (elem, setData) => { 
+const loadData = async (elem, setData) => {
   const data = await getData(elem, setData)
   setData(data)
   return update(elem)
@@ -88,7 +88,7 @@ render(<App></App>, document.body)
   - on errors display error element.
 - lazy component: used to lazy load components.
 - services component: used on testing to mock services.
-- suspense component: used to toggle fallback/section on suspense/unsuspense events.
+- suspense component: used to toggle visibility for children or fallback elements [preserving children states].
 
 ### [Rendering html](./rendering-html/)
 - main functionality: manage html elements.
