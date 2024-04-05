@@ -643,8 +643,8 @@ const getServices = (elem)=>elem.ownerDocument.__services;
 const setHiddenProps = (elem, value)=>elem.props.hidden = value;
 const Suspense = ({ suspending = true, fallback, children })=>{
     setHiddenProps(fallback, !suspending);
-    children.every((child)=>setHiddenProps(child, suspending));
-    return React.createElement(React.Fragment, null, fallback, children[0]);
+    children.forEach((child)=>setHiddenProps(child, suspending));
+    return React.createElement(React.Fragment, null, fallback, ...children);
 };
 export { Context as Context };
 export { getContexts as getContexts };
