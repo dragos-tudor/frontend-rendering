@@ -6,7 +6,7 @@ import { getHtmlName, getHtmlText, isHtmlElement, isHtmlText } from "../../rende
 
 const equalElementNames = (elem, $elem) => getJsxName(elem) === getHtmlName($elem)
 
-const equalElementProps = (elem, $elem) => !getJsxProps(elem)["no-skip"] && equalObjects(getJsxProps(elem), getJsxProps(getJsxElement($elem)))
+const equalElementProps = (elem, $elem) => equalObjects(getJsxProps(elem), getJsxProps(getJsxElement($elem)))
 
 const equalElementTexts = (elem, $elem) => getJsxText(elem) === getHtmlText($elem)
 
@@ -29,5 +29,5 @@ export const shouldUnrenderElement = (elem) => !existsElement(elem)
 export const shouldUpdateElement = (elem, $elem) =>
   equalElementNames(elem, $elem) &&
   (isJsxElement(elem) ||
-  (isJsxFactory(elem) && !equalElementProps(elem, $elem)) ||
+  (isJsxFactory(elem) && (getJsxProps(elem)["no-skip"] || !equalElementProps(elem, $elem))) ||
   (isJsxText(elem) && !equalElementTexts(elem, $elem)))

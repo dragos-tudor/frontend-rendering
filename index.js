@@ -396,7 +396,7 @@ const equalObjectsProp = (obj1, obj2, propName)=>isReservedObjectPropName(propNa
 const equalObjectsProps = (obj1, obj2)=>getObjectPropNames(obj1).every((propName)=>equalObjectsProp(obj1, obj2, propName));
 const equalObjects = (obj1, obj2)=>(!existsObjects(obj1, obj2) && equalPrimitives || !equalObjectsPropsCount(obj1, obj2) && falsy || equalObjectsProps)(obj1, obj2);
 const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
-const equalElementProps = (elem, $elem)=>!getJsxElementProps(elem)["no-skip"] && equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
+const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
 const equalElementTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
 const isStyleElement = (elem)=>getHtmlName(elem) === "style";
 const isUpdatedElement = ($elem)=>isHtmlElement($elem);
@@ -404,7 +404,7 @@ const shouldSkipElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($el
 const shouldRenderElement = ($elem)=>!existsElement($elem);
 const shouldReplaceElement = (elem, $elem)=>!equalElementNames(elem, $elem);
 const shouldUnrenderElement = (elem)=>!existsElement(elem);
-const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && !equalElementProps(elem, $elem) || isJsxText(elem) && !equalElementTexts(elem, $elem));
+const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxElementProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalElementTexts(elem, $elem));
 const renderElement = (elem, $parent)=>(isJsxText(elem) ? renderHtmlText : renderHtmlElement)(elem, $parent);
 const renderElements = (elem, $parent = parseHtml("<main></main>"))=>{
     isJsxText(elem) || throwError(validateHtmlElement($parent));
