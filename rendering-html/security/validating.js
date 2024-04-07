@@ -5,7 +5,7 @@ const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]
 
 const UnsafeTagNames = Object.freeze(["SCRIPT", "IFRAME"])
 
-const UnsafePropNames = Object.freeze(["style", "css", "innerHTML", "outerHTML"])
+const UnsafePropNames = Object.freeze(["css", "innerHTML", "outerHTML"])
 
 const UrlPropNames = Object.freeze(["action", "background", "dynsrv", "href", "lowsrc", "src"])
 
