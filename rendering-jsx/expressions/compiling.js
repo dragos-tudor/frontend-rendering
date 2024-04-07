@@ -1,6 +1,6 @@
 import { createJsxElement } from "../elements/creating.js"
 import { getJsxInternals, getJsxParent } from "../internals/getting.js"
-import { resolveJsxPropsyKey, resolveJsxPropsRef, resolveJsxProps } from "../props/resolving.js"
+import { resolveJsxPropsKey, resolveJsxPropsRef, resolveJsxProps } from "../props/resolving.js"
 import { getJsxLegacyChildren } from "./getting.js"
 import { emptyLegacyJsxChildren } from "./verifying.js"
 
@@ -8,7 +8,7 @@ const compileJsxExpression = (type, props, maybeKey) =>
   createJsxElement(
     type,
     resolveJsxProps(props, type),
-    resolveJsxPropsyKey(props, maybeKey),
+    resolveJsxPropsKey(props, maybeKey),
     getJsxParent(getJsxInternals(globalThis["React"])),
     resolveJsxPropsRef(props),
   )
