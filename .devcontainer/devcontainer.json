@@ -8,9 +8,9 @@
     }
   },
   "features": {
-  	"ghcr.io/dragos-tudor/devcontainer-features/debian-packages": "",
-  	"ghcr.io/dragos-tudor/devcontainer-features/debian-user-group": "",
-  	"ghcr.io/dragos-tudor/devcontainer-features/debian-deno": ""
+    "ghcr.io/dragos-tudor/devcontainer-features/debian-packages:1.2": {},
+    "ghcr.io/dragos-tudor/devcontainer-features/debian-user-group:1.3": {},
+    "ghcr.io/dragos-tudor/devcontainer-features/debian-deno:1.5": {}
   },
 	"containerEnv": { "DENO_AUTH_TOKENS": "${localEnv:GITHUB_TOKEN}@raw.githubusercontent.com" },
   "mounts": [
