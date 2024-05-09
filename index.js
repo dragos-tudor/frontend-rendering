@@ -9,11 +9,11 @@ const flatHtmlChildren = (elems)=>elems.flatMap(getHtmlChildren);
 const existsHtmlElement = (elem)=>elem;
 const existsHtmlElements = (elems)=>elems.length !== 0;
 const isHtmlElement = (elem)=>elem.nodeType === 1;
-const findHtmlAscendant = (elem, func)=>(existsHtmlElement(elem) || undefined) && (func(elem) && elem || findHtmlAscendant(getHtmlParentElement(elem), func));
 const findsHtmlDescendants = (elems, func, result = [])=>!existsHtmlElements(elems) && result || findsHtmlDescendants(flatHtmlChildren(elems), func, [
         ...result,
         ...elems.filter(func)
     ]);
+const findHtmlAscendant = (elem, func)=>(existsHtmlElement(elem) || undefined) && (func(elem) && elem || findHtmlAscendant(getHtmlParentElement(elem), func));
 const findHtmlDescendants = (elem, func)=>findsHtmlDescendants([
         elem
     ], func);
