@@ -1,6 +1,5 @@
-import { getHtmlParentElement, isHtmlText } from "../rendering-html/mod.js";
-import { logHtmlElement } from "./elements/logging.js"
-import { logHtmlText } from "./texts/logging.js"
+import { logHtmlElement, logHtmlText } from "../../rendering-elements/mod.js"
+import { getHtmlParentElement, isHtmlText } from "../../rendering-html/mod.js"
 
 const getLogger = ($elem) => isHtmlText($elem)? logHtmlText: logHtmlElement
 

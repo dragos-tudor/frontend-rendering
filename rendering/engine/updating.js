@@ -1,10 +1,10 @@
-import { throwError } from "../../support-errors/mod.js"
 import { validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxElement, validateJsxElement, isJsxText } from "../../rendering-jsx/mod.js"
-import { logElement, updateHtmlElement, updateHtmlText } from "../../rendering-elements/mod.js"
-import { handleError } from "../../support-errors/errors/handling.js"
+import { updateHtmlElement, updateHtmlText, throwError } from "../../rendering-elements/mod.js"
+import { handleError } from "../../rendering-elements/errors/handling.js"
 import { resolveHtmlChildren, resolveJsxChildren } from "./resolving.js"
 import { getMaxLengthElements } from "./getting.js"
+import { logElement } from "./logging.js"
 import { reconcileElement } from "./reconciliating.js"
 import { shouldSkipElement, isUpdatedElement } from "./verifying.js"
 

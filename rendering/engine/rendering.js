@@ -1,8 +1,8 @@
-import { throwError } from "../../support-errors/mod.js"
 import { parseHtml, validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxElement, isJsxText, validateJsxElement } from "../../rendering-jsx/mod.js"
-import { logElement, renderHtmlElement, renderHtmlText } from "../../rendering-elements/mod.js"
-import { handleError } from "../../support-errors/errors/handling.js"
+import { renderHtmlElement, renderHtmlText, throwError } from "../../rendering-elements/mod.js"
+import { handleError } from "../../rendering-elements/errors/handling.js"
+import { logElement } from "./logging.js"
 import { resolveJsxChildren } from "./resolving.js"
 import { shouldSkipElement } from "./verifying.js"
 

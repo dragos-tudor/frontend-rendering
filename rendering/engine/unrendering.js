@@ -1,7 +1,7 @@
-import { throwError } from "../../support-errors/mod.js"
 import { getHtmlChildNodes, isHtmlText, validateHtmlElement } from "../../rendering-html/mod.js"
-import { logElement, unrenderHtmlElement, unrenderHtmlText } from "../../rendering-elements/mod.js"
+import { unrenderHtmlElement, unrenderHtmlText, throwError } from "../../rendering-elements/mod.js"
 import { getEffects, runInitialEffects } from "../../rendering-effects/mod.js"
+import { logElement } from "./logging.js"
 import { shouldSkipElement } from "./verifying.js"
 
 const unrenderElement = ($elem) => (

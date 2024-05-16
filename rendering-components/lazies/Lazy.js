@@ -1,5 +1,5 @@
 import { render } from "../../rendering/mod.js"
-import { throwError } from "../../support-errors/mod.js"
+import { throwError } from "../../rendering-elements/mod.js"
 import { validateHtmlElement } from "../../rendering-html/mod.js"
 import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { createJsxElement } from "../../rendering-jsx/mod.js"

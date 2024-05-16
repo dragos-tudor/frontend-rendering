@@ -257,10 +257,6 @@ export { jsx as jsx };
 export { jsxs as jsxs };
 export { createElement as createElement };
 export { FragmentType as Fragment };
-const throwError = (message)=>{
-    if (!message) return false;
-    throw new Error(message);
-};
 const replaceJsxFragments = (elems, firstElem = elems[0])=>isJsxFragment(firstElem) ? getJsxPropsChildren(firstElem.props) : elems;
 const sanitizeJsxChildren = (elem)=>sanitizeJsxElements(getJsxPropsChildren(elem.props));
 const sanitizeJsxElements = (elems)=>replaceJsxFragments(elems).filter((elem)=>isValidJsxText(elem) && isSafeJsxElement(elem));
@@ -290,6 +286,10 @@ const Category = "rendering";
 const LogHeader = "[rendering]";
 const logError = (elem, ...args)=>isLogEnabled(elem, Category) && console.error(LogHeader, ...args);
 const logInfo = (elem, ...args)=>isLogEnabled(elem, Category) && console.info(LogHeader, ...args);
+const throwError = (message)=>{
+    if (!message) return false;
+    throw new Error(message);
+};
 const isIgnoreArray = (elem)=>elem.__ignore instanceof Array;
 const isIgnoredElement = ($elem)=>$elem.__ignore?.includes(getHtmlName($elem));
 const enableIgnoring = ($elem, $parent)=>isIgnoreArray($parent) && ($elem.__ignore = [
@@ -364,8 +364,6 @@ const updateHtmlText = (text, $elem)=>{
     return $elem;
 };
 const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
-const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
-const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
 const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {
         error
     });
@@ -378,6 +376,8 @@ const handleError = (func, elem)=>{
         throw error;
     }
 };
+const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
+const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
 const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
 const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
 const equalPrimitives = (value1, value2)=>value1 === value2;

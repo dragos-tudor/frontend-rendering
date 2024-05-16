@@ -1,7 +1,7 @@
-import { throwError } from "../../support-errors/mod.js"
 import { appendHtmlNode, createHtmlElement, createHtmlElementNS, getHtmlOwnerDocument, validateHtmlTagName } from "../../rendering-html/mod.js"
 import { getJsxName } from "../../rendering-jsx/mod.js"
 import { enableLogging } from "../../support-loggers/mod.js"
+import { throwError } from "../errors/throwing.js"
 import { enableIgnoring } from "../ignores/enabling.js"
 import { storeInternals } from "../internals/storing.js"
 import { getElementNS, getHtmlElementNS } from "./getting.js"
