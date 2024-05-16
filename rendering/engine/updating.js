@@ -1,4 +1,4 @@
-import { validateHtmlElement } from "../../rendering-html/mod.js"
+import { isHtmlElement, validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxElement, validateJsxElement, isJsxText } from "../../rendering-jsx/mod.js"
 import { updateHtmlElement, updateHtmlText, throwError } from "../../rendering-elements/mod.js"
 import { handleError } from "../../rendering-elements/errors/handling.js"
@@ -6,7 +6,7 @@ import { resolveHtmlChildren, resolveJsxChildren } from "./resolving.js"
 import { getMaxLengthElements } from "./getting.js"
 import { logElement } from "./logging.js"
 import { reconcileElement } from "./reconciliating.js"
-import { shouldSkipElement, isUpdatedElement } from "./verifying.js"
+import { shouldSkipElement } from "./verifying.js"
 
 export const updateElement = (elem, $elem) => (
   logElement($elem, "update"), (
@@ -27,7 +27,7 @@ export const updateElements = ($elem, elem = getJsxElement($elem)) => {
 
     getMaxLengthElements(children, $children)
       .map((_, index) => reconcileElement(children[index], $children[index], $elem))
-      .filter($elem => isUpdatedElement($elem))
+      .filter($elem => isHtmlElement($elem))
       .forEach($elem => updated.push($elem))
   }
 

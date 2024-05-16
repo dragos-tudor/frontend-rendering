@@ -340,46 +340,6 @@ const unrenderHtmlElement = ($elem)=>{
     return getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
 };
 const logHtmlElement = ($elem, $parent, message)=>logInfo($elem, message, "elem:", getHtmlName($elem), "props:", getJsxElementProps(getJsxElement($elem)), "parent:", $parent && getHtmlName($parent));
-const existsElement = (elem)=>elem;
-const insertHtmlText = (text, $elem, $parent)=>{
-    const document = getHtmlOwnerDocument($parent);
-    const $text = createHtmlText(document, text);
-    return insertHtmlNode($text, $elem);
-};
-const equalElementsKeys = (elem, $elem)=>getJsxElementKey(elem) === getJsxElementKey(getJsxElement($elem));
-const findElementsByKey = (elem, $elems)=>$elems.find(($elem)=>equalElementsKeys(elem, $elem));
-const orderElementKey = ($source, $target, $parent)=>$target === $source && $source || $source && $target && insertHtmlNode($target, $source) || $source && insertHtmlText("", $source, $parent);
-const orderElementKeys = (elems, $elems, $parent)=>{
-    elems.forEach((elem, index)=>orderElementKey(getHtmlChildNode($parent, index), findElementsByKey(elem, $elems), $parent));
-    return getHtmlChildNodes($parent);
-};
-const logHtmlText = ($text, $parent, message)=>logInfo($text, message, "text:", getHtmlText($text), "parent:", $parent && getHtmlName($parent));
-const renderHtmlText = (text, $parent)=>{
-    const document = getHtmlOwnerDocument($parent);
-    const $text = createHtmlText(document, text);
-    return appendHtmlNode($text, $parent);
-};
-const updateHtmlText = (text, $elem)=>{
-    setHtmlText($elem, text);
-    return $elem;
-};
-const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
-const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {
-        error
-    });
-const handleError = (func, elem)=>{
-    try {
-        return func();
-    } catch (error) {
-        logError(elem, error.message, error.stack);
-        dispatchError(elem, error);
-        throw error;
-    }
-};
-const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
-const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
-const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
-const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
 const equalPrimitives = (value1, value2)=>value1 === value2;
 const falsy = ()=>false;
 const truthy = ()=>true;
@@ -406,14 +366,53 @@ const equalObjectsProps = (obj1, obj2)=>getObjectPropNames(obj1).every((propName
 const equalObjects = (obj1, obj2)=>(!existsObjects(obj1, obj2) && equalPrimitives || !equalObjectsPropsCount(obj1, obj2) && falsy || equalObjectsProps)(obj1, obj2);
 const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
 const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
-const equalElementTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
+const existsElement = (elem)=>!!elem;
 const isStyleElement = (elem)=>getHtmlName(elem) === "style";
-const isUpdatedElement = ($elem)=>isHtmlElement($elem);
+const insertHtmlText = (text, $elem, $parent)=>{
+    const document = getHtmlOwnerDocument($parent);
+    const $text = createHtmlText(document, text);
+    return insertHtmlNode($text, $elem);
+};
+const equalElementsKeys = (elem, $elem)=>getJsxElementKey(elem) === getJsxElementKey(getJsxElement($elem));
+const findElementsByKey = (elem, $elems)=>$elems.find(($elem)=>equalElementsKeys(elem, $elem));
+const orderElementKey = ($source, $target, $parent)=>$target === $source && $source || $source && $target && insertHtmlNode($target, $source) || $source && insertHtmlText("", $source, $parent);
+const orderElementKeys = (elems, $elems, $parent)=>{
+    elems.forEach((elem, index)=>orderElementKey(getHtmlChildNode($parent, index), findElementsByKey(elem, $elems), $parent));
+    return getHtmlChildNodes($parent);
+};
+const logHtmlText = ($text, $parent, message)=>logInfo($text, message, "text:", getHtmlText($text), "parent:", $parent && getHtmlName($parent));
+const renderHtmlText = (text, $parent)=>{
+    const document = getHtmlOwnerDocument($parent);
+    const $text = createHtmlText(document, text);
+    return appendHtmlNode($text, $parent);
+};
+const updateHtmlText = (text, $elem)=>{
+    setHtmlText($elem, text);
+    return $elem;
+};
+const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
+const equalTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
+const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {
+        error
+    });
+const handleError = (func, elem)=>{
+    try {
+        return func();
+    } catch (error) {
+        logError(elem, error.message, error.stack);
+        dispatchError(elem, error);
+        throw error;
+    }
+};
+const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
+const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
+const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
+const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
 const shouldSkipElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
 const shouldRenderElement = ($elem)=>!existsElement($elem);
 const shouldReplaceElement = (elem, $elem)=>!equalElementNames(elem, $elem);
 const shouldUnrenderElement = (elem)=>!existsElement(elem);
-const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxElementProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalElementTexts(elem, $elem));
+const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxElementProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalTexts(elem, $elem));
 const renderElement = (elem, $parent)=>(isJsxText(elem) ? renderHtmlText : renderHtmlElement)(elem, $parent);
 const renderElements = (elem, $parent = parseHtml("<main></main>"))=>{
     isJsxText(elem) || throwError(validateHtmlElement($parent));
@@ -480,7 +479,7 @@ const updateElements = ($elem, elem = getJsxElement($elem))=>{
         if (shouldSkipElement($elem)) continue;
         const children = handleError(()=>resolveJsxChildren(getJsxElement($elem), $elem), $elem);
         const $children = resolveHtmlChildren($elem, children);
-        getMaxLengthElements(children, $children).map((_, index)=>reconcileElement(children[index], $children[index], $elem)).filter(($elem)=>isUpdatedElement($elem)).forEach(($elem)=>updated.push($elem));
+        getMaxLengthElements(children, $children).map((_, index)=>reconcileElement(children[index], $children[index], $elem)).filter(($elem)=>isHtmlElement($elem)).forEach(($elem)=>updated.push($elem));
     }
     return updated;
 };
