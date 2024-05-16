@@ -49,11 +49,11 @@ render(<App></App>, document.body)
   - the sync/layouts effects run immediately without to wait for children to be rendered, updated.
 - Performance:
   - rendering and updating operations have similar performances.
-  - unrendering operation is 2-times slower [`rendering` library remove each tree element].
+  - unrendering operation is 2-times slower [`rendering` library remove each tree element and clean properties, event handlers, internal data].
 
 ### Modules
-- main modules: rendering (engine), rendering-elements, rendering-components.
-- support modules: rendering-\*, support-\*.
+- high-level modules: rendering, rendering-elements, rendering-components.
+- low-level modules: rendering-html, rendering-jsx, rendering-effects, rendering-states, support-loggers, support-equalities.
 
 ### [Rendering](./rendering/)
 - main functionality: rendering engine transform jsx elements to html elements.
