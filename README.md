@@ -69,13 +69,13 @@ render(<App></App>, document.body)
 - unrender components/elements (`unrenderElements`):
   - run start effects funcs before removing elements.
   - remove and clear html root element and descendants.
-- handle errors [log, dispatch rethrow].
 
 ### [Rendering elements](./rendering-elements/)
 - main functionality: manage html elements and html text nodes.
 - implement rending, updating, replacing, unrending, logging html elements.
 - implement rendering, updating, replacing, unrendering, logging html text nodes.
 - implement ordering html elements with keys.
+- handle errors [handle, dispatch, rethrow].
 
 ### [Rendering components](./rendering-components/)
 - Built-in components library.
