@@ -1,9 +1,9 @@
 import { appendHtmlNode, createHtmlElement, createHtmlElementNS, getHtmlOwnerDocument, validateHtmlTagName } from "../../rendering-html/mod.js"
 import { getJsxName } from "../../rendering-jsx/mod.js"
-import { enableLogging } from "../../support-loggers/mod.js"
 import { throwError } from "../errors/throwing.js"
 import { enableIgnoring } from "../ignores/enabling.js"
 import { storeInternals } from "../internals/storing.js"
+import { enableLogging } from "../loggers/enabling.js"
 import { getElementNS, getHtmlElementNS } from "./getting.js"
 import { setHtmlElement } from "./setting.js"
 

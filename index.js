@@ -275,17 +275,6 @@ const buildJsxFactoryChildren = (elem, $elem)=>{
         factoryElems
     ]);
 };
-const isLogCategoryEnabled = (elem, category)=>elem.__log.includes(category);
-const isLogMounted = (elem)=>elem.__log instanceof Array;
-const isLogEnabled = (elem, category)=>isLogMounted(elem) && isLogCategoryEnabled(elem, category);
-const mountLog = ($elem, $parent)=>$elem.__log = [
-        ...$parent.__log
-    ];
-const enableLogging = ($elem, $parent)=>isLogMounted($elem) || isLogMounted($parent) && mountLog($elem, $parent);
-const Category = "rendering";
-const LogHeader = "[rendering]";
-const logError = (elem, ...args)=>isLogEnabled(elem, Category) && console.error(LogHeader, ...args);
-const logInfo = (elem, ...args)=>isLogEnabled(elem, Category) && console.info(LogHeader, ...args);
 const throwError = (message)=>{
     if (!message) return false;
     throw new Error(message);
@@ -296,6 +285,13 @@ const enableIgnoring = ($elem, $parent)=>isIgnoreArray($parent) && ($elem.__igno
         ...$parent.__ignore
     ]);
 const storeInternals = ($elem, elem)=>storeJsxElement($elem, elem);
+const isLogCategoryEnabled = (elem, category)=>elem.__log.includes(category);
+const isLogMounted = (elem)=>elem.__log instanceof Array;
+const isLogEnabled = (elem, category)=>isLogMounted(elem) && isLogCategoryEnabled(elem, category);
+const mountLog = ($elem, $parent)=>$elem.__log = [
+        ...$parent.__log
+    ];
+const enableLogging = ($elem, $parent)=>isLogMounted($elem) || isLogMounted($parent) && mountLog($elem, $parent);
 const getElementNS = (elem)=>getJsxElementProps(elem).xmlns;
 const getHtmlElementNS = ($elem)=>$elem && getJsxElement($elem) && getJsxElementProps(getJsxElement($elem)).xmlns;
 const getHtmlPropNames = ($elem)=>Object.getOwnPropertyNames($elem);
@@ -339,6 +335,10 @@ const unrenderHtmlElement = ($elem)=>{
     unstoreInternals($elem);
     return getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
 };
+const Category = "rendering";
+const LogHeader = "[rendering]";
+const logError = (elem, ...args)=>isLogEnabled(elem, Category) && console.error(LogHeader, ...args);
+const logInfo = (elem, ...args)=>isLogEnabled(elem, Category) && console.info(LogHeader, ...args);
 const logHtmlElement = ($elem, $parent, message)=>logInfo($elem, message, "elem:", getHtmlName($elem), "props:", getJsxElementProps(getJsxElement($elem)), "parent:", $parent && getHtmlName($parent));
 const equalPrimitives = (value1, value2)=>value1 === value2;
 const falsy = ()=>false;

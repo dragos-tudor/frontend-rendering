@@ -1,4 +1,4 @@
-import { logError } from "../../support-loggers/mod.js"
+import { logError } from "../loggers/logging.js"
 import { dispatchError } from "./dispatching.js"
 
 export const handleError = (func, elem) => {
