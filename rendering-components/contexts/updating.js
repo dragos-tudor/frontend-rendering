@@ -1,5 +1,5 @@
 import { update } from "../../rendering/mod.js"
-import { equalValues as equalContextValues } from "../../support-equalities/mod.js"
+import { equalValues as equalContextValues } from "../../rendering-equalities/mod.js"
 import { getContext, getContexts } from "./getting.js"
 import { findConsumer, findProducer } from "./finding.js"
 import { setContextValue } from "./setting.js";

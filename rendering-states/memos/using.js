@@ -1,4 +1,4 @@
-import { equalArrays as equalDeps } from "../../support-equalities/mod.js";
+import { equalArrays as equalDeps } from "../../rendering-equalities/mod.js";
 import { createMemo } from "./creating.js";
 import { getMemo, getMemoUsage } from "./getting.js"
 import { setMemo, setMemoDeps, setMemoValue } from "./setting.js"

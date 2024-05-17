@@ -1,4 +1,4 @@
-import { equalArrays as equalDeps } from "../../support-equalities/mod.js";
+import { equalArrays as equalDeps } from "../../rendering-equalities/mod.js";
 import { createState } from "./creating.js";
 import { getState, getStateUsage } from "./getting.js"
 import { setState, setStateDeps, setStateValue } from "./setting.js"

@@ -1,6 +1,6 @@
 import { getHtmlName, isHtmlText } from "../../rendering-html/mod.js"
 import { getJsxElement, getJsxName, getJsxProps, isJsxFactory } from "../../rendering-jsx/mod.js"
-import { equalObjects } from "../../support-equalities/mod.js"
+import { equalObjects } from "../../rendering-equalities/mod.js"
 
 export const equalElementNames = (elem, $elem) => getJsxName(elem) === getHtmlName($elem)
 
