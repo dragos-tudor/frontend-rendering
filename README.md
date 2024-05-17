@@ -54,7 +54,7 @@ render(<App></App>, document.body)
 ### Modules
 - *high-level modules*: rendering, rendering-components, rendering-elements.
 - *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-equalities [shared].
-- *simple architecture* design: all low-level modules **are independent** of each other [excepting rendering-equalities *low-level module*].
+- *simple architecture* design: all low-level modules **are independently** of each other [excepting shared rendering-equalities *low-level module*].
 
 ### [Rendering](./rendering/)
 - main functionality: rendering engine transform jsx elements to html elements.
