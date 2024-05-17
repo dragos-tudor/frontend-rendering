@@ -52,9 +52,10 @@ render(<App></App>, document.body)
   - unrendering operation is 2-times slower [`rendering` library remove each tree element and clean properties, event handlers, internal data].
 
 ### Modules
-- *high-level modules*: rendering, rendering-components, rendering-elements.
+- *high-level modules*: rendering, rendering-components.
+- *middle-level modules*: rendering-elements.
 - *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-equalities [shared].
-- *simple architecture* design: all low-level modules **are independently** of each other [excepting shared rendering-equalities *low-level module*].
+- *simple architecture* design: all *low-level modules* **are independently** of each other.
 
 ### [Rendering](./rendering/)
 - main functionality: rendering engine transform jsx elements to html elements.
