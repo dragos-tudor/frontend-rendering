@@ -1,7 +1,6 @@
 export { createHtmlElement, createHtmlElementNS } from "./elements/creating.js"
 export { getHtmlName, getHtmlParentElement, getHtmlOwnerDocument } from "./elements/getting.js"
 export { findHtmlAscendant, findHtmlDescendants } from "./elements/finding.js"
-export { setHtmlClassName } from "./elements/setting.js"
 export { parseHtml } from "./parsers/parsing.js"
 export { validateHtmlElement, validateHtmlTagName } from "./elements/validating.js"
 export { isHtmlElement } from "./elements/verifying.js"
