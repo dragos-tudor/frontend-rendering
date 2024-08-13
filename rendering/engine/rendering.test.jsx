@@ -209,13 +209,19 @@ Deno.test("use elements => render jsx elements", async (t) => {
     assertStrictEquals(elem.ownerDocument, elem.querySelector("c").ownerDocument)
   })
 
-   await t.step("elems without parent => render elems => each elem have different document [testing purpose]", () => {
+  await t.step("elems without parent => render elems => each elem have different document [testing purpose]", () => {
     const A = (props) => props.children
     const elem1 = renderElements(<A><b></b></A>)[0]
     const elem2 = renderElements(<A><b></b></A>)[0]
 
     assertNotStrictEquals(elem1.ownerDocument, elem2.ownerDocument)
     assertNotStrictEquals(elem1.querySelector("b").ownerDocument, elem2.querySelector("b").ownerDocument)
+  })
+
+  await t.step("factories with class names => render factories => rendered factories have class names", () => {
+    const A = (_) => <></>
+    A.className = "a-class-name"
+    assertEquals(renderElements(<A></A>)[0].className, "a-class-name")
   })
 
 })
