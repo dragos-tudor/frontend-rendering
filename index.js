@@ -2,7 +2,7 @@
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);
 const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
 const getHtmlChildren = (elem)=>Array.from(elem.children ?? []);
-const getHtmlName = (elem)=>elem.tagName?.toLowerCase() || "text";
+const getHtmlName = (elem)=>elem.tagName?.toLowerCase().replace("_", "-") || "text";
 const getHtmlOwnerDocument = (elem)=>elem?.ownerDocument;
 const getHtmlParentElement = (elem)=>elem?.parentElement;
 const flatHtmlChildren = (elems)=>elems.flatMap(getHtmlChildren);
@@ -177,7 +177,7 @@ const createHtmlText = (document, text)=>document.createTextNode(text);
 const isHtmlText = (elem)=>elem.nodeType === 3;
 const getHtmlText = ($elem)=>isHtmlText($elem) && $elem.textContent;
 const setHtmlText = ($elem, text)=>$elem.textContent = text;
-const getJsxFactoryName = (elem)=>elem.type.name.toLowerCase();
+const getJsxFactoryName = (elem)=>elem.type.name.toLowerCase().replace("_", "-");
 const isJsxArrayElems = (elems)=>elems instanceof Array;
 const isJsxFactory = (elem)=>typeof elem.type === "function";
 const getJsxFragmentName = ()=>"fragment";

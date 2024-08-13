@@ -1,2 +1,2 @@
 
-export const getJsxFactoryName = (elem) => elem.type.name.toLowerCase()
+export const getJsxFactoryName = (elem) => elem.type.name.toLowerCase().replace("_", "-")

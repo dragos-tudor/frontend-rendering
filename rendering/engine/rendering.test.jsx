@@ -218,10 +218,9 @@ Deno.test("use elements => render jsx elements", async (t) => {
     assertNotStrictEquals(elem1.querySelector("b").ownerDocument, elem2.querySelector("b").ownerDocument)
   })
 
-  await t.step("factories with class names => render factories => rendered factories have class names", () => {
-    const A = (_) => <></>
-    A.className = "a-class-name"
-    assertEquals(renderElements(<A></A>)[0].className, "a-class-name")
+  await t.step("factories with underscore names => render factories => html elements with hyphens names", () => {
+    const A_B = (_) => <></>
+    assertEquals(renderElements(<A_B></A_B>)[0].outerHTML, "<a-b></a-b>")
   })
 
 })
