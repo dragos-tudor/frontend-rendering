@@ -517,7 +517,6 @@ const updateElement = (elem, $elem)=>{
     if (isJsxText(elem)) return updateHtmlText(elem, $elem);
     throwError(validateHtmlElement($elem));
     throwError(validateJsxElement(elem));
-    runInitialEffects(getEffects($elem));
     updateHtmlElement($elem, getJsxProps(elem));
     storeJsxElement($elem, elem);
     return $elem;
