@@ -10,6 +10,10 @@ export const isAriaPropName = (propName) => propName.startsWith("aria-")
 
 export const isDangerouslyPropName = (propName) => propName === "html"
 
+export const isHtmlPropName = (elem, propName) => propName in elem
+
+export const isHtmlOrInternalPropName = (elem, propName) => isHtmlPropName(elem, propName) || isInternalPropName(propName)
+
 export const isInternalPropName = (propName) => propName.startsWith("__")
 
 export const isReservedPropName = (propName) => ReservedPropNames.includes(propName)

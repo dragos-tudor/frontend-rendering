@@ -1,6 +1,8 @@
-import { isFunctionAttrValue, isNamespaceAttrName } from "./veifying.js"
+import { isFunctionAttrValue, isXmlnsAttrName } from "./veifying.js"
+
+const setAttributeNS = (elem, attrName, attrValue) => elem.setAttributeNS?.(null, attrName, attrValue)
 
 export const setAttribute = (elem, attrName, attrValue) =>
   isFunctionAttrValue(attrValue) ||
-  isNamespaceAttrName(attrName) ||
-  elem.setAttributeNS?.(null, attrName, attrValue)
+  isXmlnsAttrName(attrName) ||
+  setAttributeNS(elem, attrName, attrValue)

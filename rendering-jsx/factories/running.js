@@ -1,3 +1,2 @@
 
-export const runJsxFactory = (elem, $elem, props) =>
-  elem.type(Object.freeze(props), $elem)
+export const runJsxFactory = (elem, $elem, props) => elem.type(Object.freeze(props), $elem)

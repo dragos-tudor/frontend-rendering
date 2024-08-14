@@ -13,13 +13,10 @@ export const useEffect = (effects, name, func, deps) =>
   }
 
   const effect = getEffect(effects, name)
-
   runInitialFunc(effect)
   setEffectInitialFunc(effect, undefined)
 
-  if(equalDeps(effect.deps, deps) && !isDefaultDeps(deps))
-    return
-
+  if(equalDeps(effect.deps, deps) && !isDefaultDeps(deps)) return
   setEffectDeps(effect, deps)
   return func()
 }

@@ -1,6 +1,4 @@
 
-export const isFunctionAttrValue = (attrValue) =>
-  typeof attrValue === "function"
+export const isFunctionAttrValue = (attrValue) => typeof attrValue === "function"
 
-export const isNamespaceAttrName = (attrName) =>
-  attrName === "xmlns"
+export const isXmlnsAttrName = (attrName) => attrName === "xmlns"

@@ -53,31 +53,25 @@ render(<App></App>, document.body)
 
 ### Modules
 - *high-level modules*: rendering, rendering-components.
-- *middle-level modules*: rendering-elements.
 - *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-equalities [shared].
 - *simple architecture* design: all *low-level modules* **are independently** of each other.
 
 ### [Rendering](./rendering/)
 - main functionality: rendering engine transform jsx elements to html elements.
-- render components/elements (`renderElements`):
+- render element tree (`renderElementTree`):
   - create html root element and descendants from jsx factory.
   - append html root element to parent html element.
   - run sync effects funcs when jsx factory run.
   - run async effects funcs when all tree elements rendered.
-- update components/elements (`updateElements`):
+- update element tree (`updateElementTree`):
   - reconciliate elements: render, update, replace, unrender html elements.
   - run sync effects funcs and start effects funcs when jsx factory run.
   - run async effects funcs when all tree elements updated.
-- unrender components/elements (`unrenderElements`):
+- unrender elements tree (`unrenderElementTree`):
   - run start effects funcs before removing elements.
   - remove and clear html root element and descendants.
-
-### [Rendering elements](./rendering-elements/)
-- main functionality: manage html elements and html text nodes.
-- implement rending, updating, replacing, unrending, logging html elements.
-- implement rendering, updating, replacing, unrendering, logging html text nodes.
 - implement ordering html elements with keys.
-- errors funcs [handle, dispatch, rethrow].
+- errors funcs [handle, dispatch, throw].
 - logging funcs [enable, log, mount].
 
 ### [Rendering components](./rendering-components/)
@@ -94,9 +88,11 @@ render(<App></App>, document.body)
 - suspense component: used to toggle visibility for children or fallback elements [preserving children states].
 
 ### [Rendering html](./rendering-html/)
-- main functionality: manage html elements.
+- main functionality: manage html elements and nodes.
 - implement parsing, creating, setting properties, registering event handlers for html elements.
+- implement rending, updating, replacing, unrending, logging html elements.
 - implement parsing, creating html text nodes.
+- implement rendering, updating, replacing, unrendering, logging html text nodes.
 - implement appending, inserting, removing, replacing html nodes.
 - firing and listening for events.
 - security based on owasp security guidance:

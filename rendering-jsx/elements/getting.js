@@ -23,3 +23,6 @@ export const getJsxName = (elem) =>
   (isJsxFragment(elem) && getJsxFragmentName()) ||
   getJsxTextName()
 
+export const getJsxProps = getJsxElementProps
+
+export const getJsxKey = getJsxElementKey

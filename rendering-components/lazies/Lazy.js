@@ -1,10 +1,10 @@
 import { render } from "../../rendering/mod.js"
-import { throwError } from "../../rendering-elements/mod.js"
 import { validateHtmlElement } from "../../rendering-html/mod.js"
 import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { createJsxElement } from "../../rendering-jsx/mod.js"
 import { setStates, useState } from "../../rendering-states/mod.js"
 import { validateLazyLoader } from "./validating.js"
+import { throwError } from "./throwing.js"
 
 export const Lazy = (props, elem) =>
 {

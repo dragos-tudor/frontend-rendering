@@ -1,24 +1,35 @@
 // deno-lint-ignore-file no-control-regex
-const createHtmlElement = (document, tagName)=>document.createElement(tagName);
-const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
 const getHtmlChildren = (elem)=>Array.from(elem.children ?? []);
 const getHtmlName = (elem)=>elem.tagName?.toLowerCase().replace("_", "-") || "text";
 const getHtmlOwnerDocument = (elem)=>elem?.ownerDocument;
 const getHtmlParentElement = (elem)=>elem?.parentElement;
-const flatHtmlChildren = (elems)=>elems.flatMap(getHtmlChildren);
 const existsHtmlElement = (elem)=>elem;
-const existsHtmlElements = (elems)=>elems.length !== 0;
 const isHtmlElement = (elem)=>elem.nodeType === 1;
-const findsHtmlDescendants = (elems, func, result = [])=>!existsHtmlElements(elems) && result || findsHtmlDescendants(flatHtmlChildren(elems), func, [
-        ...result,
-        ...elems.filter(func)
-    ]);
-const findHtmlAscendant = (elem, func)=>(existsHtmlElement(elem) || undefined) && (func(elem) && elem || findHtmlAscendant(getHtmlParentElement(elem), func));
-const findHtmlDescendants = (elem, func)=>findsHtmlDescendants([
-        elem
-    ], func);
-const HtmlMimeType = "text/html";
-const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
+const findHtmlAscendant = (elem, func)=>{
+    if (!existsHtmlElement(elem)) return undefined;
+    if (func(elem)) return elem;
+    return findHtmlAscendant(getHtmlParentElement(elem), func);
+};
+const findHtmlDescendants = (elem, func, result = [])=>{
+    if (!existsHtmlElement(elem)) return result;
+    if (func(elem)) result.push(elem);
+    for (const child of getHtmlChildren(elem))findHtmlDescendants(child, func, result);
+    return result;
+};
+const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, message, "elem:", getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
+const appendHtmlNode = (node, parent)=>parent.appendChild(node);
+const createHtmlElement = (document, tagName)=>document.createElement(tagName);
+const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
+const isEmptyPropValue = (propValue)=>propValue == undefined || propValue === "";
+const isSVGPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
+const getPropDescriptor = (elem, propName)=>Object.getOwnPropertyDescriptor(elem, propName);
+const isHtmlWritableProp = (elem, propName)=>{
+    const propDescriptor = getPropDescriptor(elem, propName);
+    if (propDescriptor && "writable" in propDescriptor) return propDescriptor.writable;
+    if (propDescriptor && "set" in propDescriptor) return true;
+    if (isSVGPropValue(elem, propName)) return false;
+    return true;
+};
 const isEventHandler = (name)=>name.startsWith("on");
 const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
 const UnsafeTagNames = Object.freeze([
@@ -44,14 +55,6 @@ const isSafeEventHandler = (props, propName)=>isEventHandler(propName) && isFunc
 const isSafePropName = (tagName, propName)=>isSafePropNameForTag(propName, tagName) || !UnsafePropNames.includes(propName);
 const isSafeTagName = (tagName)=>!UnsafeTagNames.includes(tagName.toUpperCase());
 const isSafeUrl = (props, propName)=>UrlPropNames.includes(propName) ? !JavaScriptProtocolRegex.test(props[propName] || "") : true;
-const validateHtmlElement = (elem)=>isHtmlElement(elem) ? "" : "Element type should be HTML Element.";
-const validateHtmlTagName = (name)=>isSafeTagName(name) ? "" : "Unsafe html tag " + name;
-const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
-        bubbles: true,
-        cancelable: true,
-        detail
-    });
-const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
 const ReservedPropNames = Object.freeze([
     "children"
 ]);
@@ -92,13 +95,28 @@ const TogglePropNames = Object.freeze([
 ]);
 const isAriaPropName = (propName)=>propName.startsWith("aria-");
 const isDangerouslyPropName = (propName)=>propName === "html";
+const isHtmlPropName = (elem, propName)=>propName in elem;
 const isInternalPropName = (propName)=>propName.startsWith("__");
 const isReservedPropName = (propName)=>ReservedPropNames.includes(propName);
 const isSpecialPropName = (propName)=>propName in SpecialPropMappings;
 const isStylePropName = (propName)=>propName === "style";
 const isTogglePropName = (propName)=>TogglePropNames.includes(propName);
 const isValidPropName = (elem, props, propName)=>!isReservedPropName(propName) && !isEventHandler(propName) && isSafePropName(getHtmlName(elem), propName) && isSafeUrl(props, propName);
+const PropNameTypes = Object.freeze({
+    attr: 0,
+    internal: 1,
+    readonlyProp: 2,
+    style: 3,
+    writableProp: 4
+});
 const getPropNames = (elem)=>Object.getOwnPropertyNames(elem);
+const getPropNameType = (elem, propName)=>{
+    if (isStylePropName(propName)) return PropNameTypes.style;
+    if (isInternalPropName(propName)) return PropNameTypes.internal;
+    if (!isHtmlPropName(elem, propName)) return PropNameTypes.attr;
+    if (isHtmlWritableProp(elem, propName)) return PropNameTypes.writableProp;
+    return PropNameTypes.readonlyProp;
+};
 const getValidPropNames = (elem, props)=>getPropNames(props).filter((propName)=>isValidPropName(elem, props, propName));
 const getEventName = (handlerName)=>handlerName.replace("on", "");
 const getValidEventHandlerNames = (props)=>getPropNames(props).filter((propName)=>isSafeEventHandler(props, propName));
@@ -116,13 +134,69 @@ const setEventHandler = (elem, handlerName, handler)=>{
     return handlerName;
 };
 const setEventHandlers = (elem, props)=>getValidEventHandlerNames(props).map((handlerName)=>setEventHandler(elem, handlerName, props[handlerName]));
-const appendHtmlNode = (node, parent)=>parent.appendChild(node);
+const isFunctionAttrValue = (attrValue)=>typeof attrValue === "function";
+const isXmlnsAttrName = (attrName)=>attrName === "xmlns";
+const setAttributeNS = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
+const setAttribute = (elem, attrName, attrValue)=>isFunctionAttrValue(attrValue) || isXmlnsAttrName(attrName) || setAttributeNS(elem, attrName, attrValue);
+const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
+const mapPropName = (propName)=>isSpecialPropName(propName) && SpecialPropMappings[propName] || isAriaPropName(propName) && (AriaPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
+const EncodingCharsRegex = /[^\w. ]/gi;
+const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
+const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
+const getTogglePropValue = (propValue)=>isEmptyPropValue(propValue) || propValue;
+const resolvePropValue = (props, propName)=>isDangerouslyPropName(propName) && encodeHtml(props[propName]) || isTogglePropName(propName, props[propName]) && getTogglePropValue(props[propName]) || props[propName];
+const setHtmlInternalValue = (elem, propName, propValue)=>elem[propName] = propValue;
+const setHtmlPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
+const setHtmlStylePropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
+const setHtmlStylePropValues = (elem, style)=>getPropNames(style).reduce(setHtmlStylePropValue(style), elem);
+const setHtmlProp = (props)=>(elem, propName)=>{
+        const htmlPropName = mapPropName(propName);
+        const htmlPropValue = resolvePropValue(props, propName);
+        switch(getPropNameType(elem, htmlPropName)){
+            case PropNameTypes.attr:
+                setAttribute(elem, htmlPropName, htmlPropValue);
+                break;
+            case PropNameTypes.internal:
+                setHtmlInternalValue(elem, htmlPropName, htmlPropValue);
+                break;
+            case PropNameTypes.writableProp:
+                setHtmlPropValue(elem, htmlPropName, htmlPropValue);
+                break;
+            case PropNameTypes.style:
+                setHtmlStylePropValues(elem, props[propName]);
+                break;
+        }
+        return elem;
+    };
+const setHtmlProps = (elem, props)=>getValidPropNames(elem, props).reduce(setHtmlProp(props), elem);
+const setHtmlElement = ($elem, props)=>{
+    setHtmlProps($elem, props);
+    setEventHandlers($elem, props);
+    return $elem;
+};
+const renderHtmlElement = (tagName, namespace, props, $parent)=>{
+    const document = getHtmlOwnerDocument($parent);
+    const $elem = namespace ? createHtmlElementNS(document, namespace, tagName) : createHtmlElement(document, tagName);
+    setHtmlElement($elem, props);
+    appendHtmlNode($elem, $parent);
+    return $elem;
+};
 const getHtmlChildNode = (node, index)=>node.childNodes[index];
 const getHtmlChildNodes = (node)=>Array.from(node.childNodes);
 const getHtmlParentNode = (node)=>node.parentNode;
+const replaceHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).replaceChild(node, oldNode);
+const HtmlMimeType = "text/html";
+const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
+const validateHtmlElement = (elem)=>isHtmlElement(elem) ? "" : "Element type should be HTML Element.";
+const validateHtmlTagName = (name)=>isSafeTagName(name) ? "" : "Unsafe html tag " + name;
+const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
+        bubbles: true,
+        cancelable: true,
+        detail
+    });
+const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
 const insertHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).insertBefore(node, oldNode) && node;
 const removeHtmlNode = (node)=>getHtmlParentNode(node).removeChild(node);
-const replaceHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).replaceChild(node, oldNode);
 const DOMLibraryUrl = "https://esm.sh/linkedom@0.14.26";
 const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis)=>{
     const dom = await import(url);
@@ -130,53 +204,61 @@ const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis)=>{
     global.CustomEvent = dom.CustomEvent;
     return global.DOMParser;
 };
-const isFunctionAttrValue = (attrValue)=>typeof attrValue === "function";
-const isNamespaceAttrName = (attrName)=>attrName === "xmlns";
-const setAttribute = (elem, attrName, attrValue)=>isFunctionAttrValue(attrValue) || isNamespaceAttrName(attrName) || elem.setAttributeNS?.(null, attrName, attrValue);
-const toCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
-const mapPropName = (propName)=>isSpecialPropName(propName) && SpecialPropMappings[propName] || isAriaPropName(propName) && (AriaPropMappings[propName] || toCamelCaseName(propName)) || propName;
-const EncodingCharsRegex = /[^\w. ]/gi;
-const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
-const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
-const isEmptyPropValue = (propValue)=>propValue == undefined || propValue === "";
-const isSVGPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
-const getTogglePropValue = (propValue)=>isEmptyPropValue(propValue) || propValue;
-const resolvePropValue = (props, propName)=>isDangerouslyPropName(propName) && encodeHtml(props[propName]) || isTogglePropName(propName, props[propName]) && getTogglePropValue(props[propName]) || props[propName];
-const isHtmlProperty = (elem, propName)=>propName in elem;
-const isHtmlWritableProperty = (elem, propName)=>{
-    const descriptor = Object.getOwnPropertyDescriptor(elem, propName);
-    if (descriptor && "writable" in descriptor) return descriptor.writable;
-    if (descriptor && "set" in descriptor) return true;
-    if (isSVGPropValue(elem, propName)) return false;
-    return true;
-};
-const setHtmlProperty = (props)=>(elem, propName)=>{
-        if (isStylePropName(propName)) {
-            setHtmlStyleProperties(elem, props[propName]);
-            return elem;
-        }
-        const htmlPropName = mapPropName(propName);
-        const htmlPropValue = resolvePropValue(props, propName);
-        (isHtmlProperty(elem, htmlPropName) || isInternalPropName(htmlPropName)) && isHtmlWritableProperty(elem, propName) ? setHtmlPropertyValue(elem, htmlPropName, htmlPropValue) : setAttribute(elem, htmlPropName, htmlPropValue);
-        return elem;
-    };
-const setHtmlPropertyValue = (elem, propName, propValue)=>elem[propName] = propValue;
-const setHtmlStyleProperty = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
-const setHtmlStyleProperties = (elem, style)=>getPropNames(style).reduce(setHtmlStyleProperty(style), elem);
-const setHtmlProperties = (elem, props)=>getValidPropNames(elem, props).reduce(setHtmlProperty(props), elem);
 const removeAttribute = (elem, attrName)=>elem.removeAttribute(attrName);
+const unsetHtmlInternalValue = (elem, propName)=>elem[propName] = undefined;
+const unsetHtmlPropertyValue = (elem, propName)=>elem[propName] = undefined;
 const unsetHtmlProperty = (elem, propName)=>{
-    if (isStylePropName(propName)) return elem;
     const htmlPropName = mapPropName(propName);
-    (isHtmlProperty(elem, htmlPropName) || isInternalPropName(htmlPropName)) && isHtmlWritableProperty(elem, propName) ? unsetHtmlPropertyValue(elem, htmlPropName) : removeAttribute(elem, htmlPropName);
+    switch(getPropNameType(elem, htmlPropName)){
+        case PropNameTypes.attr:
+            removeAttribute(elem, htmlPropName);
+            break;
+        case PropNameTypes.internal:
+            unsetHtmlInternalValue(elem, htmlPropName);
+            break;
+        case PropNameTypes.writableProp:
+            unsetHtmlPropertyValue(elem, htmlPropName);
+            break;
+        case PropNameTypes.style:
+            break;
+    }
     return elem;
 };
-const unsetHtmlPropertyValue = (elem, propName)=>elem[propName] = undefined;
 const unsetHtmlProperties = (elem, props)=>getValidPropNames(elem, props).reduce(unsetHtmlProperty, elem);
-const createHtmlText = (document, text)=>document.createTextNode(text);
 const isHtmlText = (elem)=>elem.nodeType === 3;
 const getHtmlText = ($elem)=>isHtmlText($elem) && $elem.textContent;
+const createHtmlText = (document, text)=>document.createTextNode(text);
+const insertHtmlText = (text, $elem, $parent)=>{
+    const document = getHtmlOwnerDocument($parent);
+    const $text = createHtmlText(document, text);
+    return insertHtmlNode($text, $elem);
+};
+const logHtmlText = ($text, $parent, message, logger)=>logger($text, message, "text:", getHtmlText($text), "parent:", $parent && getHtmlName($parent));
+const renderHtmlText = (text, $parent)=>{
+    const document = getHtmlOwnerDocument($parent);
+    const $text = createHtmlText(document, text);
+    return appendHtmlNode($text, $parent);
+};
+const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
 const setHtmlText = ($elem, text)=>$elem.textContent = text;
+const updateHtmlText = (text, $elem)=>{
+    setHtmlText($elem, text);
+    return $elem;
+};
+const unsetHtmlElement = ($elem, props)=>{
+    unsetHtmlProperties($elem, props);
+    unsetEventHandlers($elem, props);
+    return $elem;
+};
+const unrenderHtmlElement = ($elem, props)=>{
+    unsetHtmlElement($elem, props);
+    return getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
+};
+const updateHtmlElement = ($elem, props)=>{
+    setHtmlProps($elem, props);
+    setEventHandlers($elem, props);
+    return $elem;
+};
 const getJsxFactoryName = (elem)=>elem.type.name.toLowerCase().replace("_", "-");
 const isJsxArrayElems = (elems)=>elems instanceof Array;
 const isJsxFactory = (elem)=>typeof elem.type === "function";
@@ -205,6 +287,8 @@ const getJsxElementName = (elem)=>elem.type;
 const getJsxElementProps = (elem)=>elem.props;
 const getJsxElementType = (type)=>typeof type === 'symbol' ? type : ElementType;
 const getJsxName = (elem)=>isJsxFactory(elem) && getJsxFactoryName(elem) || isJsxElement(elem) && getJsxElementName(elem) || isJsxFragment(elem) && getJsxFragmentName() || getJsxTextName();
+const getJsxProps = getJsxElementProps;
+const getJsxKey = getJsxElementKey;
 const createJsxElement = (type, props, key, parent, ref)=>({
         $$typeof: getJsxElementType(type),
         type,
@@ -262,6 +346,7 @@ const sanitizeJsxChildren = (elem)=>sanitizeJsxElements(getJsxPropsChildren(elem
 const sanitizeJsxElements = (elems)=>replaceJsxFragments(elems).filter((elem)=>isValidJsxText(elem) && isSafeJsxElement(elem));
 const storeJsxElement = (store, elem)=>store.__elem = elem;
 const validateJsxElement = (elem)=>isJsxType(elem) ? "" : "Element should be jsx element.";
+const unstoreJsxElement = (store)=>delete store.__elem;
 const sanitizeJsxPropsChildren = (props, children)=>({
         ...props,
         children: sanitizeJsxElements(children)
@@ -275,6 +360,26 @@ const buildJsxFactoryChildren = (elem, $elem)=>{
         factoryElems
     ]);
 };
+const isLogCategoryEnabled = (elem, category)=>elem.__log.includes(category);
+const isLogMounted = (elem)=>elem.__log instanceof Array;
+const isLogEnabled = (elem, category)=>isLogMounted(elem) && isLogCategoryEnabled(elem, category);
+const Category = "rendering";
+const LogHeader = "[rendering]";
+const logError = (elem, ...args)=>isLogEnabled(elem, Category) && console.error(LogHeader, ...args);
+const logInfo = (elem, ...args)=>isLogEnabled(elem, Category) && console.info(LogHeader, ...args);
+const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {
+        error
+    });
+const handleError = (func, elem)=>{
+    try {
+        return func();
+    } catch (error) {
+        logError(elem, error.message, error.stack);
+        dispatchError(elem, error);
+        throw error;
+    }
+};
+const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
 const throwError = (message)=>{
     if (!message) return false;
     throw new Error(message);
@@ -284,62 +389,31 @@ const isIgnoredElement = ($elem)=>$elem.__ignore?.includes(getHtmlName($elem));
 const enableIgnoring = ($elem, $parent)=>isIgnoreArray($parent) && ($elem.__ignore = [
         ...$parent.__ignore
     ]);
-const storeInternals = ($elem, elem)=>storeJsxElement($elem, elem);
-const isLogCategoryEnabled = (elem, category)=>elem.__log.includes(category);
-const isLogMounted = (elem)=>elem.__log instanceof Array;
-const isLogEnabled = (elem, category)=>isLogMounted(elem) && isLogCategoryEnabled(elem, category);
 const mountLog = ($elem, $parent)=>$elem.__log = [
         ...$parent.__log
     ];
 const enableLogging = ($elem, $parent)=>isLogMounted($elem) || isLogMounted($parent) && mountLog($elem, $parent);
-const getElementNS = (elem)=>getJsxElementProps(elem).xmlns;
-const getHtmlElementNS = ($elem)=>$elem && getJsxElement($elem) && getJsxElementProps(getJsxElement($elem)).xmlns;
-const getHtmlPropNames = ($elem)=>Object.getOwnPropertyNames($elem);
-const setHtmlElement = ($elem, elem)=>{
-    setHtmlProperties($elem, getJsxElementProps(elem));
-    setEventHandlers($elem, getJsxElementProps(elem));
-    return $elem;
-};
-const renderHtmlElement = (elem, $parent)=>{
+const getMaxLengthElements = (elems, $elems)=>elems.length > $elems.length ? elems : $elems;
+const getJsxElementNS = (elem)=>getJsxProps(elem).xmlns;
+const getHtmlElementNS = ($elem)=>$elem && getJsxElement($elem) && getJsxProps(getJsxElement($elem)).xmlns;
+const logElement = ($elem, message)=>logHtmlElement($elem, getHtmlParentElement($elem), message, getJsxProps(getJsxElement($elem)), logInfo);
+const logElementOrText = ($elem, message)=>isHtmlText($elem) ? logText($elem, message) : logElement($elem, message);
+const logText = ($elem, message)=>logHtmlText($elem, getHtmlParentElement($elem), message, logInfo);
+const renderElement = (elem, $parent)=>{
+    if (isJsxText(elem)) return renderHtmlText(elem, $parent);
+    throwError(validateHtmlElement($parent));
+    throwError(validateJsxElement(elem));
     throwError(validateHtmlTagName(getJsxName(elem)));
-    const document = getHtmlOwnerDocument($parent);
-    const ns = getElementNS(elem) || getHtmlElementNS($parent);
-    const $elem = ns ? createHtmlElementNS(document, ns, getJsxName(elem)) : createHtmlElement(document, getJsxName(elem));
-    setHtmlElement($elem, elem);
-    appendHtmlNode($elem, $parent);
+    const namespace = getJsxElementNS(elem) || getHtmlElementNS($parent);
+    const props = getJsxProps(elem);
+    const tagName = getJsxName(elem);
+    const $elem = renderHtmlElement(tagName, namespace, props, $parent);
     enableIgnoring($elem, $parent);
     enableLogging($elem, $parent);
-    storeInternals($elem, elem);
+    storeJsxElement($elem, elem);
+    logElementOrText($elem, "render");
     return $elem;
 };
-const updateHtmlElement = (elem, $elem)=>{
-    setHtmlProperties($elem, getJsxElementProps(elem));
-    setEventHandlers($elem, getJsxElementProps(elem));
-    storeInternals($elem, elem);
-    return $elem;
-};
-const isInternalName = (name)=>name.startsWith("__");
-const unstoreInternal = (elem, propName)=>{
-    delete elem[propName];
-    return elem;
-};
-const unstoreInternals = ($elem)=>getHtmlPropNames($elem).filter(isInternalName).reduce(unstoreInternal, $elem);
-const unsetHtmlElement = ($elem)=>{
-    const props = getJsxElementProps(getJsxElement($elem));
-    unsetHtmlProperties($elem, props);
-    unsetEventHandlers($elem, props);
-    return $elem;
-};
-const unrenderHtmlElement = ($elem)=>{
-    unsetHtmlElement($elem);
-    unstoreInternals($elem);
-    return getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
-};
-const Category = "rendering";
-const LogHeader = "[rendering]";
-const logError = (elem, ...args)=>isLogEnabled(elem, Category) && console.error(LogHeader, ...args);
-const logInfo = (elem, ...args)=>isLogEnabled(elem, Category) && console.info(LogHeader, ...args);
-const logHtmlElement = ($elem, $parent, message)=>logInfo($elem, message, "elem:", getHtmlName($elem), "props:", getJsxElementProps(getJsxElement($elem)), "parent:", $parent && getHtmlName($parent));
 const equalPrimitives = (value1, value2)=>value1 === value2;
 const falsy = ()=>false;
 const truthy = ()=>true;
@@ -365,68 +439,30 @@ const equalObjectsProp = (obj1, obj2, propName)=>isReservedObjectPropName(propNa
 const equalObjectsProps = (obj1, obj2)=>getObjectPropNames(obj1).every((propName)=>equalObjectsProp(obj1, obj2, propName));
 const equalObjects = (obj1, obj2)=>(!existsObjects(obj1, obj2) && equalPrimitives || !equalObjectsPropsCount(obj1, obj2) && falsy || equalObjectsProps)(obj1, obj2);
 const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
-const equalElementProps = (elem, $elem)=>equalObjects(getJsxElementProps(elem), getJsxElementProps(getJsxElement($elem)));
-const existsElement = (elem)=>!!elem;
-const isStyleElement = (elem)=>getHtmlName(elem) === "style";
-const insertHtmlText = (text, $elem, $parent)=>{
-    const document = getHtmlOwnerDocument($parent);
-    const $text = createHtmlText(document, text);
-    return insertHtmlNode($text, $elem);
-};
-const equalElementsKeys = (elem, $elem)=>getJsxElementKey(elem) === getJsxElementKey(getJsxElement($elem));
-const findElementsByKey = (elem, $elems)=>$elems.find(($elem)=>equalElementsKeys(elem, $elem));
-const orderElementKey = ($source, $target, $parent)=>$target === $source && $source || $source && $target && insertHtmlNode($target, $source) || $source && insertHtmlText("", $source, $parent);
-const orderElementKeys = (elems, $elems, $parent)=>{
-    elems.forEach((elem, index)=>orderElementKey(getHtmlChildNode($parent, index), findElementsByKey(elem, $elems), $parent));
-    return getHtmlChildNodes($parent);
-};
-const logHtmlText = ($text, $parent, message)=>logInfo($text, message, "text:", getHtmlText($text), "parent:", $parent && getHtmlName($parent));
-const renderHtmlText = (text, $parent)=>{
-    const document = getHtmlOwnerDocument($parent);
-    const $text = createHtmlText(document, text);
-    return appendHtmlNode($text, $parent);
-};
-const updateHtmlText = (text, $elem)=>{
-    setHtmlText($elem, text);
-    return $elem;
-};
-const unrenderHtmlText = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
+const equalElementProps = (elem, $elem)=>equalObjects(getJsxProps(elem), getJsxProps(getJsxElement($elem)));
 const equalTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
-const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {
-        error
-    });
-const handleError = (func, elem)=>{
-    try {
-        return func();
-    } catch (error) {
-        logError(elem, error.message, error.stack);
-        dispatchError(elem, error);
-        throw error;
-    }
-};
-const getLogger = ($elem)=>isHtmlText($elem) ? logHtmlText : logHtmlElement;
-const logElement = ($elem, message)=>getLogger($elem)($elem, getHtmlParentElement($elem), message);
-const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && buildJsxFactoryChildren(elem, $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
-const resolveHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderElementKeys(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
+const isStyleElement = (elem)=>getHtmlName(elem) === "style";
+const existsElement = (elem)=>!!elem;
 const shouldSkipElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
 const shouldRenderElement = ($elem)=>!existsElement($elem);
 const shouldReplaceElement = (elem, $elem)=>!equalElementNames(elem, $elem);
 const shouldUnrenderElement = (elem)=>!existsElement(elem);
-const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxElementProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalTexts(elem, $elem));
-const renderElement = (elem, $parent)=>(isJsxText(elem) ? renderHtmlText : renderHtmlElement)(elem, $parent);
-const renderElements = (elem, $parent = parseHtml("<main></main>"))=>{
-    isJsxText(elem) || throwError(validateHtmlElement($parent));
-    isJsxText(elem) || throwError(validateJsxElement(elem));
+const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalTexts(elem, $elem));
+const renderElementTree = (elem, $parent = parseHtml("<main></main>"))=>{
     const rendered = [
         renderElement(elem, $parent)
     ];
-    for (const $elem of rendered){
-        logElement($elem, "render");
-        shouldSkipElement($elem) || handleError(()=>resolveJsxChildren(getJsxElement($elem), $elem), $elem).forEach((child)=>rendered.push(renderElement(child, $elem)));
-    }
+    for (const $elem of rendered)shouldSkipElement($elem) || handleError(()=>resolveJsxChildren(getJsxElement($elem), $elem), $elem).forEach((child)=>rendered.push(renderElement(child, $elem)));
     return rendered;
 };
-const replaceElement = ($elem, $oldElem)=>(logElement($oldElem, "replace"), isHtmlText($oldElem) ? replaceHtmlNode($elem, $oldElem) : replaceHtmlNode($elem, $oldElem), $elem);
+const equalKeyElements = (elem, $elem)=>getJsxKey(elem) === getJsxKey(getJsxElement($elem));
+const findKeyElements = (elem, $elems)=>$elems.find(($elem)=>equalKeyElements(elem, $elem));
+const moveKeyElement = ($source, $target, $parent)=>$target === $source && $source || $source && $target && insertHtmlNode($target, $source) || $source && insertHtmlText("", $source, $parent);
+const orderKeyElements = (elems, $elems, $parent)=>{
+    elems.forEach((elem, index)=>moveKeyElement(getHtmlChildNode($parent, index), findKeyElements(elem, $elems), $parent));
+    return getHtmlChildNodes($parent);
+};
+const orderHtmlChildren = ($elem, children)=>existsElement(children[0]) && isJsxKeyElement(children[0]) ? orderKeyElements(children, getHtmlChildNodes($elem), $elem) : getHtmlChildNodes($elem);
 const getEffect = (effects, name)=>effects[name];
 const getEffects = (elem)=>elem.__effects;
 const runInitialFunc = (effect)=>effect.initialFunc?.();
@@ -454,43 +490,64 @@ const useEffect = (effects, name, func, deps)=>{
     setEffectDeps(effect, deps);
     return func();
 };
-const unrenderElement = ($elem)=>(logElement($elem, "unrender"), isHtmlText($elem) ? unrenderHtmlText($elem) : (runInitialEffects(getEffects($elem)), unrenderHtmlElement($elem)));
-const unrenderElements = ($elem)=>{
-    isHtmlText($elem) || throwError(validateHtmlElement($elem));
+const unrenderElement = ($elem)=>{
+    logElementOrText($elem, "unrender");
+    if (isHtmlText($elem)) return unrenderHtmlText($elem);
+    throwError(validateHtmlElement($elem));
+    runInitialEffects(getEffects($elem));
+    unrenderHtmlElement($elem, getJsxProps(getJsxElement($elem)));
+    unstoreJsxElement($elem);
+    return $elem;
+};
+const unrenderElementTree = ($elem)=>{
     const unrendered = [
         unrenderElement($elem)
     ];
     for (const $elem of unrendered)shouldSkipElement($elem) || getHtmlChildNodes($elem).forEach(($child)=>unrendered.push(unrenderElement($child)));
     return unrendered;
 };
-const getMaxLengthElements = (elems, $elems)=>elems.length > $elems.length ? elems : $elems;
-const updateElement = (elem, $elem)=>(logElement($elem, "update"), (isJsxText(elem) ? updateHtmlText : updateHtmlElement)(elem, $elem));
-const reconcileElement = (elem, $elem, $parent)=>shouldRenderElement($elem) && renderElements(elem, $parent) || shouldUnrenderElement(elem) && unrenderElements($elem) || shouldUpdateElement(elem, $elem) && updateElement(elem, $elem) || shouldReplaceElement(elem, $elem) && [
-        replaceElement(renderElements(elem, $parent)[0], $elem),
-        unrenderElements($elem)
+const replaceElement = ($elem, $oldElem)=>{
+    logElementOrText($oldElem, "replace");
+    if (isHtmlText($oldElem)) return replaceHtmlNode($elem, $oldElem);
+    replaceHtmlNode($elem, $oldElem);
+    return $elem;
+};
+const updateElement = (elem, $elem)=>{
+    logElementOrText($elem, "update");
+    if (isJsxText(elem)) return updateHtmlText(elem, $elem);
+    throwError(validateHtmlElement($elem));
+    throwError(validateJsxElement(elem));
+    updateHtmlElement($elem, getJsxProps(elem));
+    storeJsxElement($elem, elem);
+    return $elem;
+};
+const reconcileElement = (elem, $elem, $parent)=>shouldRenderElement($elem) && renderElementTree(elem, $parent) || shouldUnrenderElement(elem) && unrenderElementTree($elem) || shouldUpdateElement(elem, $elem) && updateElement(elem, $elem) || shouldReplaceElement(elem, $elem) && [
+        replaceElement(renderElementTree(elem, $parent)[0], $elem),
+        unrenderElementTree($elem)
     ];
-const updateElements = ($elem, elem = getJsxElement($elem))=>{
-    isJsxText(elem) || throwError(validateHtmlElement($elem));
-    isJsxText(elem) || throwError(validateJsxElement(elem));
+const updateElementTree = ($elem, elem = getJsxElement($elem))=>{
     const updated = [
         updateElement(elem, $elem)
     ];
     for (const $elem of updated){
         if (shouldSkipElement($elem)) continue;
         const children = handleError(()=>resolveJsxChildren(getJsxElement($elem), $elem), $elem);
-        const $children = resolveHtmlChildren($elem, children);
-        getMaxLengthElements(children, $children).map((_, index)=>reconcileElement(children[index], $children[index], $elem)).filter(($elem)=>isHtmlElement($elem)).forEach(($elem)=>updated.push($elem));
+        const $children = orderHtmlChildren($elem, children);
+        getMaxLengthElements(children, $children).forEach((_, index)=>{
+            const $reconciled = reconcileElement(children[index], $children[index], $elem);
+            if (isHtmlElement($reconciled)) updated.push($reconciled);
+        });
     }
     return updated;
 };
 const render = (elem, $parent = parseHtml("<main></main>"))=>{
-    $parent.ownerDocument.__render = $parent.ownerDocument.__render || renderElements;
-    $parent.ownerDocument.__update = $parent.ownerDocument.__update || updateElements;
-    $parent.ownerDocument.__unrender = $parent.ownerDocument.__unrender || unrenderElements;
-    return renderElements(elem, $parent)[0];
+    $parent.ownerDocument.__render = $parent.ownerDocument.__render || renderElementTree;
+    $parent.ownerDocument.__update = $parent.ownerDocument.__update || updateElementTree;
+    $parent.ownerDocument.__unrender = $parent.ownerDocument.__unrender || unrenderElementTree;
+    return renderElementTree(elem, $parent)[0];
 };
-export { updateElements as update };
-export { unrenderElements as unrender };
+export { updateElementTree as update };
+export { unrenderElementTree as unrender };
 export { render as render };
 const setContext = (contexts, context)=>contexts[context.name] = context;
 const setContexts = (elem, contexts = {})=>elem.__contexts = elem.__contexts ?? contexts;
@@ -519,7 +576,7 @@ const updateConsumerContext = (name, value, elem)=>{
     const context = getContext(contexts, name);
     if (equalValues(context.value, value)) return;
     setContextValue(context, value);
-    return updateElements(elem);
+    return updateElementTree(elem);
 };
 const updateProducerContext = (name, value, elem)=>{
     const contexts = getContexts(elem);
@@ -568,7 +625,7 @@ const ErrorBoundary = ({ path, error, children }, elem)=>{
 const updateErrorBoundary = (elem, event)=>{
     const path = getErrorPath(elem, event.target);
     const error = event.detail?.error;
-    return updateElements(elem, React.createElement(ErrorBoundary, {
+    return updateElementTree(elem, React.createElement(ErrorBoundary, {
         path: path,
         error: error?.message
     }));
@@ -628,9 +685,13 @@ const useState = (states, name, value, deps)=>{
 };
 const isFunctionLazyLoader = (loader)=>typeof loader === "function";
 const validateLazyLoader = (loader)=>isFunctionLazyLoader(loader) ? "" : "Lazy loader should be function.";
+const throwError1 = (message)=>{
+    if (!message) return false;
+    throw new Error(message);
+};
 const Lazy = (props, elem)=>{
-    throwError(validateHtmlElement(elem));
-    throwError(validateLazyLoader(props.loader));
+    throwError1(validateHtmlElement(elem));
+    throwError1(validateLazyLoader(props.loader));
     const states = setStates(elem);
     const effects = setEffects(elem);
     const [factory, setFactory] = useState(states, "factory", undefined, []);

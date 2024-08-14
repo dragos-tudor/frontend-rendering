@@ -6,3 +6,5 @@ export const getHtmlName = (elem) => elem.tagName?.toLowerCase().replace("_", "-
 export const getHtmlOwnerDocument = (elem) => elem?.ownerDocument
 
 export const getHtmlParentElement = (elem) => elem?.parentElement
+
+export const getHtmlPropNames = ($elem) => Object.getOwnPropertyNames($elem)
