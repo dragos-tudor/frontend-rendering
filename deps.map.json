@@ -3,6 +3,8 @@
     "/asserts.ts": "https://deno.land/std@0.204.0/assert/mod.ts",
     "/mock.ts": "https://deno.land/std@0.204.0/testing/mock.ts",
     "/emit.ts": "https://deno.land/x/emit@0.31.2/mod.ts",
+    "/source-map.js": "https://unpkg.com/source-map@0.7.4/dist/source-map.js",
+    "/terser.ts": "https://unpkg.com/terser@5.31.5/dist/bundle.min.js",
     "/jsx/jsx-runtime": "./rendering-jsx/public.js",
 
     "/react.js": "https://esm.sh/react@18.2.0?dev",
