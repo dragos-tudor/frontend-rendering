@@ -1,25 +1,20 @@
-import { isHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxElement } from "../../rendering-jsx/mod.js"
-import { handleError } from "../errors/handling.js"
-import { orderHtmlChildren } from "../element-children/ordering.js"
-import { resolveJsxChildren } from "../element-children/resolving.js"
-import { reconcileElement } from "../elements/reconciliating.js"
-import { getMaxLengthElements } from "../elements/getting.js"
-import { shouldSkipElement } from "../elements/verifying.js"
+import { isRenderedElement, isUnrenderedElement, isUpdatedElement, shouldSkipElement } from "../elements/verifying.js"
 import { updateElement } from "../elements/updating.js"
+import { renderElementChildren } from "../element-children/rendering.js"
+import { updateElementChildren } from "../element-children/updating.js"
+import { unrenderElementChildren } from "../element-children/unrendering.js"
+import { getEffects, runEffects } from "../../rendering-effects/mod.js";
 
 export const updateElementTree = ($elem, elem = getJsxElement($elem)) =>
 {
-  const updated = [updateElement(elem, $elem)]
-  for(const $elem of updated) {
+  const $elems = [updateElement(elem, $elem)]
+  for(const $elem of $elems) {
     if (shouldSkipElement($elem)) continue
-    const children = handleError(() => resolveJsxChildren(getJsxElement($elem), $elem), $elem)
-    const $children = orderHtmlChildren($elem, children)
-
-    getMaxLengthElements(children, $children).forEach((_, index) => {
-      const $reconciled = reconcileElement(children[index], $children[index], $elem)
-      if (isHtmlElement($reconciled)) updated.push($reconciled)
-    })
+    if (isRenderedElement($elem)) $elems.push(...renderElementChildren($elem))
+    if (isUpdatedElement($elem)) $elems.push(...updateElementChildren($elem))
+    if (isUnrenderedElement($elem)) $elems.push(...unrenderElementChildren($elem))
   }
-  return updated
+  $elems.forEach($elem => runEffects(getEffects($elem)))
+  return $elems
 }

@@ -1,15 +1,16 @@
 import { assertEquals, assertNotStrictEquals, assertStrictEquals } from "/asserts.ts"
 import { assertSpyCalls, assertSpyCallArgs, spy } from "/mock.ts"
-import { dispatchEvent, registerDOMParser } from "../../rendering-html/mod.js"
-import { setEffects, useEffect } from "../../rendering-effects/mod.js"
+import { registerDOMParser } from "../../rendering-html/mod.js"
+import { setEffect, setEffects, useEffect } from "../../rendering-effects/mod.js"
+import { dispatchEvent } from "../../rendering-events/mod.js"
 import { getHtmlName } from "../../rendering-html/mod.js"
 import { renderElementTree } from "./rendering.js"
 
 
 await registerDOMParser()
 
-Deno.test("use elements => render jsx elements", async (t) => {
-
+Deno.test("use elements => render jsx elements", async (t) =>
+{
   await t.step("jsx elements => render elements => rendered html", () => {
     const renderHtml = (jsx) => renderElementTree(jsx)[0].outerHTML
 
@@ -177,7 +178,7 @@ Deno.test("use elements => render jsx elements", async (t) => {
       setEffect(effects[0], () => { throw new Error('error') })
     }
 
-    try { renderElementTree(<a onerror={handler}><B></B></a>) }
+    try { renderElementTree(<a onerror={handler}><B></B></a>); throw "effect should throw error"; }
     catch { assertSpyCalls(handler, 1) }
   })
 

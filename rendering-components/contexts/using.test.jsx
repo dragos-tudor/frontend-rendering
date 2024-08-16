@@ -1,6 +1,7 @@
 import { assertObjectMatch as eq } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
-import { registerDOMParser, setEventHandler, dispatchEvent } from "../../rendering-html/mod.js"
+import { registerDOMParser } from "../../rendering-html/mod.js"
+import { dispatchEvent, setEventHandler } from "../../rendering-events/mod.js"
 import { Context as Producer } from "./Context.js"
 import { getContexts } from "./getting.js"
 import { setContexts } from "./setting.js"

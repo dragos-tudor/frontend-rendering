@@ -1,7 +1,7 @@
 import { assertEquals } from "/asserts.ts"
 import { render, unrender } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { Lazy } from "./Lazy.js"
+import { Lazy } from "./Lazy.jsx"
 
 await registerDOMParser()
 

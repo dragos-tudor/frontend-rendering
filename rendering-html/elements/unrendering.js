@@ -1,8 +1,4 @@
-import { removeHtmlNode, getHtmlParentElement } from "../../rendering-html/mod.js"
-import { unsetHtmlElement } from "./unsetting.js"
+import { removeHtmlNode } from "../nodes/removing.js"
+import { getHtmlParentElement } from "./getting.js"
 
-export const unrenderHtmlElement = ($elem, props) =>
-{
-  unsetHtmlElement($elem, props)
-  return getHtmlParentElement($elem)? removeHtmlNode($elem): $elem
-}
+export const unrenderHtmlElement = ($elem) => getHtmlParentElement($elem)? removeHtmlNode($elem): $elem

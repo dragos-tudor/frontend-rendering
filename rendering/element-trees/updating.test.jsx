@@ -7,8 +7,8 @@ import { setEffects, useEffect, setInitialEffect } from "../../rendering-effects
 
 await registerDOMParser()
 
-Deno.test("use elements => update html elements", async (t) => {
-
+Deno.test("use elements => update html elements", async (t) =>
+{
   await t.step("elements => update elements => updated html", () => {
     const updateHtml = (oldJsx, newJsx) => updateElementTree(renderElementTree(oldJsx)[0], newJsx)[0].outerHTML
 
@@ -74,20 +74,21 @@ Deno.test("use elements => update html elements", async (t) => {
     assertEquals(updateHtml(<b><A key={1}><c></c></A></b>, <b><A key={3}><d></d></A></b>), "<b><a><d></d></a></b>")
   })
 
-  await t.step("factories => update elements => updated elements", () => {
+  await t.step("factories => update elements => reconciled elements", () => {
     const updateNames = (oldJsx, newJsx) => updateElementTree(renderElementTree(oldJsx)[0], newJsx).map(getHtmlName)
 
     const A = (props) => props.children
     const C = (props) => props.children
-    assertEquals(updateNames(<A></A>, <A><b></b></A>), ["a"])
-    assertEquals(updateNames(<A></A>, <A><C></C></A>), ["a"])
-    assertEquals(updateNames(<A><b></b></A>, <A></A>), ["a"])
-    assertEquals(updateNames(<A><C></C></A>, <A></A>), ["a"])
+    assertEquals(updateNames(<A></A>, <A><b></b></A>), ["a", "b"])
+    assertEquals(updateNames(<A></A>, <A><C></C></A>), ["a", "c"])
+    assertEquals(updateNames(<A><b></b></A>, <A></A>), ["a", "b"])
+    assertEquals(updateNames(<A><C></C></A>, <A></A>), ["a", "c"])
+    assertEquals(updateNames(<A><C></C></A>, <A><C><d></d></C></A>), ["a"])
     assertEquals(updateNames(<b><A><c></c></A></b>, <b><A><d></d></A></b>), ["b"])
     assertEquals(updateNames(<b><A prop={1}><c></c></A></b>, <b><A prop={1}><d></d></A></b>), ["b"])
-    assertEquals(updateNames(<b><A prop={1}><c></c></A></b>, <b><A prop={2}><d></d></A></b>), ["b", "a"])
-    assertEquals(updateNames(<b><A prop={1}></A></b>, <b><A prop={2}><C></C></A></b>), ["b", "a"])
-    assertEquals(updateNames(<b><A prop={1}><C></C></A></b>, <b><A prop={2}></A></b>), ["b", "a"])
+    assertEquals(updateNames(<b><A prop={1}><c></c></A></b>, <b><A prop={2}><d></d></A></b>), ["b", "a", "d", "c"])
+    assertEquals(updateNames(<b><A prop={1}></A></b>, <b><A prop={2}><C></C></A></b>), ["b", "a", "c"])
+    assertEquals(updateNames(<b><A prop={1}><C></C></A></b>, <b><A prop={2}></A></b>), ["b", "a", "c"])
   })
 
   await t.step("style, ignored elements => update elements => elements skipped", () => {

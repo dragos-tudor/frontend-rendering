@@ -14,6 +14,8 @@ Deno.test("skip updating => verify objects equality", async (t) => {
     eq(equalObjects({x: {y: {z: 1}}}, {x: {y: {z: 1}}}), true)
     eq(equalObjects({x: {y: ["a", true]}}, {x: {y: ["a", true]}}), true)
     eq(equalObjects({children: 1}, {children: 2}), true)
+    eq(equalObjects({children: 1}, {}), true)
+    eq(equalObjects({}, {children: 1}), true)
   })
 
   await t.step("different objects => verify equality => 'false'", () => {

@@ -1,8 +1,8 @@
-import { countObjectProps } from "./counting.js"
+import { getObjectPropsLength } from "./getting.js"
 
 const ReservedPropNames = Object.freeze(["children"])
 
-export const equalObjectsPropsCount = (obj1, obj2) => countObjectProps(obj1) === countObjectProps(obj2)
+export const equalObjectsPropsLength = (obj1, obj2) => getObjectPropsLength(obj1) === getObjectPropsLength(obj2)
 
 export const existsObject = (obj) => obj != null
 

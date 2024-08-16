@@ -11,8 +11,7 @@ export const useMemo = (states, name, func, deps) => {
   }
 
   const memo = getMemo(states, name)
-  if(equalDeps(memo.deps, deps) && !isDefaultDeps(deps))
-    return getMemoUsage(memo)
+  if(equalDeps(memo.deps, deps) && !isDefaultDeps(deps)) return getMemoUsage(memo)
 
   setMemoDeps(memo, deps)
   setMemoValue(memo, func())

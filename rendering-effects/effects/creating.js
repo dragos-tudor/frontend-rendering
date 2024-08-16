@@ -1,2 +1,2 @@
 
-export const createEffect = (name, deps) => ({ name, deps })
+export const createEffect = (name, func, deps) => ({ name, func, deps, initialFunc: undefined })

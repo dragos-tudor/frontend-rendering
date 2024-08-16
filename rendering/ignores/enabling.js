@@ -1,3 +1,4 @@
-import { isIgnoreArray } from "./verifying.js"
+import { setIgnore } from "./setting.js"
+import { isIgnoreSet } from "./verifying.js"
 
-export const enableIgnoring = ($elem, $parent) => isIgnoreArray($parent) && ($elem.__ignore = [...$parent.__ignore])
+export const enableIgnoring = ($elem, $parent) => isIgnoreSet($elem) || (isIgnoreSet($parent) && setIgnore($elem, $parent))

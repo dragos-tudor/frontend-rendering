@@ -1,13 +1,12 @@
-import { getHtmlChildNodes } from "../../rendering-html/mod.js"
+import { unrenderElementChildren } from "../element-children/unrendering.js"
 import { unrenderElement } from "../elements/unrendering.js"
 import { shouldSkipElement } from "../elements/verifying.js"
 
 export const unrenderElementTree = ($elem) =>
 {
-  const unrendered = [unrenderElement($elem)]
-  for(const $elem of unrendered)
+  const $elems = [unrenderElement($elem)]
+  for(const $elem of $elems)
     shouldSkipElement($elem) ||
-    getHtmlChildNodes($elem)
-      .forEach($child => unrendered.push(unrenderElement($child)))
-  return unrendered
+    $elems.push(...unrenderElementChildren($elem))
+  return $elems
 }

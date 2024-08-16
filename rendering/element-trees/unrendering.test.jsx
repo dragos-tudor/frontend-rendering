@@ -107,7 +107,7 @@ Deno.test("use elements => unrender html elements", async (t) => {
   await t.step("elem with internals => unrender elem => removed internals", () => {
     const unrenderElem = (jsx) => unrenderElementTree(renderElementTree(jsx)[0])[0]
 
-    const A = (_, elem) => <></>
+    const A = (_) => <></>
     assertEquals(unrenderElem(<A></A>).__elem, undefined)
     assertEquals(unrenderElem(<A></A>).__states, undefined)
     assertEquals(unrenderElem(<A></A>).__effects, undefined)

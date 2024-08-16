@@ -1,4 +1,4 @@
-import { mountLog } from "./mounting.js"
-import { isLogMounted } from "./verifying.js"
+import { setLog } from "./setting.js"
+import { isLogSet } from "./verifying.js"
 
-export const enableLogging = ($elem, $parent) => isLogMounted($elem) || (isLogMounted($parent) && mountLog($elem, $parent))
+export const enableLogging = ($elem, $parent) => isLogSet($elem) || (isLogSet($parent) && setLog($elem, $parent))

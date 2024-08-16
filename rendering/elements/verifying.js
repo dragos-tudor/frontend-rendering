@@ -1,4 +1,4 @@
-import { getHtmlName, getHtmlText, isHtmlText } from "../../rendering-html/mod.js"
+import { getHtmlName, getHtmlParentElement, getHtmlText, isHtmlText } from "../../rendering-html/mod.js"
 import { getJsxElement, getJsxName, getJsxProps, getJsxText, isJsxElement, isJsxFactory, isJsxText } from "../../rendering-jsx/mod.js"
 import { equalObjects } from "../../rendering-equalities/mod.js"
 import { isIgnoredElement } from "../ignores/verifying.js"
@@ -9,10 +9,17 @@ const equalElementProps = (elem, $elem) => equalObjects(getJsxProps(elem), getJs
 
 const equalTexts = (elem, $elem) => getJsxText(elem) === getHtmlText($elem)
 
-const isStyleElement = (elem) => getHtmlName(elem) === "style"
-
 
 export const existsElement = (elem) => !!elem
+
+export const isStyleElement = (elem) => getHtmlName(elem) === "style"
+
+export const isRenderedElement = (elem) => !isUnrenderedElement(elem) && !elem.__updated
+
+export const isUpdatedElement = (elem) => !isUnrenderedElement(elem) && elem.__updated
+
+export const isUnrenderedElement = (elem) => !getHtmlParentElement(elem)
+
 
 export const shouldSkipElement = ($elem) => isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem)
 

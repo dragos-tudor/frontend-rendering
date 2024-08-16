@@ -11,8 +11,7 @@ export const useState = (states, name, value, deps) => {
   }
 
   const state = getState(states, name)
-  if(equalDeps(state.deps, deps) && !isDefaultDeps(deps))
-    return getStateUsage(state)
+  if(equalDeps(state.deps, deps) && !isDefaultDeps(deps)) return getStateUsage(state)
 
   setStateDeps(state, deps)
   setStateValue(state, value)

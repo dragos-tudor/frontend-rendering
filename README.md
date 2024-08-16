@@ -45,15 +45,15 @@ render(<App></App>, document.body)
   - the update is manually invoked by programmer [the states could be modified in batches].
   - there is no virtual DOM.
 - Other remarks:
-  - the async effects run immediately after all html tree elements are rendered or updated.
-  - the sync/layouts effects run immediately without to wait for children to be rendered, updated.
+  - the effects run when all html elements are rendered or updated.
+  - the initial effects run when each element is unrendered.
 - Performance:
   - rendering and updating operations have similar performances.
   - unrendering operation is 2-times slower [`rendering` library remove each tree element and clean properties, event handlers, internal data].
 
 ### Modules
 - *high-level modules*: rendering, rendering-components.
-- *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-equalities [shared].
+- *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-events, rendering-props, rendering-equalities [shared].
 - *low-level modules* completely independent ["parallel" modules].
 
 ### [Rendering](./rendering/)
@@ -61,18 +61,16 @@ render(<App></App>, document.body)
 - render element tree (`renderElementTree`):
   - create html root element and descendants from jsx factory.
   - append html root element to parent html element.
-  - run sync effects funcs when jsx factory run.
-  - run async effects funcs when all tree elements rendered.
+  - run effects after all elements are rendered.
 - update element tree (`updateElementTree`):
-  - reconciliate elements: render, update, replace, unrender html elements.
-  - run sync effects funcs and start effects funcs when jsx factory run.
-  - run async effects funcs when all tree elements updated.
+  - reconciliate elements: render, update, replace, unrender html elements [breadth-first strategy].
+  - run effects after all elements are updated.
 - unrender elements tree (`unrenderElementTree`):
-  - run start effects funcs before removing elements.
+  - run initial effects before removing elements.
   - remove and clear html root element and descendants.
-- implement ordering html elements with keys.
+- implement ordering html element children with keys.
 - errors funcs [handle, dispatch, throw].
-- logging funcs [enable, log, mount].
+- logging funcs [enable, log].
 
 ### [Rendering components](./rendering-components/)
 - Built-in components library.
@@ -89,15 +87,12 @@ render(<App></App>, document.body)
 
 ### [Rendering html](./rendering-html/)
 - main functionality: manage html elements and nodes.
-- implement parsing, creating, setting properties, registering event handlers for html elements.
-- implement rending, updating, replacing, unrending, logging html elements.
-- implement parsing, creating html text nodes.
-- implement rendering, updating, replacing, unrendering, logging html text nodes.
+- implement creating, rendering, replacing, unrendering, html elements.
+- implement creating, rendering, updating, replacing, unrendering html text nodes.
 - implement appending, inserting, removing, replacing html nodes.
-- firing and listening for events.
+- use html DOM parser to create html elements and html text nodes.
 - security based on owasp security guidance:
   - validate html tag names.
-  - validate html element properties names.
   - validate html element urls poperties.
   - encode js content.
   - encode html content.
@@ -114,12 +109,10 @@ render(<App></App>, document.body)
 ### [Rendering effects](./rendering-effects/)
 - implement `getEffects`,`useEffect`, `setInitialEffect` functions.
 - `useEffect` func:
-  - run effect func immediately!
-  - use async funcs for side-effects.
-  - use sync funcs for (limited) layout effect.
-  - async (side-effects) funcs run after all tree elemens are rendered.
+  - use effect funcs for layout effects.
+  - use async effect funcs for side-effects.
 - `setInitialEffect` is used to cover subscribing flows.
-  - initial func will run at next render before effect func.
+  - initial effect func will run before effect func.
 
 
 ### [Rendering states](./rendering-states/)

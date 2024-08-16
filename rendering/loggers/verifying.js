@@ -1,6 +1,6 @@
 
 const isLogCategoryEnabled = (elem, category) => elem.__log.includes(category)
 
-export const isLogMounted = (elem) => elem.__log instanceof Array
+export const isLogEnabled = (elem, category) => isLogSet(elem) && isLogCategoryEnabled(elem, category)
 
-export const isLogEnabled = (elem, category) => isLogMounted(elem) && isLogCategoryEnabled(elem, category)
+export const isLogSet = (elem) => elem.__log instanceof Array

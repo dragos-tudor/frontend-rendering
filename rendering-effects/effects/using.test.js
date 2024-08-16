@@ -1,32 +1,35 @@
 import { assertEquals as eq } from "/asserts.ts"
-import { setInitialEffect } from "./setting.js"
 import { useEffect } from "./using.js"
 
-Deno.test("use component effects => use effects", async (t) => {
-
-  await t.step("no effect => use effect => func run", () => {
-    eq(useEffect({}, "", () => 1), 1)
-    eq(useEffect({}, "", () => 1, []),  1)
-    eq(useEffect({}, "", () => 1, [undefined]), 1)
-  })
-
-  await t.step("equal deps => use effect twice => second time func not run", () => {
-    const efects = {}
-    eq((useEffect(efects, "a", () => 1, []), useEffect(efects, "a", () => 2, [])), undefined)
-    eq((useEffect(efects, "b", () => 1, ["x"]), useEffect(efects, "b", () => 2, ["x"])), undefined)
-  })
-
-  await t.step("not equal deps => use effect twice => second time func run", () => {
+Deno.test("use component effects => use effects", async (t) =>
+{
+  await t.step("equal deps => use effect twice => effect func unset", () => {
     const effects = {}
-    eq((useEffect(effects, "a", () => 1, []), useEffect(effects, "a", () => 2, ["x"])), 2)
-    eq((useEffect(effects, "b", () => 1, ["x"]), useEffect(effects, "b", () => 2, [undefined])), 2)
-    eq((useEffect(effects, "c", () => 1, ["x"]), useEffect(effects, "c", () => 2, [])), 2)
+    useEffect(effects, "a", console.log, []); useEffect(effects, "a", console.log, [])
+    useEffect(effects, "b", console.log, ["x"]); useEffect(effects, "b", console.log, ["x"])
+
+    eq(effects["a"].func, undefined)
+    eq(effects["b"].func, undefined)
   })
 
-  await t.step("no sdeps => use effect twice => second time func run", () => {
+  await t.step("not equal deps => use effect twice => effect func changed", () => {
     const effects = {}
-    eq((useEffect(effects, "a", () => 1), useEffect(effects, "a", () => 2)), 2)
-    eq((useEffect(effects, "b", () => 1), useEffect(effects, "b", () => 2)), 2)
+    useEffect(effects, "a", console.log, []); useEffect(effects, "a", console.info, ["x"])
+    useEffect(effects, "b", console.log, ["x"]); useEffect(effects, "b", console.info, [undefined])
+    useEffect(effects, "c", console.log, ["x"]); useEffect(effects, "c", console.info, [])
+
+    eq(effects["a"].func, console.info)
+    eq(effects["b"].func, console.info)
+    eq(effects["c"].func, console.info)
+  })
+
+  await t.step("no deps => use effect twice => effect func changed", () => {
+    const effects = {}
+    useEffect(effects, "a", console.log); useEffect(effects, "a", console.info)
+    useEffect(effects, "b", console.log); useEffect(effects, "b", console.info)
+
+    eq(effects["a"].func, console.info)
+    eq(effects["b"].func, console.info)
   })
 
   await t.step("equal deps => use effect twice => deps not changed", () => {
@@ -47,24 +50,10 @@ Deno.test("use component effects => use effects", async (t) => {
     eq(effects["b"].deps, [])
   })
 
-
-  await t.step("effect with initial func => use effect => second time initial func run before func", () => {
+  await t.step("no deps => use effect twice => deps no changed", () => {
     const effects = {}
-    const spies = []
-    useEffect(effects, "a", () => setInitialEffect(effects, "a", () => spies.push(1)))
-    useEffect(effects, "a", () => spies.push(2))
+    useEffect(effects, "a", console.log); useEffect(effects, "a", console.log)
 
-    eq(spies, [1, 2])
+    eq(effects["a"].deps, undefined)
   })
-
-  await t.step("effect with inital func => use effect twice => second time initial func not run", () => {
-    const effects = {}
-    const spies = []
-    useEffect(effects, "a", () => setInitialEffect(effects, "a", () => spies.push(1)))
-    useEffect(effects, "a", () => spies.push(2))
-    useEffect(effects, "a", () => spies.push(3))
-
-    eq(spies, [1, 2, 3])
-  })
-
 })

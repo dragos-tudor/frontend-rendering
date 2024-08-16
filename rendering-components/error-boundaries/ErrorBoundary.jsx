@@ -1,4 +1,4 @@
-import { setEventHandler } from "../../rendering-html/mod.js"
+import { setEventHandler } from "../../rendering-events/mod.js"
 import { updateErrorBoundary } from "./updating.jsx"
 
 

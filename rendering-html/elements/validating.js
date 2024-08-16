@@ -1,4 +1,4 @@
-import { isSafeTagName } from "../security/validating.js"
+import { isSafeTagName } from "../security/verifying.js"
 import { isHtmlElement } from "./verifying.js"
 
 export const validateHtmlElement = (elem) => isHtmlElement(elem)? "": "Element type should be HTML Element."
