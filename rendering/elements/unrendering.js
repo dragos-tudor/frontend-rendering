@@ -1,10 +1,10 @@
-import { getValidEventHandlerNames, unsetEventHandlers } from "../../rendering-events/mod.js"
+import { unsetEventHandlers } from "../../rendering-events/mod.js"
 import { getEffects, runInitialEffects } from "../../rendering-effects/mod.js"
 import { getHtmlName, isHtmlText, unrenderHtmlElement, unrenderHtmlText, validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxElement, getJsxProps } from "../../rendering-jsx/mod.js"
 import { throwError } from "../errors/throwing.js"
 import { logElementOrText } from "./logging.js"
-import { getValidPropNames, unsetInternalProps, unsetProps } from "../../rendering-props/mod.js";
+import { unsetInternalProps, unsetProps } from "../../rendering-props/mod.js";
 
 export const unrenderElement = ($elem) =>
 {
@@ -16,8 +16,8 @@ export const unrenderElement = ($elem) =>
   const tagName = getHtmlName($elem)
 
   runInitialEffects(getEffects($elem))
-  unsetProps($elem, getValidPropNames(props, tagName))
-  unsetEventHandlers($elem, getValidEventHandlerNames(props))
+  unsetProps($elem, tagName)
+  unsetEventHandlers($elem, props)
   unsetInternalProps($elem)
   unrenderHtmlElement($elem)
   return $elem

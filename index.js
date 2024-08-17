@@ -296,13 +296,13 @@ const unsetEventHandler = (elem, handlerName)=>{
     unstoreEventHandler(elem, handlerName);
     return handlerName;
 };
-const unsetEventHandlers = (elem, eventHandlers)=>eventHandlers.map((handlerName)=>unsetEventHandler(elem, handlerName));
+const unsetEventHandlers = (elem, props)=>getValidEventHandlerNames(props).map((handlerName)=>unsetEventHandler(elem, handlerName));
 const setEventHandler = (elem, handlerName, handler)=>{
     unsetEventHandler(elem, handlerName);
     storeEventHandler(elem, handlerName, handler);
     return handlerName;
 };
-const setEventHandlers = (elem, props, eventHandlers)=>eventHandlers.map((handlerName)=>setEventHandler(elem, handlerName, props[handlerName]));
+const setEventHandlers = (elem, props)=>getValidEventHandlerNames(props).map((handlerName)=>setEventHandler(elem, handlerName, props[handlerName]));
 const isAttrName = (elem, propName)=>!(propName in elem);
 const isFunctionAttrValue = (attrValue)=>typeof attrValue === "function";
 const isXmlnsAttrName = (attrName)=>attrName === "xmlns";
@@ -313,7 +313,23 @@ const setAttr = (elem, attrName, attrValue)=>{
     setAttrValue(elem, attrName, attrValue);
     return attrValue;
 };
-const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
+const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+const UnsafePropNames = Object.freeze([
+    "css",
+    "innerHTML",
+    "outerHTML"
+]);
+const UrlPropNames = Object.freeze([
+    "action",
+    "background",
+    "dynsrv",
+    "href",
+    "lowsrc",
+    "src"
+]);
+const isSafePropNameForTag = (propName, tagName)=>tagName === "style" && propName === "css";
+const isSafePropName = (tagName, propName)=>isSafePropNameForTag(propName, tagName) || !UnsafePropNames.includes(propName);
+const isSafeUrl = (props, propName)=>UrlPropNames.includes(propName) ? !JavaScriptProtocolRegex.test(props[propName] || "") : true;
 const AriaPropMappings = Object.freeze({
     "aria-autocomplete": "ariaAutoComplete",
     "aria-colcount": "ariaColCount",
@@ -342,23 +358,6 @@ const SpecialPropMappings = Object.freeze({
     css: "innerHTML",
     html: "innerHTML"
 });
-const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
-const UnsafePropNames = Object.freeze([
-    "css",
-    "innerHTML",
-    "outerHTML"
-]);
-const UrlPropNames = Object.freeze([
-    "action",
-    "background",
-    "dynsrv",
-    "href",
-    "lowsrc",
-    "src"
-]);
-const isSafePropNameForTag = (propName, tagName)=>tagName === "style" && propName === "css";
-const isSafePropName = (tagName, propName)=>isSafePropNameForTag(propName, tagName) || !UnsafePropNames.includes(propName);
-const isSafeUrl = (props, propName)=>UrlPropNames.includes(propName) ? !JavaScriptProtocolRegex.test(props[propName] || "") : true;
 const ReservedPropNames1 = Object.freeze([
     "children"
 ]);
@@ -378,6 +377,9 @@ const isSpecialPropName = (propName)=>propName in SpecialPropMappings;
 const isStylePropName = (propName)=>propName === "style";
 const isTogglePropName = (propName)=>TogglePropNames.includes(propName);
 const isValidPropName = (props, propName, tagName)=>!isReservedPropName(propName) && !isEventHandlerName1(propName) && isSafePropName(tagName, propName) && isSafeUrl(props, propName);
+const getPropNames1 = (elem)=>Object.getOwnPropertyNames(elem);
+const getValidPropNames = (props, tagName)=>getPropNames1(props).filter((propName)=>isValidPropName(props, propName, tagName));
+const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
 const mapPropName = (propName)=>isSpecialPropName(propName) && SpecialPropMappings[propName] || isAriaPropName(propName) && (AriaPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
 const EncodingCharsRegex = /[^\w. ]/gi;
 const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
@@ -386,8 +388,6 @@ const isEmptyPropValue = (propValue)=>propValue == undefined || propValue === ""
 const isSVGPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
 const getTogglePropValue = (propValue)=>isEmptyPropValue(propValue) || propValue;
 const resolvePropValue = (props, propName)=>isDangerouslyPropName(propName) && encodeHtml(props[propName]) || isTogglePropName(mapPropName(propName)) && getTogglePropValue(props[propName]) || props[propName];
-const getPropNames1 = (elem)=>Object.getOwnPropertyNames(elem);
-const getValidPropNames = (props, tagName)=>getPropNames1(props).filter((propName)=>isValidPropName(props, propName, tagName));
 const setPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
 const setStylePropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
 const setStylePropValues = (elem, style)=>getPropNames1(style).reduce(setStylePropValue(style), elem);
@@ -429,7 +429,7 @@ const setProp = (elem, props, propName)=>{
     }
     return elem;
 };
-const setProps = (elem, props, propNames)=>propNames.reduce((elem, propName)=>setProp(elem, props, propName), elem);
+const setProps = (elem, props, tagName)=>getValidPropNames(props, tagName).reduce((elem, propName)=>setProp(elem, props, propName), elem);
 const removeAttr = (elem, attrName)=>elem.removeAttribute(attrName);
 const unsetPropValue = (elem, propName)=>elem[propName] = undefined;
 const unsetProp = (elem, propName)=>{
@@ -446,7 +446,7 @@ const unsetProp = (elem, propName)=>{
     return elem;
 };
 const unsetInternalProps = (elem)=>getPropNames1(elem).filter(isInternalPropName).reduce((elem, propName)=>unsetProp(elem, propName), elem);
-const unsetProps = (elem, propNames)=>propNames.reduce((elem, propName)=>unsetProp(elem, propName), elem);
+const unsetProps = (elem, props, tagName)=>getValidPropNames(props, tagName).reduce((elem, propName)=>unsetProp(elem, propName), elem);
 const throwError1 = (message)=>{
     if (!message) return false;
     throw new Error(message);
@@ -483,8 +483,8 @@ const renderElement = (elem, $parent)=>{
     const tagName = getJsxName(elem);
     const props = getJsxProps(elem);
     const $elem = renderHtmlElement(tagName, getElementNS(elem, $parent), $parent);
-    setProps($elem, props, getValidPropNames(props, tagName));
-    setEventHandlers($elem, props, getValidEventHandlerNames(props));
+    setProps($elem, props, tagName);
+    setEventHandlers($elem, props);
     enableIgnoring($elem, $parent);
     enableLogging($elem, $parent);
     storeJsxElement($elem, elem);
@@ -535,8 +535,8 @@ const updateElement = (elem, $elem)=>{
     throwError1(validateJsxElement(elem));
     const props = getJsxProps(elem);
     const tagName = getHtmlName($elem);
-    setProps($elem, props, getValidPropNames(props, tagName));
-    setEventHandlers($elem, props, getValidEventHandlerNames(props));
+    setProps($elem, props, tagName);
+    setEventHandlers($elem, props);
     storeJsxElement($elem, elem);
     return $elem;
 };
@@ -547,8 +547,8 @@ const unrenderElement = ($elem)=>{
     const props = getJsxProps(getJsxElement($elem));
     const tagName = getHtmlName($elem);
     runInitialEffects(getEffects($elem));
-    unsetProps($elem, getValidPropNames(props, tagName));
-    unsetEventHandlers($elem, getValidEventHandlerNames(props));
+    unsetProps($elem, tagName);
+    unsetEventHandlers($elem, props);
     unsetInternalProps($elem);
     unrenderHtmlElement($elem);
     return $elem;

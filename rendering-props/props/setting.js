@@ -1,4 +1,5 @@
 import { setAttr } from "../attributes/setting.js"
+import { getValidPropNames } from "../props-names/getting.js";
 import { mapPropName } from "../props-names/mapping.js"
 import { resolvePropValue } from "../props-values/resolving.js"
 import { setPropValue, setStylePropValues } from "../props-values/setting.js"
@@ -18,4 +19,4 @@ export const setProp = (elem, props, propName) =>
   return elem
 }
 
-export const setProps = (elem, props, propNames) => propNames.reduce((elem, propName) => setProp(elem, props, propName), elem)
+export const setProps = (elem, props, tagName) => getValidPropNames(props, tagName).reduce((elem, propName) => setProp(elem, props, propName), elem)

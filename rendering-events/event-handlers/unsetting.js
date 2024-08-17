@@ -1,4 +1,4 @@
-import { getEventName } from "./getting.js"
+import { getEventName, getValidEventHandlerNames } from "./getting.js"
 import { unstoreEventHandler } from "./unstoring.js"
 
 export const unsetEventHandler = (elem, handlerName) =>
@@ -8,4 +8,4 @@ export const unsetEventHandler = (elem, handlerName) =>
   return handlerName
 }
 
-export const unsetEventHandlers = (elem, eventHandlers) => eventHandlers.map(handlerName => unsetEventHandler(elem, handlerName))
+export const unsetEventHandlers = (elem, props) => getValidEventHandlerNames(props).map(handlerName => unsetEventHandler(elem, handlerName))

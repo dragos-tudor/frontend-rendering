@@ -1,5 +1,5 @@
 import { removeAttr } from "../attributes/removing.js"
-import { getPropNames } from "../props-names/getting.js"
+import { getPropNames, getValidPropNames } from "../props-names/getting.js"
 import { mapPropName } from "../props-names/mapping.js"
 import { isInternalPropName } from "../props-names/verifying.js"
 import { unsetPropValue } from "../props-values/unsetting.js"
@@ -19,4 +19,4 @@ export const unsetProp = (elem, propName) =>
 
 export const unsetInternalProps = (elem) => getPropNames(elem).filter(isInternalPropName).reduce((elem, propName) => unsetProp(elem, propName), elem)
 
-export const unsetProps = (elem, propNames) => propNames.reduce((elem, propName) => unsetProp(elem, propName), elem)
+export const unsetProps = (elem, props, tagName) => getValidPropNames(props, tagName).reduce((elem, propName) => unsetProp(elem, propName), elem)

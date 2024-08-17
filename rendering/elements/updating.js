@@ -1,7 +1,7 @@
-import { getValidEventHandlerNames, setEventHandlers } from "../../rendering-events/mod.js";
+import { setEventHandlers } from "../../rendering-events/mod.js";
 import { getHtmlName, updateHtmlText, validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxProps, isJsxText, storeJsxElement, validateJsxElement } from "../../rendering-jsx/mod.js"
-import { getValidPropNames, setProps } from "../../rendering-props/mod.js"
+import { setProps } from "../../rendering-props/mod.js"
 import { throwError } from "../errors/throwing.js"
 import { logElementOrText } from "./logging.js"
 import { setUpdatedElement } from "./setting.js"
@@ -18,8 +18,8 @@ export const updateElement = (elem, $elem) =>
   const props = getJsxProps(elem)
   const tagName = getHtmlName($elem)
 
-  setProps($elem, props, getValidPropNames(props, tagName))
-  setEventHandlers($elem, props, getValidEventHandlerNames(props))
+  setProps($elem, props, tagName)
+  setEventHandlers($elem, props)
   storeJsxElement($elem, elem)
   return $elem
 }
