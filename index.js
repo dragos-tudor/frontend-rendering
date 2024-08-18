@@ -610,9 +610,18 @@ const updateElementTree = ($elem, elem = getJsxElement($elem))=>{
     ];
     for (const $elem of $elems){
         if (isStyleIgnoredOrTextElement($elem)) continue;
-        if (isUpdatedElement($elem)) $elems.push(...updateElementChildren($elem));
-        if (isRenderedElement($elem)) $elems.push(...renderElementChildren($elem));
-        if (isUnrenderedElement($elem)) $elems.push(...unrenderElementChildren($elem));
+        if (isRenderedElement($elem)) {
+            $elems.push(...renderElementChildren($elem));
+            continue;
+        }
+        if (isUpdatedElement($elem)) {
+            $elems.push(...updateElementChildren($elem));
+            continue;
+        }
+        if (isUnrenderedElement($elem)) {
+            $elems.push(...unrenderElementChildren($elem));
+            continue;
+        }
     }
     $elems.forEach(($elem)=>runEffects(getEffects($elem)));
     return $elems;
