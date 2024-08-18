@@ -4,6 +4,7 @@ const getHtmlName = (elem)=>elem.tagName?.toLowerCase().replace("_", "-") || "te
 const getHtmlOwnerDocument = (elem)=>elem?.ownerDocument;
 const getHtmlParentElement = (elem)=>elem?.parentElement;
 const existsHtmlElement = (elem)=>elem;
+const existsHtmlParentElement = (elem)=>elem.parentElement;
 const isHtmlElement = (elem)=>elem.nodeType === 1;
 const findHtmlAscendant = (elem, func)=>{
     if (!existsHtmlElement(elem)) return undefined;
@@ -32,8 +33,6 @@ const getHtmlParentNode = (node)=>node.parentNode;
 const replaceHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).replaceChild(node, oldNode);
 const removeHtmlNode = (node)=>getHtmlParentNode(node).removeChild(node);
 const unrenderHtmlElement = ($elem)=>getHtmlParentElement($elem) ? removeHtmlNode($elem) : $elem;
-const HtmlMimeType = "text/html";
-const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
 const UnsafeTagNames = Object.freeze([
     "SCRIPT",
     "IFRAME"
@@ -42,6 +41,9 @@ const isSafeTagName = (tagName)=>!UnsafeTagNames.includes(tagName.toUpperCase())
 const validateHtmlElement = (elem)=>isHtmlElement(elem) ? "" : "Element type should be HTML Element.";
 const validateHtmlTagName = (name)=>isSafeTagName(name) ? "" : "Unsafe html tag " + name;
 const insertHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).insertBefore(node, oldNode) && node;
+const existsHtmlNodeChildren = (node)=>node.childNodes !== 0;
+const HtmlMimeType = "text/html";
+const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
 const DOMLibraryUrl = "https://esm.sh/linkedom@0.14.26";
 const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis)=>{
     const dom = await import(url);
@@ -153,6 +155,7 @@ const SafeTypes = Object.freeze([
     ElementType,
     FragmentType
 ]);
+const existsJsxElement = (elem)=>!!elem;
 const isJsxElement = (elem)=>typeof elem.type === 'string';
 const isJsxKeyElement = (elem)=>elem.key != undefined;
 const isJsxType = (elem)=>typeof elem.$$typeof === "symbol";
@@ -509,27 +512,22 @@ const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem)
 const equalElementProps = (elem, $elem)=>equalObjects(getJsxProps(elem), getJsxProps(getJsxElement($elem)));
 const equalTexts = (elem, $elem)=>getJsxText(elem) === getHtmlText($elem);
 const existsElement = (elem)=>!!elem;
+const existsNoSkipElementProp = (elem)=>getJsxProps(elem)["no-skip"];
+const isRenderedElement = (elem)=>existsHtmlParentElement(elem) && !existsHtmlNodeChildren(elem);
+const isUpdatedElement = (elem)=>existsHtmlParentElement(elem) && existsHtmlNodeChildren(elem);
+const isUnrenderedElement = (elem)=>!existsHtmlParentElement(elem);
 const isStyleElement = (elem)=>getHtmlName(elem) === "style";
-const isRenderedElement = (elem)=>!isUnrenderedElement(elem) && !elem.__updated;
-const isUpdatedElement = (elem)=>!isUnrenderedElement(elem) && elem.__updated;
-const isUnrenderedElement = (elem)=>!getHtmlParentElement(elem);
-const shouldSkipElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
-const shouldRenderElement = ($elem)=>!existsElement($elem);
-const shouldReplaceElement = (elem, $elem)=>!equalElementNames(elem, $elem);
-const shouldUnrenderElement = (elem)=>!existsElement(elem);
-const shouldUpdateElement = (elem, $elem)=>equalElementNames(elem, $elem) && (isJsxElement(elem) || isJsxFactory(elem) && (getJsxProps(elem)["no-skip"] || !equalElementProps(elem, $elem)) || isJsxText(elem) && !equalTexts(elem, $elem));
+const isStyleIgnoredOrTextElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
 const renderElementTree = (elem, $parent = parseHtml("<main></main>"))=>{
     const $elems = [
         renderElement(elem, $parent)
     ];
-    for (const $elem of $elems)shouldSkipElement($elem) || $elems.push(...renderElementChildren($elem));
+    for (const $elem of $elems)isStyleIgnoredOrTextElement($elem) || $elems.push(...renderElementChildren($elem));
     $elems.forEach(($elem)=>runEffects(getEffects($elem)));
     return $elems;
 };
-const setUpdatedElement = (elem)=>elem.__updated = true;
 const updateElement = (elem, $elem)=>{
     logElementOrText($elem, "update");
-    setUpdatedElement($elem);
     if (isJsxText(elem)) return updateHtmlText(elem, $elem);
     throwError1(validateHtmlElement($elem));
     throwError1(validateJsxElement(elem));
@@ -558,15 +556,39 @@ const replaceElement = ($elem, $oldElem)=>{
     isHtmlText($oldElem) ? replaceHtmlNode($elem, $oldElem) : replaceHtmlNode($elem, $oldElem);
     return $elem;
 };
+const ReconcilingTypes = Object.freeze({
+    render: 0,
+    update: 1,
+    replace: 2,
+    unrender: 3,
+    skip: 4
+});
+const getReconcilingType = (elem, $elem)=>{
+    if (!existsHtmlElement($elem)) return ReconcilingTypes.render;
+    if (!existsJsxElement(elem)) return ReconcilingTypes.unrender;
+    if (!equalElementNames(elem, $elem)) return ReconcilingTypes.replace;
+    if (isJsxElement(elem)) return ReconcilingTypes.update;
+    if (isJsxFactory(elem) && !equalElementProps(elem, $elem)) return ReconcilingTypes.update;
+    if (isJsxFactory(elem) && existsNoSkipElementProp(elem)) return ReconcilingTypes.update;
+    if (isJsxText(elem) && !equalTexts(elem, $elem)) return ReconcilingTypes.update;
+    return ReconcilingTypes.skip;
+};
 const reconcileElement = (elem, $elem, $parent)=>{
-    if (shouldRenderElement($elem)) return renderElement(elem, $parent);
-    if (shouldUnrenderElement(elem)) return unrenderElement($elem);
-    if (shouldUpdateElement(elem, $elem)) return updateElement(elem, $elem);
-    if (shouldReplaceElement(elem, $elem)) return [
-        replaceElement(renderElement(elem, $parent), $elem),
-        unrenderElement($elem)
-    ];
-    return [];
+    switch(getReconcilingType(elem, $elem)){
+        case ReconcilingTypes.render:
+            return renderElement(elem, $parent);
+        case ReconcilingTypes.replace:
+            return [
+                replaceElement(renderElement(elem, $parent), $elem),
+                unrenderElement($elem)
+            ];
+        case ReconcilingTypes.update:
+            return updateElement(elem, $elem);
+        case ReconcilingTypes.unrender:
+            return unrenderElement($elem);
+        default:
+            return [];
+    }
 };
 const equalKeyElements = (elem, $elem)=>getJsxKey(elem) === getJsxKey(getJsxElement($elem));
 const findKeyElements = (elem, $elems)=>$elems.find(($elem)=>equalKeyElements(elem, $elem));
@@ -587,9 +609,9 @@ const updateElementTree = ($elem, elem = getJsxElement($elem))=>{
         updateElement(elem, $elem)
     ];
     for (const $elem of $elems){
-        if (shouldSkipElement($elem)) continue;
-        if (isRenderedElement($elem)) $elems.push(...renderElementChildren($elem));
+        if (isStyleIgnoredOrTextElement($elem)) continue;
         if (isUpdatedElement($elem)) $elems.push(...updateElementChildren($elem));
+        if (isRenderedElement($elem)) $elems.push(...renderElementChildren($elem));
         if (isUnrenderedElement($elem)) $elems.push(...unrenderElementChildren($elem));
     }
     $elems.forEach(($elem)=>runEffects(getEffects($elem)));
@@ -599,7 +621,7 @@ const unrenderElementTree = ($elem)=>{
     const $elems = [
         unrenderElement($elem)
     ];
-    for (const $elem of $elems)shouldSkipElement($elem) || $elems.push(...unrenderElementChildren($elem));
+    for (const $elem of $elems)isStyleIgnoredOrTextElement($elem) || $elems.push(...unrenderElementChildren($elem));
     return $elems;
 };
 const render = (elem, $parent = parseHtml("<main></main>"))=>{

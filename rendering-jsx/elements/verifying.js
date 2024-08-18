@@ -3,6 +3,8 @@ import { FragmentType } from "../fragments/FragmentType.js"
 
 const SafeTypes = Object.freeze([ElementType, FragmentType])
 
+export const existsJsxElement = (elem) => !!elem
+
 export const isJsxElement = (elem) => typeof elem.type === 'string'
 
 export const isJsxKeyElement = (elem) => elem.key != undefined

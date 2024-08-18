@@ -4,12 +4,10 @@ import { getJsxProps, isJsxText, storeJsxElement, validateJsxElement } from "../
 import { setProps } from "../../rendering-props/mod.js"
 import { throwError } from "../errors/throwing.js"
 import { logElementOrText } from "./logging.js"
-import { setUpdatedElement } from "./setting.js"
 
 export const updateElement = (elem, $elem) =>
 {
   logElementOrText($elem, "update")
-  setUpdatedElement($elem)
   if (isJsxText(elem)) return updateHtmlText(elem, $elem)
 
   throwError(validateHtmlElement($elem))
