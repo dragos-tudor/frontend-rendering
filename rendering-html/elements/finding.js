@@ -9,8 +9,6 @@ export const findHtmlAscendant = (elem, func) =>
   return findHtmlAscendant(getHtmlParentElement(elem), func)
 }
 
-export const findHtmlDescendant = (elem, func, findStrategy = findBreadthHtmlDescendant) =>
-  func(elem)? elem: findStrategy(getHtmlChildren(elem), func)
+export const findHtmlDescendant = (elem, func, findStrategy = findBreadthHtmlDescendant) => findStrategy(getHtmlChildren(elem), func)
 
-export const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants) =>
-  (func(elem) && result.push(elem), findStrategy(getHtmlChildren(elem), func, result))
+export const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants) => findStrategy(getHtmlChildren(elem), func, result)

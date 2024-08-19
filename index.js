@@ -23,7 +23,7 @@ const findHtmlAscendant = (elem, func)=>{
     if (func(elem)) return elem;
     return findHtmlAscendant(getHtmlParentElement(elem), func);
 };
-const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>(func(elem) && result.push(elem), findStrategy(getHtmlChildren(elem), func, result));
+const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>findStrategy(getHtmlChildren(elem), func, result);
 const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, message, "elem:", getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
 const appendHtmlNode = (node, parent)=>parent.appendChild(node);
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);
