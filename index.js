@@ -3,6 +3,18 @@ const getHtmlChildren = (elem)=>Array.from(elem.children ?? []);
 const getHtmlName = (elem)=>elem.tagName?.toLowerCase().replace("_", "-") || "text";
 const getHtmlOwnerDocument = (elem)=>elem?.ownerDocument;
 const getHtmlParentElement = (elem)=>elem?.parentElement;
+const findBreadthHtmlDescendant = (elems, func)=>{
+    for (const elem of elems)if (func(elem)) return elem;
+    for (const elem of elems){
+        const descendant = findBreadthHtmlDescendant(getHtmlChildren(elem), func);
+        if (descendant) return descendant;
+    }
+};
+const findBreadthHtmlDescendants = (elems, func, result = [])=>{
+    for (const elem of elems)if (func(elem)) result.push(elem);
+    for (const elem of elems)findBreadthHtmlDescendants(getHtmlChildren(elem), func, result);
+    return result;
+};
 const existsHtmlElement = (elem)=>elem;
 const existsHtmlParentElement = (elem)=>elem.parentElement;
 const isHtmlElement = (elem)=>elem.nodeType === 1;
@@ -11,12 +23,7 @@ const findHtmlAscendant = (elem, func)=>{
     if (func(elem)) return elem;
     return findHtmlAscendant(getHtmlParentElement(elem), func);
 };
-const findHtmlDescendants = (elem, func, result = [])=>{
-    if (!existsHtmlElement(elem)) return result;
-    if (func(elem)) result.push(elem);
-    for (const child of getHtmlChildren(elem))findHtmlDescendants(child, func, result);
-    return result;
-};
+const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>(func(elem) && result.push(elem), findStrategy(getHtmlChildren(elem), func, result));
 const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, message, "elem:", getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
 const appendHtmlNode = (node, parent)=>parent.appendChild(node);
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);

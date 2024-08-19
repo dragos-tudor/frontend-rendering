@@ -1,5 +1,6 @@
 import { getHtmlChildren, getHtmlParentElement } from "./getting.js"
-import { existsHtmlElement } from "./verifying.js";
+import { findBreadthHtmlDescendants, findBreadthHtmlDescendant } from "./finding.breadth.js"
+import { existsHtmlElement } from "./verifying.js"
 
 export const findHtmlAscendant = (elem, func) =>
 {
@@ -8,18 +9,8 @@ export const findHtmlAscendant = (elem, func) =>
   return findHtmlAscendant(getHtmlParentElement(elem), func)
 }
 
-export const findHtmlDescendants = (elem, func, result = []) =>
-{
-  if (!existsHtmlElement(elem)) return result
-  if (func(elem)) result.push(elem)
-  for (const child of getHtmlChildren(elem))
-    findHtmlDescendants(child, func, result)
-  return result
-}
+export const findHtmlDescendant = (elem, func, findStrategy = findBreadthHtmlDescendant) =>
+  func(elem)? elem: findStrategy(getHtmlChildren(elem), func)
 
-// conditional control [if] vs conjunctions [&&] and disjunctions [||] [below]
-// export const findHtmlAscendant = (elem, func) =>
-//   (existsHtmlElement(elem) || undefined) &&
-//   (func(elem) && elem ||
-//    findHtmlAscendant(getHtmlParentElement(elem), func))
-
+export const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants) =>
+  (func(elem) && result.push(elem), findStrategy(getHtmlChildren(elem), func, result))
