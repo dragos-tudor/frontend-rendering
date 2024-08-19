@@ -1,12 +1,12 @@
-import { getValidEventHandlerNames } from "./getting.js";
-import { storeEventHandler } from "./storing.js"
-import { unsetEventHandler } from "./unsetting.js"
+import { getValidHtmlEventHandlerNames } from "./getting.js";
+import { storeHtmlEventHandler } from "./storing.js"
+import { unsetHtmlEventHandler } from "./unsetting.js"
 
-export const setEventHandler = (elem, handlerName, handler) =>
+export const setHtmlEventHandler = (elem, handlerName, handler) =>
 {
-  unsetEventHandler(elem, handlerName)
-  storeEventHandler(elem, handlerName, handler)
+  unsetHtmlEventHandler(elem, handlerName)
+  storeHtmlEventHandler(elem, handlerName, handler)
   return handlerName
 }
 
-export const setEventHandlers = (elem, props) => getValidEventHandlerNames(props).map(handlerName => setEventHandler(elem, handlerName, props[handlerName]))
+export const setHtmlEventHandlers = (elem, props) => getValidHtmlEventHandlerNames(props).map(handlerName => setHtmlEventHandler(elem, handlerName, props[handlerName]))

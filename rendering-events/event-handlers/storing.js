@@ -1,2 +1,2 @@
 
-export const storeEventHandler = (elem, handlerName, handler) => elem[handlerName] = handler
+export const storeHtmlEventHandler = (elem, handlerName, handler) => elem[handlerName] = handler

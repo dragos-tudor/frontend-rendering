@@ -1,9 +1,9 @@
-import { mapPropName } from "../props-names/mapping.js";
-import { isDangerouslyPropName, isTogglePropName } from "../props-names/verifying.js"
+import { mapHtmlPropName } from "../props-names/mapping.js";
+import { isDangerouslyHtmlPropName, isToggleHtmlPropName } from "../props-names/verifying.js"
 import { encodeHtml } from "../security/encoding.js"
-import { getTogglePropValue } from "./getting.js"
+import { getToggleHtmlPropValue } from "./getting.js"
 
-export const resolvePropValue = (props, propName) =>
-  (isDangerouslyPropName(propName) && encodeHtml(props[propName])) ||
-  (isTogglePropName(mapPropName(propName)) && getTogglePropValue(props[propName])) ||
+export const resolveHtmlPropValue = (props, propName) =>
+  (isDangerouslyHtmlPropName(propName) && encodeHtml(props[propName])) ||
+  (isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(props[propName])) ||
   props[propName]

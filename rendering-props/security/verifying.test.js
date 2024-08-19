@@ -1,20 +1,20 @@
 import { assertEquals } from "/asserts.ts"
-import { isSafePropName, isSafeUrl } from "./verifying.js"
+import { isSafeHtmlPropName, isSafeUrl } from "./verifying.js"
 
 Deno.test("securely use html components => verify prop and url names", async (t) =>
 {
   await t.step("safe property names => validate property names => true", () => {
-    assertEquals(isSafePropName("", "id"), true)
-    assertEquals(isSafePropName("", "name"), true)
-    assertEquals(isSafePropName("", "title"), true)
-    assertEquals(isSafePropName("style", "css"), true)
+    assertEquals(isSafeHtmlPropName("", "id"), true)
+    assertEquals(isSafeHtmlPropName("", "name"), true)
+    assertEquals(isSafeHtmlPropName("", "title"), true)
+    assertEquals(isSafeHtmlPropName("style", "css"), true)
   })
 
   await t.step("unsafe property names [css, innerHTML, outerHTML] => validate property names => false", () => {
-    assertEquals(isSafePropName("", "css"), false)
+    assertEquals(isSafeHtmlPropName("", "css"), false)
     // assertEquals(isSafePropName("", "style"), false)
-    assertEquals(isSafePropName("", "innerHTML"), false)
-    assertEquals(isSafePropName("", "outerHTML"), false)
+    assertEquals(isSafeHtmlPropName("", "innerHTML"), false)
+    assertEquals(isSafeHtmlPropName("", "outerHTML"), false)
   })
 
   await t.step("non-url property names => validate url names => true", () => {

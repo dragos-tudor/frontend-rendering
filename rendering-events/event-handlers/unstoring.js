@@ -1,2 +1,2 @@
 
-export const unstoreEventHandler = (elem, handlerName) => delete elem[handlerName]
+export const unstoreHtmlEventHandler = (elem, handlerName) => delete elem[handlerName]

@@ -1,4 +1,4 @@
 
-export const isEmptyPropValue = (propValue) => propValue == undefined || propValue === ""
+export const isEmptyHtmlPropValue = (propValue) => propValue == undefined || propValue === ""
 
-export const isSVGPropValue = (elem, propName) => elem[propName]?.constructor?.name.startsWith("SVG")
+export const isSVGHtmlPropValue = (elem, propName) => elem[propName]?.constructor?.name.startsWith("SVG")

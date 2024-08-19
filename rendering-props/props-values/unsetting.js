@@ -1,2 +1,2 @@
 
-export const unsetPropValue = (elem, propName) => elem[propName] = undefined
+export const unsetHtmlPropValue = (elem, propName) => elem[propName] = undefined

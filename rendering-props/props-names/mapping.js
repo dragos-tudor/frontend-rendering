@@ -1,8 +1,8 @@
 import { toAriaCamelCaseName } from "./formatting.js"
-import { AriaPropMappings, SpecialPropMappings } from "./mappings.js"
-import { isAriaPropName, isSpecialPropName } from "./verifying.js"
+import { AriaHtmlPropMappings, SpecialHtmlPropMappings } from "./mappings.js"
+import { isAriaHtmlPropName, isSpecialHtmlPropName } from "./verifying.js"
 
-export const mapPropName = (propName) =>
-  (isSpecialPropName(propName) && SpecialPropMappings[propName]) ||
-  (isAriaPropName(propName) && (AriaPropMappings[propName] || toAriaCamelCaseName(propName))) ||
+export const mapHtmlPropName = (propName) =>
+  (isSpecialHtmlPropName(propName) && SpecialHtmlPropMappings[propName]) ||
+  (isAriaHtmlPropName(propName) && (AriaHtmlPropMappings[propName] || toAriaCamelCaseName(propName))) ||
   propName

@@ -1,6 +1,6 @@
-import { isValidPropName } from "./verifying.js"
+import { isValidHtmlPropName } from "./verifying.js"
 
 
-export const getPropNames = (elem) => Object.getOwnPropertyNames(elem)
+export const getHtmlPropNames = (elem) => Object.getOwnPropertyNames(elem)
 
-export const getValidPropNames = (props, tagName) => getPropNames(props).filter(propName => isValidPropName(props, propName, tagName))
+export const getValidHtmlPropNames = (props, tagName) => getHtmlPropNames(props).filter(propName => isValidHtmlPropName(props, propName, tagName))

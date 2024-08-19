@@ -1,2 +1,2 @@
 export { dispatchEvent } from "./events/dispatching.js"
-export { setEventHandler } from "./event-handlers/setting.js"
+export { setHtmlEventHandler } from "./event-handlers/setting.js"

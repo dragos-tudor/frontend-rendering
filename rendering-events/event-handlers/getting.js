@@ -1,7 +1,7 @@
-import { isEventHandler } from "./verifying.js";
+import { isHtmlEventHandler } from "./verifying.js";
 
-const getPropNames = (props) => Object.getOwnPropertyNames(props)
+const getHtmlPropNames = (props) => Object.getOwnPropertyNames(props)
 
-export const getEventName = (handlerName) => handlerName.replace("on", "")
+export const getHtmlEventName = (handlerName) => handlerName.replace("on", "")
 
-export const getValidEventHandlerNames = (props) => getPropNames(props).filter(propName => isEventHandler(props, propName))
+export const getValidHtmlEventHandlerNames = (props) => getHtmlPropNames(props).filter(propName => isHtmlEventHandler(props, propName))

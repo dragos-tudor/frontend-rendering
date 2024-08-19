@@ -1,2 +1,2 @@
 
-export const removeAttr = (elem, attrName) => elem.removeAttribute(attrName)
+export const removeHtmlAttr = (elem, attrName) => elem.removeAttribute(attrName)

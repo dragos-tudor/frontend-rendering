@@ -1,5 +1,5 @@
 
-export const AriaPropMappings = Object.freeze({
+export const AriaHtmlPropMappings = Object.freeze({
   "aria-autocomplete": "ariaAutoComplete",
   "aria-colcount": "ariaColCount",
   "aria-colindex": "ariaColIndex",
@@ -20,7 +20,7 @@ export const AriaPropMappings = Object.freeze({
   "aria-valuetext": "ariaValueText"
 })
 
-export const SpecialPropMappings = Object.freeze({
+export const SpecialHtmlPropMappings = Object.freeze({
   class: "className",
   for: "htmlFor",
   readonly: "readOnly",

@@ -1,6 +1,6 @@
 
-const isFunctionPropValue = (props, propName) => typeof props[propName] === "function"
+const isFunctionHtmlPropValue = (props, propName) => typeof props[propName] === "function"
 
-export const isEventHandler = (props, propName) => isEventHandlerName(propName) && isFunctionPropValue(props, propName)
+export const isHtmlEventHandler = (props, propName) => isHtmlEventHandlerName(propName) && isFunctionHtmlPropValue(props, propName)
 
-export const isEventHandlerName = (propName) => propName.startsWith("on")
+export const isHtmlEventHandlerName = (propName) => propName.startsWith("on")

@@ -1,25 +1,25 @@
-import { isSafePropName, isSafeUrl } from "../security/verifying.js";
-import { SpecialPropMappings } from "./mappings.js"
+import { isSafeHtmlPropName, isSafeUrl } from "../security/verifying.js";
+import { SpecialHtmlPropMappings } from "./mappings.js"
 
-const ReservedPropNames = Object.freeze(["children"])
+const ReservedHtmlPropNames = Object.freeze(["children"])
 
-const TogglePropNames = Object.freeze([ "checked", "disabled", "hidden", "readOnly", "selected" ])
+const ToggleHtmlPropNames = Object.freeze([ "checked", "disabled", "hidden", "readOnly", "selected" ])
 
 
-export const isAriaPropName = (propName) => propName.startsWith("aria-")
+export const isAriaHtmlPropName = (propName) => propName.startsWith("aria-")
 
-export const isDangerouslyPropName = (propName) => propName === "html"
+export const isDangerouslyHtmlPropName = (propName) => propName === "html"
 
 export const isEventHandlerName = (propName) => propName.startsWith("on")
 
-export const isInternalPropName = (propName) => propName.startsWith("__")
+export const isInternalHtmlPropName = (propName) => propName.startsWith("__")
 
-export const isReservedPropName = (propName) => ReservedPropNames.includes(propName)
+export const isReservedHtmlPropName = (propName) => ReservedHtmlPropNames.includes(propName)
 
-export const isSpecialPropName = (propName) => propName in SpecialPropMappings
+export const isSpecialHtmlPropName = (propName) => propName in SpecialHtmlPropMappings
 
-export const isStylePropName = (propName) =>  propName === "style"
+export const isStyleHtmlPropName = (propName) =>  propName === "style"
 
-export const isTogglePropName = (propName) => TogglePropNames.includes(propName)
+export const isToggleHtmlPropName = (propName) => ToggleHtmlPropNames.includes(propName)
 
-export const isValidPropName = (props, propName, tagName) => !isReservedPropName(propName) && !isEventHandlerName(propName) && isSafePropName(tagName, propName) && isSafeUrl(props, propName)
+export const isValidHtmlPropName = (props, propName, tagName) => !isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && isSafeHtmlPropName(tagName, propName) && isSafeUrl(props, propName)

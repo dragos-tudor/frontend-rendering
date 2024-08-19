@@ -1,9 +1,9 @@
-import { setEventHandler } from "../../rendering-events/mod.js"
+import { setHtmlEventHandler } from "../../rendering-events/mod.js"
 import { updateErrorBoundary } from "./updating.jsx"
 
 
 export const ErrorBoundary = ({path, error, children}, elem) => {
-  setEventHandler(elem, "onerror", (event) => {
+  setHtmlEventHandler(elem, "onerror", (event) => {
     event.stopPropagation()
     return updateErrorBoundary(elem, event)
   })

@@ -1,7 +1,7 @@
 import { assertObjectMatch as eq } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { dispatchEvent, setEventHandler } from "../../rendering-events/mod.js"
+import { dispatchEvent, setHtmlEventHandler } from "../../rendering-events/mod.js"
 import { Context as Producer } from "./Context.js"
 import { getContexts } from "./getting.js"
 import { setContexts } from "./setting.js"
@@ -55,6 +55,6 @@ const Consumer = (props, elem) => {
   const contexts = setContexts(elem)
   const [, setContext] = useContext(contexts, props.context, "fallback", elem)
 
-  setEventHandler(elem, "onclick", (event) => setContext(event.detail))
+  setHtmlEventHandler(elem, "onclick", (event) => setContext(event.detail))
   return <></>
 }

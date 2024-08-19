@@ -1,3 +1,3 @@
-import { isEmptyPropValue } from "./verifying.js"
+import { isEmptyHtmlPropValue } from "./verifying.js"
 
-export const getTogglePropValue = (propValue) => isEmptyPropValue(propValue) || propValue
+export const getToggleHtmlPropValue = (propValue) => isEmptyHtmlPropValue(propValue) || propValue
