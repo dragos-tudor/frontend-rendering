@@ -1,11 +1,6 @@
-import { getHtmlName } from "../../rendering-html/mod.js"
+import { findHtmlAscendants } from "../../rendering-html/mod.js";
+import { isErrorBoundaryElement } from "./verifying.js";
 
-export const getErrorPath = (boundary, elem, names = []) =>
-{
-  if(!elem) return
-  names.push(getHtmlName(elem))
+export const getErrorPath = (source, boundary) => findHtmlAscendants(source, (elem) => isErrorBoundaryElement(elem, boundary))
 
-  return boundary === elem?
-    names.reverse().join("/"):
-    getErrorPath(boundary, elem.parentElement, names)
-}
+export const getEventDetailError = (event) => event.detail?.error

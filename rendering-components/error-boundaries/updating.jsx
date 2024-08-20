@@ -1,10 +1,11 @@
 import { update } from "../../rendering/mod.js"
-import { getErrorPath } from "./getting.js"
+import { getErrorPath, getEventDetailError } from "./getting.js"
 import { ErrorBoundary } from "./ErrorBoundary.jsx"
+import { toStringErrorPath } from "./converting.js";
 
 export const updateErrorBoundary = (elem, event) =>
 {
-  const path = getErrorPath(elem, event.target)
-  const error = event.detail?.error
-  return update(elem, <ErrorBoundary path={path} error={error?.message}/>)
+  const error = getEventDetailError(event)
+  const path = getErrorPath(event.target, elem)
+  return update(elem, <ErrorBoundary error={error?.message} path={toStringErrorPath(path)}/>)
 }
