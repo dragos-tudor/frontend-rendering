@@ -1,6 +1,8 @@
-import { setServices } from "./setting.js"
+import { setService, setServices } from "./setting.js"
 
-export const Services = (props, elem) => {
-  setServices(elem, props)
+export const Service = (props, elem) =>
+{
+  const services = setServices(elem)
+  setService(services, props.name, props.value)
   return props.children
 }

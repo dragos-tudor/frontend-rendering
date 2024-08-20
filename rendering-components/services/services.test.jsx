@@ -1,52 +1,36 @@
-import { spy, assertSpyCalls, assertSpyCallArgs } from "/mock.ts"
+import { assertEquals } from "/asserts.ts"
 import { render } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { setEffects, useEffect } from "../../rendering-effects/mod.js"
-import { getService } from "./getting.js"
-import { Services } from "./Services.js"
+import { getServices } from "./getting.js"
+import { useService } from "./using.js"
+import { Service } from "./Services.js"
 
 await registerDOMParser()
 
-Deno.test("mock component services => use services", async (t) => {
+Deno.test("mock component service => use service", async (t) =>
+{
+  await t.step("service => render service => service registered", () => {
+    const elem = render(<Service name="test" value={console.log}></Service>)
 
-  await t.step("mock service => render services => mock service available", () => {
-    const spyService = spy(() => {})
-    const A = (_, elem) => {
-      const service = getService(elem, "service")
-      const effects = setEffects(elem)
-      useEffect(effects, "", () => service("data"), [])
-    }
-    render(<Services service={spyService}><A></A></Services>)
-
-    assertSpyCalls(spyService, 1)
-    assertSpyCallArgs(spyService, 0, ["data"])
+    assertEquals(useService(getServices(elem), "test"), console.log)
   })
 
-  await t.step("no service => render services => fallback service available", () => {
-    const spyService = spy(() => {})
-    const A = (_, elem) => {
-      const service = getService(elem, "service", spyService)
-      const effects = setEffects(elem)
-      useEffect(effects, "", () => service("data"), [])
-    }
-    render(<Services><A></A></Services>)
+  await t.step("service => render service twice => last service registered", () => {
+    const elem = render(<Service name="test" value={console.log}></Service>)
+    render(<Service name="test" value={console.info}></Service>, elem.parentElement)
 
-    assertSpyCalls(spyService, 1)
-    assertSpyCallArgs(spyService, 0, ["data"])
+    assertEquals(useService(getServices(elem), "test"), console.info)
   })
 
-  await t.step("no services => render element => fallback service available", () => {
-    const spyService = spy(() => {})
-    const A = (_, elem) => {
-      const service = getService(elem, "service", spyService)
-      const effects = setEffects(elem)
-      useEffect(effects, "", () => service("data"), [])
-    }
-    render(<A></A>)
+  await t.step("services => render services => services registered", () => {
+    const elem = render(
+      <services>
+        <Service name="test1" value={console.log}></Service>
+        <Service name="test2" value={console.info}></Service>
+      </services>)
 
-    assertSpyCalls(spyService, 1)
-    assertSpyCallArgs(spyService, 0, ["data"])
+    assertEquals(useService(getServices(elem), "test1"), console.log)
+    assertEquals(useService(getServices(elem), "test2"), console.info)
   })
-
 })
 

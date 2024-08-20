@@ -1,6 +1,4 @@
 
-export const getService = (elem, name, fallback) =>
-  getServices(elem)?.[name] ?? fallback
+export const getService = (services, name) => services?.[name]
 
-export const getServices = (elem) =>
-  elem.ownerDocument.__services
+export const getServices = (elem) => elem.ownerDocument.__services
