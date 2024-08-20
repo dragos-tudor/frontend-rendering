@@ -1,7 +1,7 @@
 import { assertEquals, assertStringIncludes, assertExists } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { ErrorBoundary } from "./ErrorBoundary.jsx"
+import { ErrorBoundary } from "./errorboundary.jsx"
 
 await registerDOMParser()
 

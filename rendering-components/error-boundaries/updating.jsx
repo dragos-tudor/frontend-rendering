@@ -1,6 +1,6 @@
 import { update } from "../../rendering/mod.js"
 import { getErrorPath, getEventDetailError } from "./getting.js"
-import { ErrorBoundary } from "./ErrorBoundary.jsx"
+import { ErrorBoundary } from "./errorboundary.jsx"
 import { toStringErrorPath } from "./converting.js";
 
 export const updateErrorBoundary = (elem, event) =>

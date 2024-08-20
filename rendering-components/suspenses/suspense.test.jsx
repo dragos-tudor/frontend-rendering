@@ -1,7 +1,7 @@
 import { assertEquals, assertExists } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { Suspense } from "./Suspense.jsx"
+import { Suspense } from "./suspense.jsx"
 
 await registerDOMParser()
 

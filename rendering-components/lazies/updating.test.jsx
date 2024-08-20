@@ -2,7 +2,7 @@ import { assertEquals, assertExists } from "/asserts.ts"
 import { spy, assertSpyCalls } from "/mock.ts"
 import { render, update, unrender } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
-import { Lazy } from "./Lazy.jsx"
+import { Lazy } from "./lazy.jsx"
 
 await registerDOMParser()
 

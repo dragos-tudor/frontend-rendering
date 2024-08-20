@@ -1,8 +1,8 @@
-export { Context } from "./contexts/Context.js"
-export { ErrorBoundary } from "./error-boundaries/ErrorBoundary.jsx"
-export { Lazy } from "./lazies/Lazy.jsx"
-export { Service } from "./services/Services.js"
-export { Suspense } from "./suspenses/Suspense.jsx"
+export { Context } from "./contexts/context.js"
+export { ErrorBoundary } from "./error-boundaries/errorboundary.jsx"
+export { Lazy } from "./lazies/lazy.jsx"
+export { Service } from "./services/services.js"
+export { Suspense } from "./suspenses/suspense.jsx"
 
 export { getContexts } from "./contexts/getting.js"
 export { setContexts } from "./contexts/setting.js"

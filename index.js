@@ -23,6 +23,12 @@ const findHtmlAscendant = (elem, func)=>{
     if (func(elem)) return elem;
     return findHtmlAscendant(getHtmlParentElement(elem), func);
 };
+const findHtmlAscendants = (elem, func, result = [])=>{
+    if (!existsHtmlElement(elem)) return [];
+    if (existsHtmlElement(elem)) result.push(elem);
+    if (func(elem)) return result;
+    return findHtmlAscendants(getHtmlParentElement(elem), func, result);
+};
 const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>findStrategy(getHtmlChildren(elem), func, result);
 const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, message, "elem:", getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
 const appendHtmlNode = (node, parent)=>parent.appendChild(node);
@@ -684,11 +690,10 @@ const Context = ({ name, value, children }, elem)=>{
     ]);
     return children;
 };
-const getErrorPath = (boundary, elem, names = [])=>{
-    if (!elem) return;
-    names.push(getHtmlName(elem));
-    return boundary === elem ? names.reverse().join("/") : getErrorPath(boundary, elem.parentElement, names);
-};
+const isErrorBoundaryElement = (elem, boundary)=>elem === boundary;
+const getErrorPath = (source, boundary)=>findHtmlAscendants(source, (elem)=>isErrorBoundaryElement(elem, boundary));
+const getEventDetailError = (event)=>event.detail?.error;
+const toStringErrorPath = (elems)=>elems.map(getHtmlName).reverse().join("/");
 const ErrorBoundary = ({ path, error, children }, elem)=>{
     setHtmlEventHandler(elem, "onerror", (event)=>{
         event.stopPropagation();
@@ -701,20 +706,20 @@ const ErrorBoundary = ({ path, error, children }, elem)=>{
     }, `Error: ${error}`)) : children;
 };
 const updateErrorBoundary = (elem, event)=>{
-    const path = getErrorPath(elem, event.target);
-    const error = event.detail?.error;
+    const error = getEventDetailError(event);
+    const path = getErrorPath(event.target, elem);
     return updateElementTree(elem, React.createElement(ErrorBoundary, {
-        path: path,
-        error: error?.message
+        error: error?.message,
+        path: toStringErrorPath(path)
     }));
 };
-const setServices = (elem, services)=>elem.ownerDocument.__services = services;
-const Services = (props, elem)=>{
-    setServices(elem, props);
+const setService = (services, name, value)=>services[name] = value;
+const setServices = (elem)=>elem.ownerDocument.__services = elem.ownerDocument.__services || {};
+const Service = (props, elem)=>{
+    const services = setServices(elem);
+    setService(services, props.name, props.value);
     return props.children;
 };
-const getService = (elem, name, fallback)=>getServices(elem)?.[name] ?? fallback;
-const getServices = (elem)=>elem.ownerDocument.__services;
 const setElementPropsHidden = (elem, value)=>(elem.props.hidden = value, elem);
 const setElementsPropsHiodden = (elems, value)=>elems.map((elem)=>setElementPropsHidden(elem, value));
 const Suspense = ({ suspending = true, fallback, children })=>{
@@ -722,6 +727,8 @@ const Suspense = ({ suspending = true, fallback, children })=>{
     setElementsPropsHiodden(children, suspending);
     return React.createElement(React.Fragment, null, fallback, ...children);
 };
+const getService = (services, name)=>services?.[name];
+const getServices = (elem)=>elem.ownerDocument.__services;
 const getJsxParent = (internals)=>internals?.ReactCurrentOwner?.current;
 const getJsxInternals = (store)=>store?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 const setJsxPropValue = (props, propName, propValue)=>props[propName] = propValue;
@@ -774,11 +781,13 @@ const Lazy = (props, elem)=>{
 };
 export { setEffects as setEffects, useEffect as useEffect, setInitialEffect as setInitialEffect };
 export { setStates as setStates, useMemo as useMemo, useState as useState };
+export { ErrorBoundary as ErrorBoundary };
+export { Lazy as Lazy };
+export { Service as Service };
+export { Suspense as Suspense };
 export { getContexts as getContexts };
 export { setContexts as setContexts };
 export { useContext as useContext };
-export { ErrorBoundary as ErrorBoundary };
-export { Lazy as Lazy };
-export { Services as Services };
-export { getService as getService };
-export { Suspense as Suspense };
+export { getServices as getServices };
+export { setServices as setServices };
+export { getService as useService };
