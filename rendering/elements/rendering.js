@@ -1,3 +1,4 @@
+import { setHtmlAttrs } from "../../rendering-attrs/mod.js"
 import { setHtmlEventHandlers } from "../../rendering-events/mod.js"
 import { renderHtmlElement, renderHtmlText, validateHtmlElement, validateHtmlTagName } from "../../rendering-html/mod.js"
 import { getJsxName, getJsxProps, isJsxText, storeJsxElement, validateJsxElement } from "../../rendering-jsx/mod.js"
@@ -15,12 +16,11 @@ export const renderElement = (elem, $parent) =>
   throwError(validateHtmlElement($parent))
   throwError(validateJsxElement(elem))
   throwError(validateHtmlTagName(getJsxName(elem)))
-
-  const tagName = getJsxName(elem)
   const props = getJsxProps(elem)
-  const $elem = renderHtmlElement(tagName, getElementNS(elem, $parent), $parent)
+  const $elem = renderHtmlElement(getJsxName(elem), getElementNS(elem, $parent), $parent)
 
-  setHtmlProps($elem, props, tagName)
+  setHtmlAttrs($elem, props)
+  setHtmlProps($elem, props)
   setHtmlEventHandlers($elem, props)
   enableIgnoring($elem, $parent)
   enableLogging($elem, $parent)

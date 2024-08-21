@@ -293,59 +293,7 @@ const getProducerContextValue = (name, fallbackValue, elem)=>{
     return context.value;
 };
 const findConsumer = (elem, name)=>findHtmlDescendants(elem, (elem)=>isContextConsumer(elem, name));
-const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
-        bubbles: true,
-        cancelable: true,
-        detail
-    });
-const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
-const isFunctionHtmlPropValue = (props, propName)=>typeof props[propName] === "function";
-const isHtmlEventHandler = (props, propName)=>isHtmlEventHandlerName(propName) && isFunctionHtmlPropValue(props, propName);
-const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
-const getHtmlPropNames = (props)=>Object.getOwnPropertyNames(props);
-const getHtmlEventName = (handlerName)=>handlerName.replace("on", "");
-const getValidHtmlEventHandlerNames = (props)=>getHtmlPropNames(props).filter((propName)=>isHtmlEventHandler(props, propName));
-const storeHtmlEventHandler = (elem, handlerName, handler)=>elem[handlerName] = handler;
-const unstoreHtmlEventHandler = (elem, handlerName)=>delete elem[handlerName];
-const unsetHtmlEventHandler = (elem, handlerName)=>{
-    elem.removeEventListener(getHtmlEventName(handlerName), elem[handlerName]);
-    unstoreHtmlEventHandler(elem, handlerName);
-    return handlerName;
-};
-const unsetHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>unsetHtmlEventHandler(elem, handlerName));
-const setHtmlEventHandler = (elem, handlerName, handler)=>{
-    unsetHtmlEventHandler(elem, handlerName);
-    storeHtmlEventHandler(elem, handlerName, handler);
-    return handlerName;
-};
-const setHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>setHtmlEventHandler(elem, handlerName, props[handlerName]));
-const isHtmlAttrName = (elem, propName)=>!(propName in elem);
-const isFunctionHtmlAttrValue = (attrValue)=>typeof attrValue === "function";
-const isXmlnsHtmlAttrName = (attrName)=>attrName === "xmlns";
-const setHtmlAttrNSValue = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
-const setHtmlAttrValue = (elem, attrName, attrValue)=>{
-    if (isFunctionHtmlAttrValue(attrValue)) return;
-    if (isXmlnsHtmlAttrName(attrName)) return;
-    setHtmlAttrNSValue(elem, attrName, attrValue);
-    return attrValue;
-};
-const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
-const UnsafeHtmlPropNames = Object.freeze([
-    "css",
-    "innerHTML",
-    "outerHTML"
-]);
-const UrlHtmlPropNames = Object.freeze([
-    "action",
-    "background",
-    "dynsrv",
-    "href",
-    "lowsrc",
-    "src"
-]);
-const isSafeHtmlPropNameForTag = (propName, tagName)=>tagName === "style" && propName === "css";
-const isSafeHtmlPropName = (tagName, propName)=>isSafeHtmlPropNameForTag(propName, tagName) || !UnsafeHtmlPropNames.includes(propName);
-const isSafeUrl = (props, propName)=>UrlHtmlPropNames.includes(propName) ? !JavaScriptProtocolRegex.test(props[propName] || "") : true;
+const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
 const AriaHtmlPropMappings = Object.freeze({
     "aria-autocomplete": "ariaAutoComplete",
     "aria-colcount": "ariaColCount",
@@ -374,6 +322,25 @@ const SpecialHtmlPropMappings = Object.freeze({
     css: "innerHTML",
     html: "innerHTML"
 });
+const isEmptyHtmlPropValue = (propValue)=>propValue == undefined || propValue === "";
+const isSvgHtmlPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
+const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+const UnsafeHtmlPropNames = Object.freeze([
+    "innerHTML",
+    "outerHTML"
+]);
+const UrlHtmlPropNames = Object.freeze([
+    "action",
+    "background",
+    "dynsrv",
+    "href",
+    "lowsrc",
+    "src"
+]);
+const isJavascriptInjection = (propValue)=>JavaScriptProtocolRegex.test(propValue || "");
+const isUrlHtmlPropName = (propName)=>UrlHtmlPropNames.includes(propName);
+const isSafeHtmlPropName = (propName)=>!UnsafeHtmlPropNames.includes(propName);
+const isSafeUrlHtmlPropValue = (props, propName)=>isUrlHtmlPropName(propName) ? !isJavascriptInjection(props[propName]) : true;
 const ReservedHtmlPropNames = Object.freeze([
     "children"
 ]);
@@ -382,39 +349,24 @@ const ToggleHtmlPropNames = Object.freeze([
     "disabled",
     "hidden",
     "readOnly",
+    "readonly",
     "selected"
 ]);
 const isAriaHtmlPropName = (propName)=>propName.startsWith("aria-");
 const isDangerouslyHtmlPropName = (propName)=>propName === "html";
 const isEventHandlerName = (propName)=>propName.startsWith("on");
+const isHtmlPropName = (props, propName)=>propName in props;
 const isInternalHtmlPropName = (propName)=>propName.startsWith("__");
 const isReservedHtmlPropName = (propName)=>ReservedHtmlPropNames.includes(propName);
 const isSpecialHtmlPropName = (propName)=>propName in SpecialHtmlPropMappings;
+const mapHtmlPropName = (propName)=>isSpecialHtmlPropName(propName) && SpecialHtmlPropMappings[propName] || isAriaHtmlPropName(propName) && (AriaHtmlPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
 const isStyleHtmlPropName = (propName)=>propName === "style";
 const isToggleHtmlPropName = (propName)=>ToggleHtmlPropNames.includes(propName);
-const isValidHtmlPropName = (props, propName, tagName)=>!isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && isSafeHtmlPropName(tagName, propName) && isSafeUrl(props, propName);
-const getHtmlPropNames1 = (elem)=>Object.getOwnPropertyNames(elem);
-const getValidHtmlPropNames = (props, tagName)=>getHtmlPropNames1(props).filter((propName)=>isValidHtmlPropName(props, propName, tagName));
-const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
-const mapHtmlPropName = (propName)=>isSpecialHtmlPropName(propName) && SpecialHtmlPropMappings[propName] || isAriaHtmlPropName(propName) && (AriaHtmlPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
-const isEmptyHtmlPropValue = (propValue)=>propValue == undefined || propValue === "";
-const isSVGHtmlPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
-const getPropValue = (props, propName)=>props[propName];
+const isValidHtmlPropName = (elem, props, propName)=>(isHtmlPropName(elem, mapHtmlPropName(propName)) || isInternalHtmlPropName(propName)) && !isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && !isSvgHtmlPropValue(elem, propName) && isSafeHtmlPropName(propName) && isSafeUrlHtmlPropValue(props, propName);
+const getHtmlPropNames = (elem)=>Object.getOwnPropertyNames(elem);
+const getValidHtmlPropNames = (elem, props)=>getHtmlPropNames(props).filter((propName)=>isValidHtmlPropName(elem, props, propName));
+const getHtmlPropValue = (props, propName)=>props[propName];
 const getToggleHtmlPropValue = (propValue)=>isEmptyHtmlPropValue(propValue) || propValue;
-const EncodingCharsRegex = /[^\w. ]/gi;
-const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
-const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
-const resolveHtmlPropValue = (propName, propValue)=>isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(propValue) || isDangerouslyHtmlPropName(propName) && encodeHtml(propValue) || propValue;
-const setHtmlPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
-const setStyleHtmlPropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
-const setStyleHtmlPropValues = (elem, style)=>getHtmlPropNames1(style).reduce(setStyleHtmlPropValue(style), elem);
-const HtmlPropTypes = Object.freeze({
-    attr: 0,
-    readonlyProp: 1,
-    writableProp: 2,
-    style: 3,
-    svgProp: 4
-});
 const getHtmlPropDescriptor = (elem, propName)=>Object.getOwnPropertyDescriptor(elem, propName);
 const isWritableHtmlProp = (elem, propName)=>{
     const propDescriptor = getHtmlPropDescriptor(elem, propName);
@@ -422,52 +374,72 @@ const isWritableHtmlProp = (elem, propName)=>{
     if (propDescriptor && "set" in propDescriptor) return true;
     return true;
 };
-const getHtmlPropType = (elem, propName)=>{
-    if (isInternalHtmlPropName(propName)) return HtmlPropTypes.writableProp;
-    if (isSVGHtmlPropValue(elem, propName)) return HtmlPropTypes.svgProp;
-    if (isStyleHtmlPropName(propName)) return HtmlPropTypes.style;
-    if (isHtmlAttrName(elem, propName)) return HtmlPropTypes.attr;
-    if (isWritableHtmlProp(elem, propName)) return HtmlPropTypes.writableProp;
-    return HtmlPropTypes.readonlyProp;
+const EncodingCharsRegex = /[^\w. ]/gi;
+const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
+const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
+const resolveHtmlPropValue = (propName, propValue)=>isToggleHtmlPropName(propName) && getToggleHtmlPropValue(propValue) || isDangerouslyHtmlPropName(propName) && encodeHtml(propValue) || propValue;
+const setPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
+const setStyleHtmlPropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
+const setStyleHtmlPropValues = (elem, style)=>getHtmlPropNames(style).reduce(setStyleHtmlPropValue(style), elem);
+const setHtmlPropValue = (elem, propName, propValue)=>{
+    if (isStyleHtmlPropName(propName)) return setStyleHtmlPropValues(elem, propValue);
+    if (isInternalHtmlPropName(propName)) return setPropValue(elem, propName, propValue);
+    if (!isWritableHtmlProp(elem, propName)) return;
+    setPropValue(elem, mapHtmlPropName(propName), resolveHtmlPropValue(propName, propValue));
+    return propValue;
 };
-const setHtmlProp = (elem, props, propName)=>{
-    const mappedName = mapHtmlPropName(propName);
-    const propValue = getPropValue(props, propName);
-    const propType = getHtmlPropType(elem, mappedName);
-    switch(propType){
-        case HtmlPropTypes.attr:
-            setHtmlAttrValue(elem, mappedName, propValue);
-            break;
-        case HtmlPropTypes.style:
-            setStyleHtmlPropValues(elem, propValue);
-            break;
-        case HtmlPropTypes.svgProp:
-            setHtmlAttrValue(elem, propName, propValue);
-            break;
-        case HtmlPropTypes.writableProp:
-            setHtmlPropValue(elem, mappedName, resolveHtmlPropValue(propName, propValue));
-            break;
-    }
-    return elem;
+const setHtmlProps = (elem, props)=>getValidHtmlPropNames(elem, props).reduce((elem, propName)=>(setHtmlPropValue(elem, propName, getHtmlPropValue(props, propName)), elem), elem);
+const unsetPropValue = (elem, propName)=>elem[propName] = undefined;
+const unsetHtmlPropValue = (elem, propName)=>{
+    if (!isWritableHtmlProp(elem, propName)) return;
+    return unsetPropValue(elem, mapHtmlPropName(propName));
 };
-const setHtmlProps = (elem, props, tagName)=>getValidHtmlPropNames(props, tagName).reduce((elem, propName)=>setHtmlProp(elem, props, propName), elem);
+const unsetInternalHtmlProps = (elem)=>getHtmlPropNames(elem).filter(isInternalHtmlPropName).reduce((elem, propName)=>(unsetHtmlPropValue(elem, propName), elem), elem);
+const unsetHtmlProps = (elem, props)=>getValidHtmlPropNames(elem, props).reduce((elem, propName)=>(unsetHtmlPropValue(elem, propName), elem), elem);
+const isFunctionHtmlAttrValue = (attrValue)=>typeof attrValue === "function";
+const isSvgHtmlPropValue1 = (elem, attrName)=>elem[attrName]?.constructor?.name.startsWith("SVG");
+const isHtmlPropName1 = (elem, propName)=>propName in elem;
+const isEventHandlerName1 = (attrName)=>attrName.startsWith("on");
+const isInternalHtmlAttrName = (attrName)=>attrName.startsWith("__");
+const isXmlnsHtmlAttrName = (attrName)=>attrName === "xmlns";
+const isValidHtmlAttrName = (elem, attrName)=>(!isHtmlPropName1(elem, mapHtmlPropName(attrName)) || isSvgHtmlPropValue1(elem, attrName)) && !isEventHandlerName1(attrName) && !isInternalHtmlAttrName(attrName) && !isXmlnsHtmlAttrName(attrName);
+const getHtmlAttrNames = (attrs)=>Object.getOwnPropertyNames(attrs);
+const getValidHtmlAttrNames = (elem, attrs)=>getHtmlAttrNames(attrs).filter((attrName)=>isValidHtmlAttrName(elem, attrName));
+const setAttrValue = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
+const setHtmlAttrValue = (elem, attrName, attrValue)=>{
+    if (isFunctionHtmlAttrValue(attrValue)) return undefined;
+    setAttrValue(elem, attrName, attrValue);
+    return attrValue;
+};
+const setHtmlAttrs = (elem, props)=>getValidHtmlAttrNames(elem, props).reduce((elem, attrName)=>(setHtmlAttrValue(elem, attrName, props[attrName]), elem), elem);
 const removeHtmlAttr = (elem, attrName)=>elem.removeAttribute(attrName);
-const unsetHtmlPropValue = (elem, propName)=>elem[propName] = undefined;
-const unsetHtmlProp = (elem, propName)=>{
-    const mappedName = mapHtmlPropName(propName);
-    const propType = getHtmlPropType(elem, mappedName);
-    switch(propType){
-        case HtmlPropTypes.attr:
-            removeHtmlAttr(elem, mappedName);
-            break;
-        case HtmlPropTypes.writableProp:
-            unsetHtmlPropValue(elem, mappedName);
-            break;
-    }
-    return elem;
+const unsetHtmlAttrs = (elem, props)=>getValidHtmlAttrNames(elem, props).reduce((elem, attrName)=>(removeHtmlAttr(elem, attrName), elem), elem);
+const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
+        bubbles: true,
+        cancelable: true,
+        detail
+    });
+const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
+const isFunctionHtmlPropValue = (props, propName)=>typeof props[propName] === "function";
+const isHtmlEventHandler = (props, propName)=>isHtmlEventHandlerName(propName) && isFunctionHtmlPropValue(props, propName);
+const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
+const getHtmlPropNames1 = (props)=>Object.getOwnPropertyNames(props);
+const getHtmlEventName = (handlerName)=>handlerName.replace("on", "");
+const getValidHtmlEventHandlerNames = (props)=>getHtmlPropNames1(props).filter((propName)=>isHtmlEventHandler(props, propName));
+const storeHtmlEventHandler = (elem, handlerName, handler)=>elem[handlerName] = handler;
+const unstoreHtmlEventHandler = (elem, handlerName)=>delete elem[handlerName];
+const unsetHtmlEventHandler = (elem, handlerName)=>{
+    elem.removeEventListener(getHtmlEventName(handlerName), elem[handlerName]);
+    unstoreHtmlEventHandler(elem, handlerName);
+    return handlerName;
 };
-const unsetInternalHtmlProps = (elem)=>getHtmlPropNames1(elem).filter(isInternalHtmlPropName).reduce((elem, propName)=>unsetHtmlProp(elem, propName), elem);
-const unsetHtmlProps = (elem, props, tagName)=>getValidHtmlPropNames(props, tagName).reduce((elem, propName)=>unsetHtmlProp(elem, propName), elem);
+const unsetHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>unsetHtmlEventHandler(elem, handlerName));
+const setHtmlEventHandler = (elem, handlerName, handler)=>{
+    unsetHtmlEventHandler(elem, handlerName);
+    storeHtmlEventHandler(elem, handlerName, handler);
+    return handlerName;
+};
+const setHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>setHtmlEventHandler(elem, handlerName, props[handlerName]));
 const throwError1 = (message)=>{
     if (!message) return false;
     throw new Error(message);
@@ -501,10 +473,10 @@ const renderElement = (elem, $parent)=>{
     throwError1(validateHtmlElement($parent));
     throwError1(validateJsxElement(elem));
     throwError1(validateHtmlTagName(getJsxName(elem)));
-    const tagName = getJsxName(elem);
     const props = getJsxProps(elem);
-    const $elem = renderHtmlElement(tagName, getElementNS(elem, $parent), $parent);
-    setHtmlProps($elem, props, tagName);
+    const $elem = renderHtmlElement(getJsxName(elem), getElementNS(elem, $parent), $parent);
+    setHtmlAttrs($elem, props);
+    setHtmlProps($elem, props);
     setHtmlEventHandlers($elem, props);
     enableIgnoring($elem, $parent);
     enableLogging($elem, $parent);
@@ -550,8 +522,8 @@ const updateElement = (elem, $elem)=>{
     throwError1(validateHtmlElement($elem));
     throwError1(validateJsxElement(elem));
     const props = getJsxProps(elem);
-    const tagName = getHtmlName($elem);
-    setHtmlProps($elem, props, tagName);
+    setHtmlAttrs($elem, props);
+    setHtmlProps($elem, props);
     setHtmlEventHandlers($elem, props);
     storeJsxElement($elem, elem);
     return $elem;
@@ -561,9 +533,9 @@ const unrenderElement = ($elem)=>{
     if (isHtmlText($elem)) return unrenderHtmlText($elem);
     throwError1(validateHtmlElement($elem));
     const props = getJsxProps(getJsxElement($elem));
-    const tagName = getHtmlName($elem);
     runInitialEffects(getEffects($elem));
-    unsetHtmlProps($elem, tagName);
+    unsetHtmlAttrs($elem, props);
+    unsetHtmlProps($elem, props);
     unsetHtmlEventHandlers($elem, props);
     unsetInternalHtmlProps($elem);
     unrenderHtmlElement($elem);

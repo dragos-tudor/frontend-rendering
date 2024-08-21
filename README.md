@@ -53,7 +53,7 @@ render(<App></App>, document.body)
 
 ### Modules
 - *high-level modules*: rendering, rendering-components.
-- *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-events, rendering-props, rendering-equalities [shared].
+- *low-level modules*: rendering-html, rendering-jsx, rendering-effects, rendering-states, rendering-attrs, rendering-events, rendering-props, rendering-equalities [shared].
 - *low-level modules* completely independent ["parallel" modules].
 
 ### [Rendering](./rendering/)

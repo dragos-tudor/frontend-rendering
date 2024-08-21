@@ -1,2 +1,11 @@
+import { mapHtmlPropName } from "../props-names/mapping.js"
+import { isWritableHtmlProp } from "../props/verifying.js";
 
-export const unsetHtmlPropValue = (elem, propName) => elem[propName] = undefined
+
+const unsetPropValue = (elem, propName) => elem[propName] = undefined
+
+export const unsetHtmlPropValue = (elem, propName) =>
+{
+  if (!isWritableHtmlProp(elem, propName)) return
+  return unsetPropValue(elem, mapHtmlPropName(propName))
+}

@@ -33,8 +33,8 @@ Deno.test("use html components => set html prop values", async (t) =>
     assertObjectMatch(setHtmlProps({style: {}}, {style: {backgroundColor: "red"}}), {style: {backgroundColor: "red"}})
   })
 
-  await t.step("html style element and css prop => set html element props values => element with inner html props values", () => {
-    assertObjectMatch(setHtmlProps({innerHTML: {}}, {css: {backgroundColor: "red"}}, "style"), {innerHTML: {backgroundColor: "red"}})
+  await t.step("html element and css prop => set html element props values => element with inner html props values", () => {
+    assertObjectMatch(setHtmlProps({innerHTML: {}}, {css: {backgroundColor: "red"}}), {innerHTML: {backgroundColor: "red"}})
   })
 
   await t.step("html element and internal props => set html element props values => element with internal props values", () => {
@@ -50,7 +50,6 @@ Deno.test("use html components => set html prop values", async (t) =>
   })
 
   await t.step("html element and unsafe props => set html element props values  => nothing happend", () => {
-    assertObjectMatch(setHtmlProps({css: undefined}, {css: 1}), {css: undefined})
     assertObjectMatch(setHtmlProps({innerHTML: undefined}, {innerHTML: 1}), {innerHTML: undefined})
     assertObjectMatch(setHtmlProps({outerHTML: undefined}, {outerHTML: 1}), {outerHTML: undefined})
   })
@@ -62,18 +61,5 @@ Deno.test("use html components => set html prop values", async (t) =>
   await t.step("html element without props => set html element props values  => element without prop values", () => {
     assertObjectMatch(setHtmlProps({}, {}), {})
     assertObjectMatch(setHtmlProps({}, {class: 1}), {})
-  })
-
-  await t.step("html element and non-props => set html element props values => element with attr values", () => {
-    const elem = {}
-    elem.setAttributeNS = (_, name, value) => elem["attr" + name] = value;
-    assertObjectMatch(setHtmlProps(elem, {test: "0 0 48 48"}), {attrtest: "0 0 48 48"})
-  })
-
-  await t.step("html element and svg props => set html element props values => element with svg attr values", () => {
-    function SVGViewBox(){ return this; }
-    const elem = {viewBox: new SVGViewBox()}
-    elem.setAttributeNS = (_, name, value) => elem["attr" + name] = value;
-    assertObjectMatch(setHtmlProps(elem, {viewBox: "0 0 48 48"}), {attrviewBox: "0 0 48 48"})
   })
 })
