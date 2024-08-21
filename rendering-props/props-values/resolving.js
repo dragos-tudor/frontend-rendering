@@ -3,7 +3,7 @@ import { isDangerouslyHtmlPropName, isToggleHtmlPropName } from "../props-names/
 import { encodeHtml } from "../security/encoding.js"
 import { getToggleHtmlPropValue } from "./getting.js"
 
-export const resolveHtmlPropValue = (props, propName) =>
-  (isDangerouslyHtmlPropName(propName) && encodeHtml(props[propName])) ||
-  (isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(props[propName])) ||
-  props[propName]
+export const resolveHtmlPropValue = (propName, propValue) =>
+  (isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(propValue)) ||
+  (isDangerouslyHtmlPropName(propName) && encodeHtml(propValue)) ||
+  propValue

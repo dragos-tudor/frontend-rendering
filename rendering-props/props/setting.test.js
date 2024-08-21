@@ -63,4 +63,17 @@ Deno.test("use html components => set html prop values", async (t) =>
     assertObjectMatch(setHtmlProps({}, {}), {})
     assertObjectMatch(setHtmlProps({}, {class: 1}), {})
   })
+
+  await t.step("html element and non-props => set html element props values => element with attr values", () => {
+    const elem = {}
+    elem.setAttributeNS = (_, name, value) => elem["attr" + name] = value;
+    assertObjectMatch(setHtmlProps(elem, {test: "0 0 48 48"}), {attrtest: "0 0 48 48"})
+  })
+
+  await t.step("html element and svg props => set html element props values => element with svg attr values", () => {
+    function SVGViewBox(){ return this; }
+    const elem = {viewBox: new SVGViewBox()}
+    elem.setAttributeNS = (_, name, value) => elem["attr" + name] = value;
+    assertObjectMatch(setHtmlProps(elem, {viewBox: "0 0 48 48"}), {attrviewBox: "0 0 48 48"})
+  })
 })

@@ -322,11 +322,11 @@ const setHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props)
 const isHtmlAttrName = (elem, propName)=>!(propName in elem);
 const isFunctionHtmlAttrValue = (attrValue)=>typeof attrValue === "function";
 const isXmlnsHtmlAttrName = (attrName)=>attrName === "xmlns";
-const setHtmlAttrValue = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
-const setHtmlAttr = (elem, attrName, attrValue)=>{
+const setHtmlAttrNSValue = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
+const setHtmlAttrValue = (elem, attrName, attrValue)=>{
     if (isFunctionHtmlAttrValue(attrValue)) return;
     if (isXmlnsHtmlAttrName(attrName)) return;
-    setHtmlAttrValue(elem, attrName, attrValue);
+    setHtmlAttrNSValue(elem, attrName, attrValue);
     return attrValue;
 };
 const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
@@ -397,13 +397,14 @@ const getHtmlPropNames1 = (elem)=>Object.getOwnPropertyNames(elem);
 const getValidHtmlPropNames = (props, tagName)=>getHtmlPropNames1(props).filter((propName)=>isValidHtmlPropName(props, propName, tagName));
 const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
 const mapHtmlPropName = (propName)=>isSpecialHtmlPropName(propName) && SpecialHtmlPropMappings[propName] || isAriaHtmlPropName(propName) && (AriaHtmlPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
+const isEmptyHtmlPropValue = (propValue)=>propValue == undefined || propValue === "";
+const isSVGHtmlPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
+const getPropValue = (props, propName)=>props[propName];
+const getToggleHtmlPropValue = (propValue)=>isEmptyHtmlPropValue(propValue) || propValue;
 const EncodingCharsRegex = /[^\w. ]/gi;
 const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
 const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
-const isEmptyHtmlPropValue = (propValue)=>propValue == undefined || propValue === "";
-const isSVGHtmlPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
-const getToggleHtmlPropValue = (propValue)=>isEmptyHtmlPropValue(propValue) || propValue;
-const resolveHtmlPropValue = (props, propName)=>isDangerouslyHtmlPropName(propName) && encodeHtml(props[propName]) || isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(props[propName]) || props[propName];
+const resolveHtmlPropValue = (propName, propValue)=>isToggleHtmlPropName(mapHtmlPropName(propName)) && getToggleHtmlPropValue(propValue) || isDangerouslyHtmlPropName(propName) && encodeHtml(propValue) || propValue;
 const setHtmlPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
 const setStyleHtmlPropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
 const setStyleHtmlPropValues = (elem, style)=>getHtmlPropNames1(style).reduce(setStyleHtmlPropValue(style), elem);
@@ -411,7 +412,8 @@ const HtmlPropTypes = Object.freeze({
     attr: 0,
     readonlyProp: 1,
     writableProp: 2,
-    style: 3
+    style: 3,
+    svgProp: 4
 });
 const getHtmlPropDescriptor = (elem, propName)=>Object.getOwnPropertyDescriptor(elem, propName);
 const isWritableHtmlProp = (elem, propName)=>{
@@ -422,7 +424,7 @@ const isWritableHtmlProp = (elem, propName)=>{
 };
 const getHtmlPropType = (elem, propName)=>{
     if (isInternalHtmlPropName(propName)) return HtmlPropTypes.writableProp;
-    if (isSVGHtmlPropValue(elem, propName)) return HtmlPropTypes.readonlyProp;
+    if (isSVGHtmlPropValue(elem, propName)) return HtmlPropTypes.svgProp;
     if (isStyleHtmlPropName(propName)) return HtmlPropTypes.style;
     if (isHtmlAttrName(elem, propName)) return HtmlPropTypes.attr;
     if (isWritableHtmlProp(elem, propName)) return HtmlPropTypes.writableProp;
@@ -430,17 +432,20 @@ const getHtmlPropType = (elem, propName)=>{
 };
 const setHtmlProp = (elem, props, propName)=>{
     const mappedName = mapHtmlPropName(propName);
-    const resolvedValue = resolveHtmlPropValue(props, propName);
+    const propValue = getPropValue(props, propName);
     const propType = getHtmlPropType(elem, mappedName);
     switch(propType){
         case HtmlPropTypes.attr:
-            setHtmlAttr(elem, mappedName, resolvedValue);
-            break;
-        case HtmlPropTypes.writableProp:
-            setHtmlPropValue(elem, mappedName, resolvedValue);
+            setHtmlAttrValue(elem, mappedName, propValue);
             break;
         case HtmlPropTypes.style:
-            setStyleHtmlPropValues(elem, props[propName]);
+            setStyleHtmlPropValues(elem, propValue);
+            break;
+        case HtmlPropTypes.svgProp:
+            setHtmlAttrValue(elem, propName, propValue);
+            break;
+        case HtmlPropTypes.writableProp:
+            setHtmlPropValue(elem, mappedName, resolveHtmlPropValue(propName, propValue));
             break;
     }
     return elem;

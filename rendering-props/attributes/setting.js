@@ -1,11 +1,11 @@
 import { isFunctionHtmlAttrValue, isXmlnsHtmlAttrName } from "./verifying.js"
 
-const setHtmlAttrValue = (elem, attrName, attrValue) => elem.setAttributeNS?.(null, attrName, attrValue)
+const setHtmlAttrNSValue = (elem, attrName, attrValue) => elem.setAttributeNS?.(null, attrName, attrValue)
 
-export const setHtmlAttr = (elem, attrName, attrValue) =>
+export const setHtmlAttrValue = (elem, attrName, attrValue) =>
 {
   if (isFunctionHtmlAttrValue(attrValue)) return
   if (isXmlnsHtmlAttrName(attrName)) return
-  setHtmlAttrValue(elem, attrName, attrValue)
+  setHtmlAttrNSValue(elem, attrName, attrValue)
   return attrValue
 }
