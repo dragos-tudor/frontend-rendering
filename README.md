@@ -5,8 +5,7 @@
 
 ### Usage
 ```javascript
-import {render, update, setEffects, setStates, useEffect, useState}
-  from "/scripts/rendering.js"
+import {render, update, setEffects, setStates, useEffect, useState} from "index.js"
 
 const getData = async () => {
   const response = await fetch("/api/data.json", { method: "GET" });
