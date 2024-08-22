@@ -249,6 +249,7 @@ const setStateDeps = (state, deps)=>state.deps = deps;
 const setStateValue = (state, value)=>state.value = value;
 const setStates = (elem, states = {})=>elem.__states = elem.__states ?? states;
 const getState = (states, name)=>states[name];
+const getStates = (elem)=>elem.__states;
 const getStateUsage = (state)=>[
         state.value,
         (value)=>setStateValue(state, value)
@@ -293,6 +294,24 @@ const getProducerContextValue = (name, fallbackValue, elem)=>{
     return context.value;
 };
 const findConsumer = (elem, name)=>findHtmlDescendants(elem, (elem)=>isContextConsumer(elem, name));
+const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+const UnsafeHtmlPropNames = Object.freeze([
+    "innerHTML",
+    "outerHTML"
+]);
+const UrlHtmlPropNames = Object.freeze([
+    "action",
+    "background",
+    "dynsrv",
+    "href",
+    "lowsrc",
+    "src"
+]);
+const isJavascriptInjection = (propValue)=>JavaScriptProtocolRegex.test(propValue || "");
+const isUrlHtmlPropName = (propName)=>UrlHtmlPropNames.includes(propName);
+const isSafeUrlHtmlPropValue = (props, propName)=>isUrlHtmlPropName(propName) ? !isJavascriptInjection(props[propName]) : true;
+const isDangerouslyHtmlPropName = (propName)=>propName === "html";
+const isSafeHtmlPropName = (props, propName)=>!UnsafeHtmlPropNames.includes(propName) && isSafeUrlHtmlPropValue(props, propName);
 const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
 const AriaHtmlPropMappings = Object.freeze({
     "aria-autocomplete": "ariaAutoComplete",
@@ -324,23 +343,6 @@ const SpecialHtmlPropMappings = Object.freeze({
 });
 const isEmptyHtmlPropValue = (propValue)=>propValue == undefined || propValue === "";
 const isSvgHtmlPropValue = (elem, propName)=>elem[propName]?.constructor?.name.startsWith("SVG");
-const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
-const UnsafeHtmlPropNames = Object.freeze([
-    "innerHTML",
-    "outerHTML"
-]);
-const UrlHtmlPropNames = Object.freeze([
-    "action",
-    "background",
-    "dynsrv",
-    "href",
-    "lowsrc",
-    "src"
-]);
-const isJavascriptInjection = (propValue)=>JavaScriptProtocolRegex.test(propValue || "");
-const isUrlHtmlPropName = (propName)=>UrlHtmlPropNames.includes(propName);
-const isSafeHtmlPropName = (propName)=>!UnsafeHtmlPropNames.includes(propName);
-const isSafeUrlHtmlPropValue = (props, propName)=>isUrlHtmlPropName(propName) ? !isJavascriptInjection(props[propName]) : true;
 const ReservedHtmlPropNames = Object.freeze([
     "children"
 ]);
@@ -352,19 +354,19 @@ const ToggleHtmlPropNames = Object.freeze([
     "readonly",
     "selected"
 ]);
-const isAriaHtmlPropName = (propName)=>propName.startsWith("aria-");
-const isDangerouslyHtmlPropName = (propName)=>propName === "html";
 const isEventHandlerName = (propName)=>propName.startsWith("on");
+const isReservedHtmlPropName = (propName)=>ReservedHtmlPropNames.includes(propName);
+const isAriaHtmlPropName = (propName)=>propName.startsWith("aria-");
 const isHtmlPropName = (props, propName)=>propName in props;
 const isInternalHtmlPropName = (propName)=>propName.startsWith("__");
-const isReservedHtmlPropName = (propName)=>ReservedHtmlPropNames.includes(propName);
 const isSpecialHtmlPropName = (propName)=>propName in SpecialHtmlPropMappings;
 const mapHtmlPropName = (propName)=>isSpecialHtmlPropName(propName) && SpecialHtmlPropMappings[propName] || isAriaHtmlPropName(propName) && (AriaHtmlPropMappings[propName] || toAriaCamelCaseName(propName)) || propName;
+const isInternalOrHtmlPrtopName = (elem, propName)=>isHtmlPropName(elem, mapHtmlPropName(propName)) || isInternalHtmlPropName(propName);
 const isStyleHtmlPropName = (propName)=>propName === "style";
 const isToggleHtmlPropName = (propName)=>ToggleHtmlPropNames.includes(propName);
-const isValidHtmlPropName = (elem, props, propName)=>(isHtmlPropName(elem, mapHtmlPropName(propName)) || isInternalHtmlPropName(propName)) && !isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && !isSvgHtmlPropValue(elem, propName) && isSafeHtmlPropName(propName) && isSafeUrlHtmlPropValue(props, propName);
+const isValidHtmlPropName = (elem, propName)=>isInternalOrHtmlPrtopName(elem, propName) && !isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && !isSvgHtmlPropValue(elem, propName);
 const getHtmlPropNames = (elem)=>Object.getOwnPropertyNames(elem);
-const getValidHtmlPropNames = (elem, props)=>getHtmlPropNames(props).filter((propName)=>isValidHtmlPropName(elem, props, propName));
+const getValidHtmlPropNames = (elem, props)=>getHtmlPropNames(props).filter((propName)=>isValidHtmlPropName(elem, propName)).filter((propName)=>isSafeHtmlPropName(props, propName));
 const getHtmlPropValue = (props, propName)=>props[propName];
 const getToggleHtmlPropValue = (propValue)=>isEmptyHtmlPropValue(propValue) || propValue;
 const getHtmlPropDescriptor = (elem, propName)=>Object.getOwnPropertyDescriptor(elem, propName);
@@ -398,11 +400,12 @@ const unsetInternalHtmlProps = (elem)=>getHtmlPropNames(elem).filter(isInternalH
 const unsetHtmlProps = (elem, props)=>getValidHtmlPropNames(elem, props).reduce((elem, propName)=>(unsetHtmlPropValue(elem, propName), elem), elem);
 const isFunctionHtmlAttrValue = (attrValue)=>typeof attrValue === "function";
 const isSvgHtmlPropValue1 = (elem, attrName)=>elem[attrName]?.constructor?.name.startsWith("SVG");
+const isSvgPropOrHtmlNonPropName = (elem, attrName)=>!isHtmlPropName1(elem, mapHtmlPropName(attrName)) || isSvgHtmlPropValue1(elem, attrName);
 const isHtmlPropName1 = (elem, propName)=>propName in elem;
 const isEventHandlerName1 = (attrName)=>attrName.startsWith("on");
 const isInternalHtmlAttrName = (attrName)=>attrName.startsWith("__");
 const isXmlnsHtmlAttrName = (attrName)=>attrName === "xmlns";
-const isValidHtmlAttrName = (elem, attrName)=>(!isHtmlPropName1(elem, mapHtmlPropName(attrName)) || isSvgHtmlPropValue1(elem, attrName)) && !isEventHandlerName1(attrName) && !isInternalHtmlAttrName(attrName) && !isXmlnsHtmlAttrName(attrName);
+const isValidHtmlAttrName = (elem, attrName)=>isSvgPropOrHtmlNonPropName(elem, attrName) && !isEventHandlerName1(attrName) && !isInternalHtmlAttrName(attrName) && !isXmlnsHtmlAttrName(attrName);
 const getHtmlAttrNames = (attrs)=>Object.getOwnPropertyNames(attrs);
 const getValidHtmlAttrNames = (elem, attrs)=>getHtmlAttrNames(attrs).filter((attrName)=>isValidHtmlAttrName(elem, attrName));
 const setAttrValue = (elem, attrName, attrValue)=>elem.setAttributeNS?.(null, attrName, attrValue);
@@ -420,9 +423,9 @@ const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
         detail
     });
 const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
+const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
 const isFunctionHtmlPropValue = (props, propName)=>typeof props[propName] === "function";
 const isHtmlEventHandler = (props, propName)=>isHtmlEventHandlerName(propName) && isFunctionHtmlPropValue(props, propName);
-const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
 const getHtmlPropNames1 = (props)=>Object.getOwnPropertyNames(props);
 const getHtmlEventName = (handlerName)=>handlerName.replace("on", "");
 const getValidHtmlEventHandlerNames = (props)=>getHtmlPropNames1(props).filter((propName)=>isHtmlEventHandler(props, propName));
@@ -732,8 +735,15 @@ export { jsx as jsx };
 export { jsxs as jsxs };
 export { createElement as createElement };
 export { FragmentType as Fragment };
+export { getEffects as getEffects };
+export { setEffects as setEffects, setInitialEffect as setInitialEffect };
+export { useEffect as useEffect };
 export { dispatchEvent as dispatchEvent };
 export { setHtmlEventHandler as setHtmlEventHandler };
+export { useMemo as useMemo };
+export { getStates as getStates };
+export { setStates as setStates };
+export { useState as useState };
 try {
     globalThis["DOMParser"] || await registerDOMParser();
     globalThis["React"] = globalThis["React"] ?? {};
@@ -756,8 +766,6 @@ const Lazy = (props, elem)=>{
     if (factory) return createJsxElement(factory, props);
     return React.createElement(React.Fragment, null);
 };
-export { setEffects as setEffects, useEffect as useEffect, setInitialEffect as setInitialEffect };
-export { setStates as setStates, useMemo as useMemo, useState as useState };
 export { ErrorBoundary as ErrorBoundary };
 export { Lazy as Lazy };
 export { Service as Service };

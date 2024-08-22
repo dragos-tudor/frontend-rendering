@@ -1,4 +1,4 @@
-import { getValidHtmlEventHandlerNames } from "./getting.js";
+import { getValidHtmlEventHandlerNames } from "../eventhandler-names/getting.js";
 import { storeHtmlEventHandler } from "./storing.js"
 import { unsetHtmlEventHandler } from "./unsetting.js"
 

@@ -1,5 +1,6 @@
-import { isDangerouslyHtmlPropName, isToggleHtmlPropName } from "../props-names/verifying.js"
-import { encodeHtml } from "../security/encoding.js"
+import { isToggleHtmlPropName } from "../prop-names/verifying.js"
+import { encodeHtml } from "../prop-security/encoding.js"
+import { isDangerouslyHtmlPropName } from "../prop-security/verifying.js"
 import { getToggleHtmlPropValue } from "./getting.js"
 
 export const resolveHtmlPropValue = (propName, propValue) =>

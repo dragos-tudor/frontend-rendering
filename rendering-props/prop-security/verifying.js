@@ -11,7 +11,13 @@ const isJavascriptInjection = (propValue) => JavaScriptProtocolRegex.test(propVa
 
 const isUrlHtmlPropName = (propName) => UrlHtmlPropNames.includes(propName)
 
+const isSafeUrlHtmlPropValue = (props, propName) => isUrlHtmlPropName(propName)? !isJavascriptInjection(props[propName]): true
 
-export const isSafeHtmlPropName = (propName) => !UnsafeHtmlPropNames.includes(propName)
 
-export const isSafeUrlHtmlPropValue = (props, propName) => isUrlHtmlPropName(propName)? !isJavascriptInjection(props[propName]): true
+export const isDangerouslyHtmlPropName = (propName) => propName === "html"
+
+export const isSafeHtmlPropName = (props, propName) => !UnsafeHtmlPropNames.includes(propName) && isSafeUrlHtmlPropValue(props, propName)
+
+
+
+

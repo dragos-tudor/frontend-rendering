@@ -3,7 +3,7 @@ import { mapHtmlPropName } from "./mapping.js"
 
 Deno.test("use html components => map prop names", async (t) =>
 {
-  await t.step("special prop names => map names => html property names", () => {
+  await t.step("special prop names => map prop names => html prop names", () => {
     assertEquals(mapHtmlPropName("class"), "className")
     assertEquals(mapHtmlPropName("for"), "htmlFor")
     assertEquals(mapHtmlPropName("readonly"), "readOnly")
@@ -12,7 +12,7 @@ Deno.test("use html components => map prop names", async (t) =>
     assertEquals(mapHtmlPropName("html"), "innerHTML")
   })
 
-  await t.step("aria props names => map names => html aria names", () => {
+  await t.step("aria props names => map prop names => html aria names", () => {
     assertEquals(mapHtmlPropName("aria-label"), "ariaLabel")
     assertEquals(mapHtmlPropName("aria-autocomplete"), "ariaAutoComplete")
   })

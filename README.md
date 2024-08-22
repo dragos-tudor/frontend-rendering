@@ -82,8 +82,8 @@ render(<App></App>, document.body)
   - handle sync effects errors.
   - on errors display error element.
 - lazy component: used to lazy load components.
-- services component: used on testing to mock services.
 - suspense component: used to toggle visibility for children or fallback elements [preserving children states].
+- service component: used on testing to mock service on development.
 
 ### [Rendering html](./rendering-html/)
 - main functionality: manage html elements and nodes.
@@ -118,3 +118,4 @@ render(<App></App>, document.body)
 ### [Rendering states](./rendering-states/)
 - implement `getStates`, `useStates`, `useMemo` functions.
 
+*SIMPLE ALWAYS MEANS SIMPLE*

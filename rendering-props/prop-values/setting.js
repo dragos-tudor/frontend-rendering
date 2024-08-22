@@ -1,6 +1,6 @@
-import { getHtmlPropNames } from "../props-names/getting.js"
-import { mapHtmlPropName } from "../props-names/mapping.js"
-import { isInternalHtmlPropName, isStyleHtmlPropName } from "../props-names/verifying.js"
+import { mapHtmlPropName } from "../prop-maps/mapping.js"
+import { getHtmlPropNames } from "../prop-names/getting.js"
+import { isInternalHtmlPropName, isStyleHtmlPropName } from "../prop-names/verifying.js"
 import { isWritableHtmlProp } from "../props/verifying.js"
 import { resolveHtmlPropValue } from "./resolving.js"
 

@@ -1,4 +1,4 @@
-import { isHtmlEventHandler } from "./verifying.js";
+import { isHtmlEventHandler } from "../eventhandlers/verifying.js"
 
 const getHtmlPropNames = (props) => Object.getOwnPropertyNames(props)
 

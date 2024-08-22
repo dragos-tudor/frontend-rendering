@@ -1,5 +1,5 @@
-import { mapHtmlPropName } from "../props-names/mapping.js"
-import { isWritableHtmlProp } from "../props/verifying.js";
+import { mapHtmlPropName } from "../prop-maps/mapping.js"
+import { isWritableHtmlProp } from "../props/verifying.js"
 
 
 const unsetPropValue = (elem, propName) => elem[propName] = undefined

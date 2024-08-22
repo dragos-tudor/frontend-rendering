@@ -1,4 +1,4 @@
-import { getHtmlEventName, getValidHtmlEventHandlerNames } from "./getting.js"
+import { getHtmlEventName, getValidHtmlEventHandlerNames } from "../eventhandler-names/getting.js"
 import { unstoreHtmlEventHandler } from "./unstoring.js"
 
 export const unsetHtmlEventHandler = (elem, handlerName) =>
