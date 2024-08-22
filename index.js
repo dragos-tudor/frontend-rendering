@@ -312,6 +312,7 @@ const isUrlHtmlPropName = (propName)=>UrlHtmlPropNames.includes(propName);
 const isSafeUrlHtmlPropValue = (props, propName)=>isUrlHtmlPropName(propName) ? !isJavascriptInjection(props[propName]) : true;
 const isDangerouslyHtmlPropName = (propName)=>propName === "html";
 const isSafeHtmlPropName = (props, propName)=>!UnsafeHtmlPropNames.includes(propName) && isSafeUrlHtmlPropValue(props, propName);
+const isUnsafeHtmlCssPropName = (elem, propName)=>elem.tagName !== "STYLE" && propName === "css";
 const toAriaCamelCaseName = (attrName)=>`aria${attrName[5].toUpperCase()}${attrName.substring(6)}`;
 const AriaHtmlPropMappings = Object.freeze({
     "aria-autocomplete": "ariaAutoComplete",
@@ -367,6 +368,7 @@ const isToggleHtmlPropName = (propName)=>ToggleHtmlPropNames.includes(propName);
 const isValidHtmlPropName = (elem, propName)=>isInternalOrHtmlPrtopName(elem, propName) && !isReservedHtmlPropName(propName) && !isEventHandlerName(propName) && !isSvgHtmlPropValue(elem, propName);
 const getHtmlPropNames = (elem)=>Object.getOwnPropertyNames(elem);
 const getValidHtmlPropNames = (elem, props)=>getHtmlPropNames(props).filter((propName)=>isValidHtmlPropName(elem, propName)).filter((propName)=>isSafeHtmlPropName(props, propName));
+const NeutralCSSPropValue = "*";
 const getHtmlPropValue = (props, propName)=>props[propName];
 const getToggleHtmlPropValue = (propValue)=>isEmptyHtmlPropValue(propValue) || propValue;
 const getHtmlPropDescriptor = (elem, propName)=>Object.getOwnPropertyDescriptor(elem, propName);
@@ -379,15 +381,14 @@ const isWritableHtmlProp = (elem, propName)=>{
 const EncodingCharsRegex = /[^\w. ]/gi;
 const getHtmlEntity = (__char)=>`&#${__char.charCodeAt(0)};`;
 const encodeHtml = (string)=>string.replace(EncodingCharsRegex, getHtmlEntity);
-const resolveHtmlPropValue = (propName, propValue)=>isToggleHtmlPropName(propName) && getToggleHtmlPropValue(propValue) || isDangerouslyHtmlPropName(propName) && encodeHtml(propValue) || propValue;
+const resolveHtmlPropValue = (elem, propName, propValue)=>isToggleHtmlPropName(propName) && getToggleHtmlPropValue(propValue) || isUnsafeHtmlCssPropName(elem, propName) && NeutralCSSPropValue || isDangerouslyHtmlPropName(propName) && encodeHtml(propValue) || propValue;
 const setPropValue = (elem, propName, propValue)=>elem[propName] = propValue;
-const setStyleHtmlPropValue = (style)=>(elem, styleName)=>(elem.style[styleName] = style[styleName], styleName);
-const setStyleHtmlPropValues = (elem, style)=>getHtmlPropNames(style).reduce(setStyleHtmlPropValue(style), elem);
+const setStyleHtmlPropValues = (elem, style)=>Object.assign(elem.style, style);
 const setHtmlPropValue = (elem, propName, propValue)=>{
     if (isStyleHtmlPropName(propName)) return setStyleHtmlPropValues(elem, propValue);
     if (isInternalHtmlPropName(propName)) return setPropValue(elem, propName, propValue);
     if (!isWritableHtmlProp(elem, propName)) return;
-    setPropValue(elem, mapHtmlPropName(propName), resolveHtmlPropValue(propName, propValue));
+    setPropValue(elem, mapHtmlPropName(propName), resolveHtmlPropValue(elem, propName, propValue));
     return propValue;
 };
 const setHtmlProps = (elem, props)=>getValidHtmlPropNames(elem, props).reduce((elem, propName)=>(setHtmlPropValue(elem, propName, getHtmlPropValue(props, propName)), elem), elem);

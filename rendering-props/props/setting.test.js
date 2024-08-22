@@ -33,8 +33,12 @@ Deno.test("use html components => set html prop values", async (t) =>
     assertObjectMatch(setHtmlProps({style: {}}, {style: {backgroundColor: "red"}}), {style: {backgroundColor: "red"}})
   })
 
-  await t.step("html element and css prop => set html element props values => element with inner html props values", () => {
-    assertObjectMatch(setHtmlProps({innerHTML: {}}, {css: {backgroundColor: "red"}}), {innerHTML: {backgroundColor: "red"}})
+  await t.step("html style element and css prop => set html element props values => element with inner html css props values", () => {
+    assertObjectMatch(setHtmlProps({tagName: "STYLE", innerHTML: {}}, {css: "css"}), {innerHTML: "css"})
+  })
+
+  await t.step("html element and css prop => set html element props values => element with inner html neutral css props values", () => {
+    assertObjectMatch(setHtmlProps({innerHTML: {}}, {css: "css"}), {innerHTML: "*"})
   })
 
   await t.step("html element and internal props => set html element props values => element with internal props values", () => {

@@ -18,6 +18,4 @@ export const isDangerouslyHtmlPropName = (propName) => propName === "html"
 
 export const isSafeHtmlPropName = (props, propName) => !UnsafeHtmlPropNames.includes(propName) && isSafeUrlHtmlPropValue(props, propName)
 
-
-
-
+export const isUnsafeHtmlCssPropName = (elem, propName) => elem.tagName !== "STYLE" && propName === "css"
