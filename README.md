@@ -5,7 +5,7 @@
 
 ### Usage
 ```javascript
-import {render, update, getEffects, getStates, useEffect, useState}
+import {render, update, setEffects, setStates, useEffect, useState}
   from "/scripts/rendering.js"
 
 const getData = async () => {
@@ -23,15 +23,15 @@ const renderData = (data) =>
   data.map(item => (<div>{item.value}</div>))
 
 export const App = (_, elem) => {
-  const states = getStates(elem)
-  const effects = getEffects(elem)
+  const states = setStates(elem)
+  const effects = setEffects(elem)
 
   const [data, setData] = useState(states, "data", [], [])
   useEffect(effects, "load data", () => loadData(elem, setData), [])
 
   return (
     <main>
-      {renderData(data)}
+      {...renderData(data)}
     </main>
   )
 }
