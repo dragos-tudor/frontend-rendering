@@ -5,15 +5,15 @@
 
 ### Usage
 ```javascript
-import {render, update, setEffects, setStates, useEffect, useState} from "index.js"
+import {render, update, setEffects, setStates, useEffect, useState} from "./index.js"
 
-const getData = async () => {
-  const response = await fetch("/api/data.json", { method: "GET" });
+const getData = async (fetchData) => {
+  const response = await fetchData("/api/data.json", { method: "GET" });
   return await response.json()
 }
 
-const loadData = async (elem, setData) => {
-  const data = await getData(elem, setData)
+const loadData = async (elem, setData, fetchData) => {
+  const data = await getData(fetchData)
   setData(data)
   return update(elem)
 }
@@ -21,12 +21,14 @@ const loadData = async (elem, setData) => {
 const renderData = (data) =>
   data.map(item => (<div>{item.value}</div>))
 
-export const App = (_, elem) => {
+export const App = (props, elem) =>
+{
+  const fetchData = props["fetch-data"] ?? fetch
   const states = setStates(elem)
   const effects = setEffects(elem)
 
   const [data, setData] = useState(states, "data", [], [])
-  useEffect(effects, "load data", () => loadData(elem, setData), [])
+  useEffect(effects, "load data", () => loadData(elem, setData, fetchData), [])
 
   return (
     <main>
@@ -35,7 +37,19 @@ export const App = (_, elem) => {
   )
 }
 
-render(<App></App>, document.body)
+
+
+const createJsonHeaders = (body) => new Headers({
+  "content-length": body? body.length: 0,
+  "content-type": "application/json"
+  })
+const createJsonResponseInit = (body, status) => ({ headers: createJsonHeaders(body), ok: true, status })
+const createJsonResponse = (body) => new Response(
+  body,
+  createJsonResponseInit(body, 200)
+)
+const data = JSON.stringify([{value: 1}, {value: 2}, {value: 3}])
+render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>, document.body)
 ```
 
 ### Remarks
