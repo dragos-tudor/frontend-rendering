@@ -1,5 +1,5 @@
 import { setHtmlAttrs } from "../../rendering-attrs/mod.js"
-import { setHtmlEventHandlers } from "../../rendering-events/mod.js"
+import { setHtmlEventHandlers, unsetHtmlEventHandlers } from "../../rendering-events/mod.js"
 import { updateHtmlText, validateHtmlElement } from "../../rendering-html/mod.js"
 import { getJsxProps, isJsxText, storeJsxElement, validateJsxElement } from "../../rendering-jsx/mod.js"
 import { setHtmlProps } from "../../rendering-props/mod.js"
@@ -15,6 +15,7 @@ export const updateElement = (elem, $elem) =>
   throwError(validateJsxElement(elem))
   const props = getJsxProps(elem)
 
+  unsetHtmlEventHandlers($elem, props)
   setHtmlAttrs($elem, props)
   setHtmlProps($elem, props)
   setHtmlEventHandlers($elem, props)

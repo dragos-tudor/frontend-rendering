@@ -424,26 +424,27 @@ const createCustomEvent = (eventName, detail)=>new CustomEvent(eventName, {
         detail
     });
 const dispatchEvent = (elem, eventName, detail)=>elem.dispatchEvent(createCustomEvent(eventName, detail));
-const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
-const isFunctionHtmlPropValue = (props, propName)=>typeof props[propName] === "function";
-const isHtmlEventHandler = (props, propName)=>isHtmlEventHandlerName(propName) && isFunctionHtmlPropValue(props, propName);
-const getHtmlPropNames1 = (props)=>Object.getOwnPropertyNames(props);
 const getHtmlEventName = (handlerName)=>handlerName.replace("on", "");
-const getValidHtmlEventHandlerNames = (props)=>getHtmlPropNames1(props).filter((propName)=>isHtmlEventHandler(props, propName));
-const storeHtmlEventHandler = (elem, handlerName, handler)=>elem[handlerName] = handler;
-const unstoreHtmlEventHandler = (elem, handlerName)=>delete elem[handlerName];
-const unsetHtmlEventHandler = (elem, handlerName)=>{
-    elem.removeEventListener(getHtmlEventName(handlerName), elem[handlerName]);
-    unstoreHtmlEventHandler(elem, handlerName);
-    return handlerName;
-};
-const unsetHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>unsetHtmlEventHandler(elem, handlerName));
+const isFunctionHtmlPropValue = (props, propName)=>typeof props[propName] === "function";
+const isHtmlEventHandlerName = (propName)=>propName.startsWith("on");
+const getHtmlPropNames1 = (props)=>Object.getOwnPropertyNames(props);
+const getValidHtmlEventHandlerNames = (props)=>getHtmlPropNames1(props).filter(isHtmlEventHandlerName).filter((propName)=>isFunctionHtmlPropValue(props, propName));
+const getEventHandlerStoreName = (handlerName)=>"__" + handlerName;
+const getEventHandlerFromStore = (elem, handlerName)=>elem[getEventHandlerStoreName(handlerName)];
+const storeHtmlEventHandler = (elem, handlerName, handler)=>elem[getEventHandlerStoreName(handlerName)] = handler;
 const setHtmlEventHandler = (elem, handlerName, handler)=>{
-    unsetHtmlEventHandler(elem, handlerName);
+    elem.addEventListener(getHtmlEventName(handlerName), handler);
     storeHtmlEventHandler(elem, handlerName, handler);
     return handlerName;
 };
 const setHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>setHtmlEventHandler(elem, handlerName, props[handlerName]));
+const unstoreHtmlEventHandler = (elem, handlerName)=>delete elem[getEventHandlerStoreName(handlerName)];
+const unsetHtmlEventHandler = (elem, handlerName)=>{
+    elem.removeEventListener(getHtmlEventName(handlerName), getEventHandlerFromStore(elem, handlerName));
+    unstoreHtmlEventHandler(elem, handlerName);
+    return handlerName;
+};
+const unsetHtmlEventHandlers = (elem, props)=>getValidHtmlEventHandlerNames(props).map((handlerName)=>unsetHtmlEventHandler(elem, handlerName));
 const throwError1 = (message)=>{
     if (!message) return false;
     throw new Error(message);
@@ -526,6 +527,7 @@ const updateElement = (elem, $elem)=>{
     throwError1(validateHtmlElement($elem));
     throwError1(validateJsxElement(elem));
     const props = getJsxProps(elem);
+    unsetHtmlEventHandlers($elem, props);
     setHtmlAttrs($elem, props);
     setHtmlProps($elem, props);
     setHtmlEventHandlers($elem, props);
@@ -676,6 +678,7 @@ const getErrorPath = (source, boundary)=>findHtmlAscendants(source, (elem)=>isEr
 const getEventDetailError = (event)=>event.detail?.error;
 const toStringErrorPath = (elems)=>elems.map(getHtmlName).reverse().join("/");
 const ErrorBoundary = ({ path, error, children }, elem)=>{
+    unsetHtmlEventHandler(elem, "onerror");
     setHtmlEventHandler(elem, "onerror", (event)=>{
         event.stopPropagation();
         return updateErrorBoundary(elem, event);

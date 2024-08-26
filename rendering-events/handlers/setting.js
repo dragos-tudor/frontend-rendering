@@ -1,10 +1,10 @@
-import { getValidHtmlEventHandlerNames } from "../eventhandler-names/getting.js";
+import { getHtmlEventName } from "../event-names/getting.js"
+import { getValidHtmlEventHandlerNames } from "../handler-names/getting.js"
 import { storeHtmlEventHandler } from "./storing.js"
-import { unsetHtmlEventHandler } from "./unsetting.js"
 
 export const setHtmlEventHandler = (elem, handlerName, handler) =>
 {
-  unsetHtmlEventHandler(elem, handlerName)
+  elem.addEventListener(getHtmlEventName(handlerName), handler)
   storeHtmlEventHandler(elem, handlerName, handler)
   return handlerName
 }

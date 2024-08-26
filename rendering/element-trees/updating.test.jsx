@@ -4,6 +4,9 @@ import { getHtmlName, registerDOMParser } from "../../rendering-html/mod.js"
 import { renderElementTree } from "./rendering.js"
 import { updateElementTree } from "./updating.js"
 import { setEffects, useEffect, setInitialEffect } from "../../rendering-effects/mod.js";
+import { useState } from "../../rendering-states/mod.js";
+import { setStates } from "../../mod.js";
+import { dispatchEvent } from "../../rendering-events/mod.js";
 
 await registerDOMParser()
 
@@ -228,6 +231,16 @@ Deno.test("use elements => update html elements", async (t) =>
     catch { assertSpyCalls(handler, 1) }
   })
 
+  await t.step("element with event handler => update element on event => element updated", () => {
+    const A = (_, elem) => {
+      const [value, setValue] = useState(setStates(elem), "value", "1", [])
+      return <><input value={value} onchange={() => { setValue("2"); updateElementTree(elem, <A></A>) }}></input></>
+    }
+    const $elem = renderElementTree(<A></A>)[0]
+    dispatchEvent($elem.querySelector("input"), "change")
+
+    assertEquals($elem.querySelector("input").value, "2")
+  })
 })
 
 const waitForAsyncs = () =>
