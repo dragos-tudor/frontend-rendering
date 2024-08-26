@@ -129,6 +129,6 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 
 
 ### [Rendering states](./rendering-states/)
-- implement `getStates`, `useStates`, `useMemo` functions.
+- implement `setStates`, `useStates`, `useMemo` functions.
 
 *SIMPLE ALWAYS MEANS SIMPLE*
