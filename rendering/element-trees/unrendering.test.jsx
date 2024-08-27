@@ -7,8 +7,8 @@ import { unrenderElementTree } from "./unrendering.js"
 
 await registerDOMParser()
 
-Deno.test("use elements => unrender html elements", async (t) => {
-
+Deno.test("use elements => unrender html elements", async (t) =>
+{
   await t.step("html elements => unrender elements => empty html", () => {
     const unrenderHtml = (jsx) => unrenderElementTree(renderElementTree(jsx)[0])[0].outerHTML
 
@@ -90,18 +90,19 @@ Deno.test("use elements => unrender html elements", async (t) => {
   })
 
   await t.step("elem with event handlers => unrender elem => removed event handlers", () => {
-    const unrenderElement = (jsx) => unrenderElementTree(renderElementTree(jsx)[0])[0]
+    const unrenderElem = (jsx) => unrenderElementTree(renderElementTree(jsx)[0])[0]
 
-    unrenderElement(<a onclick={() => { throw 'event handler not removed'} }></a>)
+    unrenderElem(<a onclick={() => { throw 'event handler not removed'} }></a>)
       .dispatchEvent(new CustomEvent("click", {bubbles: true}))
   })
 
   await t.step("elem with props => unrender elem => removed props", () => {
-    const unrenderNames = (jsx) => unrenderElementTree(renderElementTree(jsx)[0]).map(getHtmlName)
+    const unrenderElem = (jsx) => unrenderElementTree(renderElementTree(jsx)[0])[0]
 
-    assertEquals(unrenderNames(<a prop={"text"}></a>).prop, undefined)
-    assertEquals(unrenderNames(<a prop={{x: 1}}></a>).prop, undefined)
-    assertEquals(unrenderNames(<a prop={[1, 2]}></a>).prop, undefined)
+    assertEquals(unrenderElem(<a prop={"text"}></a>).prop, undefined)
+    assertEquals(unrenderElem(<a prop={{x: 1}}></a>).prop, undefined)
+    assertEquals(unrenderElem(<a prop={[1, 2]}></a>).prop, undefined)
+    assertEquals(unrenderElem(<a class="test"></a>).className, "")
   })
 
   await t.step("elem with internals => unrender elem => removed internals", () => {
@@ -122,7 +123,6 @@ Deno.test("use elements => unrender html elements", async (t) => {
     assertEquals(unrenderNames(<a __ignore={["a"]}><b></b></a>), ["a"])
     assertEquals(unrenderNames(<a __ignore={["b"]}><b><c></c></b></a>), ["a", "b"])
   })
-
 })
 
 const waitForAsyncs = () =>

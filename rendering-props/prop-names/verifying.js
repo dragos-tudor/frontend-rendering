@@ -14,6 +14,8 @@ const isReservedHtmlPropName = (propName) => ReservedHtmlPropNames.includes(prop
 
 export const isAriaHtmlPropName = (propName) => propName.startsWith("aria-")
 
+export const isClassNameHtmlPropName = (propName) => propName === "className"
+
 export const isHtmlPropName = (props, propName) => propName in props
 
 export const isInternalHtmlPropName = (propName) => propName.startsWith("__")

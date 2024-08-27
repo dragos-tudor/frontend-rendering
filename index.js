@@ -358,6 +358,7 @@ const ToggleHtmlPropNames = Object.freeze([
 const isEventHandlerName = (propName)=>propName.startsWith("on");
 const isReservedHtmlPropName = (propName)=>ReservedHtmlPropNames.includes(propName);
 const isAriaHtmlPropName = (propName)=>propName.startsWith("aria-");
+const isClassNameHtmlPropName = (propName)=>propName === "className";
 const isHtmlPropName = (props, propName)=>propName in props;
 const isInternalHtmlPropName = (propName)=>propName.startsWith("__");
 const isSpecialHtmlPropName = (propName)=>propName in SpecialHtmlPropMappings;
@@ -392,7 +393,7 @@ const setHtmlPropValue = (elem, propName, propValue)=>{
     return propValue;
 };
 const setHtmlProps = (elem, props)=>getValidHtmlPropNames(elem, props).reduce((elem, propName)=>(setHtmlPropValue(elem, propName, getHtmlPropValue(props, propName)), elem), elem);
-const unsetPropValue = (elem, propName)=>elem[propName] = undefined;
+const unsetPropValue = (elem, propName)=>elem[propName] = isClassNameHtmlPropName(propName) ? "" : undefined;
 const unsetHtmlPropValue = (elem, propName)=>{
     if (!isWritableHtmlProp(elem, propName)) return;
     return unsetPropValue(elem, mapHtmlPropName(propName));
