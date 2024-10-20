@@ -553,35 +553,42 @@ const replaceElement = ($elem, $oldElem)=>{
     isHtmlText($oldElem) ? replaceHtmlNode($elem, $oldElem) : replaceHtmlNode($elem, $oldElem);
     return $elem;
 };
-const ReconcilingTypes = Object.freeze({
+const isRenderReconciliation = (elem, $elem)=>existsJsxElement(elem) && !existsHtmlElement($elem);
+const isUnrenderReconciliation = (elem, $elem)=>existsHtmlElement($elem) && !existsJsxElement(elem);
+const isReplaceReconciliation = (elem, $elem)=>!equalElementNames(elem, $elem);
+const isUpdateReconciliation = (elem, $elem)=>{
+    if (isJsxElement(elem)) return true;
+    if (isJsxFactory(elem) && !equalElementProps(elem, $elem)) return true;
+    if (isJsxFactory(elem) && existsNoSkipElementProp(elem)) return true;
+    if (isJsxText(elem) && !equalTexts(elem, $elem)) return true;
+    return false;
+};
+const ReconciliationTypes = Object.freeze({
     render: 0,
     update: 1,
     replace: 2,
     unrender: 3,
     skip: 4
 });
-const getReconcilingType = (elem, $elem)=>{
-    if (!existsHtmlElement($elem)) return ReconcilingTypes.render;
-    if (!existsJsxElement(elem)) return ReconcilingTypes.unrender;
-    if (!equalElementNames(elem, $elem)) return ReconcilingTypes.replace;
-    if (isJsxElement(elem)) return ReconcilingTypes.update;
-    if (isJsxFactory(elem) && !equalElementProps(elem, $elem)) return ReconcilingTypes.update;
-    if (isJsxFactory(elem) && existsNoSkipElementProp(elem)) return ReconcilingTypes.update;
-    if (isJsxText(elem) && !equalTexts(elem, $elem)) return ReconcilingTypes.update;
-    return ReconcilingTypes.skip;
+const getReconciliationType = (elem, $elem)=>{
+    if (isRenderReconciliation(elem, $elem)) return ReconciliationTypes.render;
+    if (isUnrenderReconciliation(elem, $elem)) return ReconciliationTypes.unrender;
+    if (isReplaceReconciliation(elem, $elem)) return ReconciliationTypes.replace;
+    if (isUpdateReconciliation(elem, $elem)) return ReconciliationTypes.update;
+    return ReconciliationTypes.skip;
 };
 const reconcileElement = (elem, $elem, $parent)=>{
-    switch(getReconcilingType(elem, $elem)){
-        case ReconcilingTypes.render:
+    switch(getReconciliationType(elem, $elem)){
+        case ReconciliationTypes.render:
             return renderElement(elem, $parent);
-        case ReconcilingTypes.replace:
+        case ReconciliationTypes.replace:
             return [
                 replaceElement(renderElement(elem, $parent), $elem),
                 unrenderElement($elem)
             ];
-        case ReconcilingTypes.update:
+        case ReconciliationTypes.update:
             return updateElement(elem, $elem);
-        case ReconcilingTypes.unrender:
+        case ReconciliationTypes.unrender:
             return unrenderElement($elem);
         default:
             return [];
