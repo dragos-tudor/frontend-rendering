@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-control-regex
 const getHtmlChildren = (elem)=>Array.from(elem.children ?? []);
 const getHtmlName = (elem)=>elem.tagName?.toLowerCase().replace("_", "-") || "text";
 const getHtmlOwnerDocument = (elem)=>elem?.ownerDocument;
@@ -57,7 +56,7 @@ const insertHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).insertBefore(
 const existsHtmlNodeChildren = (node)=>node.childNodes !== 0;
 const HtmlMimeType = "text/html";
 const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
-const DOMLibraryUrl = "https://esm.sh/linkedom@0.14.26";
+const DOMLibraryUrl = "npm:linkedom@0.18.5";
 const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis)=>{
     const dom = await import(url);
     global.DOMParser = global.DOMParser || dom.DOMParser;
@@ -137,24 +136,16 @@ const useEffect = (effects, name, func, deps)=>{
     setFuncEffect(effect, func);
     return effect;
 };
-const ResevedPropNames = Object.freeze({
+Object.freeze({
     key: undefined,
     ref: undefined,
     __self: undefined,
     __source: undefined
 });
-const existsJsxKey = (key)=>key !== undefined;
-const getJsxPropsKey = (props)=>props.key;
-const existsJsxPropsKey = (props)=>getJsxPropsKey(props) !== undefined;
 const isArrayPropsChildren = (props)=>props.children instanceof Array;
 const getJsxPropsChildren = (props)=>isArrayPropsChildren(props) ? props.children : [
         props.children
     ];
-const getJsxPropNames = (props)=>Object.getOwnPropertyNames(props);
-const getJsxPropsRef = (props)=>props.ref;
-const existsJsxPropsRef = (props)=>getJsxPropsRef(props) !== undefined;
-const existsJsxPropValue = (props, propName)=>props[propName] !== undefined;
-const isReservedJsxPropName = (propName)=>propName in ResevedPropNames;
 const FragmentType = Symbol.for("react.fragment");
 const isJsxFragment = (elem)=>elem?.type === FragmentType;
 const replaceJsxFragments = (elems, firstElem = elems[0])=>isJsxFragment(firstElem) ? getJsxPropsChildren(firstElem.props) : elems;
@@ -721,32 +712,6 @@ const Suspense = ({ suspending = true, fallback, children })=>{
 };
 const getService = (services, name)=>services?.[name];
 const getServices = (elem)=>elem.ownerDocument.__services;
-const getJsxParent = (internals)=>internals?.ReactCurrentOwner?.current;
-const getJsxInternals = (store)=>store?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-const setJsxPropValue = (props, propName, propValue)=>props[propName] = propValue;
-const copyJsxProp = (sourceProps)=>(targetProps, propName)=>{
-        setJsxPropValue(targetProps, propName, sourceProps[propName]);
-        return targetProps;
-    };
-const copyDefaultJsxProps = (sourceProps, targetProps)=>getJsxPropNames(sourceProps).filter((propName)=>!existsJsxPropValue(targetProps, propName)).reduce(copyJsxProp(sourceProps), targetProps);
-const copyValidJsxProps = (sourceProps, targetProps = {})=>getJsxPropNames(sourceProps).filter((propName)=>!isReservedJsxPropName(propName)).reduce(copyJsxProp(sourceProps), targetProps);
-const resolveJsxPropsKey = (props, maybeKey)=>existsJsxPropsKey(props) && getJsxPropsKey(props).toString() || existsJsxKey(maybeKey) && maybeKey.toString() || null;
-const resolveJsxPropsRef = (props)=>existsJsxPropsRef(props) && getJsxPropsRef(props) || null;
-const resolveJsxProps = (initialProps, type)=>type && type.defaultProps ? copyDefaultJsxProps(type.defaultProps, copyValidJsxProps(initialProps)) : copyValidJsxProps(initialProps);
-const getJsxLegacyChildren = (children)=>children?.length == 1 ? children[0] : children;
-const emptyLegacyJsxChildren = (children)=>!children || children.length === 0;
-const compileJsxExpression = (type, props, maybeKey)=>createJsxElement(type, resolveJsxProps(props, type), resolveJsxPropsKey(props, maybeKey), getJsxParent(getJsxInternals(globalThis["React"])), resolveJsxPropsRef(props));
-const compileLegacyJsxExpression = (type, props, ...children)=>emptyLegacyJsxChildren(children) ? compileJsxExpression(type, props ?? {}) : compileJsxExpression(type, {
-        ...props ?? {},
-        children: getJsxLegacyChildren(children)
-    });
-const jsx = compileJsxExpression;
-const jsxs = compileJsxExpression;
-const createElement = compileLegacyJsxExpression;
-export { jsx as jsx };
-export { jsxs as jsxs };
-export { createElement as createElement };
-export { FragmentType as Fragment };
 export { getEffects as getEffects };
 export { setEffects as setEffects, setInitialEffect as setInitialEffect };
 export { useEffect as useEffect };
@@ -758,9 +723,6 @@ export { setStates as setStates };
 export { useState as useState };
 try {
     globalThis["DOMParser"] || await registerDOMParser();
-    globalThis["React"] = globalThis["React"] ?? {};
-    globalThis["React"].createElement = createElement;
-    globalThis["React"].Fragment = FragmentType;
 } catch (error) {
     console.error(error);
     throw error;

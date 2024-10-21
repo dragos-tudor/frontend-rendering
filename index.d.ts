@@ -34,8 +34,8 @@ export function Context(props: {name: string, value: any, children: JSX[] | JSX}
 export function ErrorBoundary(props: {error?: string, path?: string, children: JSX[] | JSX}, elem: HTMLElement): JSXReturn[] | JSXReturn
 export function Lazy(props: Record<string, any> & {loader: () => Promise<JSX>, children: JSX[] | JSX}, elem: HTMLElement): JSXReturn
 export function Suspense(props: {suspending: boolean, fallback: JSX, children: JSX[] | JSX}, elem: HTMLElement): JSXReturn[] | JSXReturn
-export function Services(props: Record<string, any> & { children: JSX[] | JSX }, elem: HTMLElement): JSXReturn[] | JSXReturn
+export function Service(props: {name: string, value: string} & { children: JSX[] | JSX }, elem: HTMLElement): JSXReturn[] | JSXReturn
 
 export function jsx(type: string| JSXFactoryFunc| undefined, props: Record<string, any> & {children: any | any[]}, key: any | undefined): JSXReturn
 export function jsxs(type: string| JSXFactoryFunc| undefined, props: Record<string, any> & {children: any | any[]}, key: any | undefined): JSXReturn
-export function createElement(type: string| JSXFactoryFunc| undefined, props: Record<string, any>, children: any | any[]): JSXReturn
+export function jsxLegacy(type: string| JSXFactoryFunc| undefined, props: Record<string, any>, children: any | any[]): JSXReturn

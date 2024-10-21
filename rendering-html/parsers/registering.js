@@ -1,4 +1,4 @@
-export const DOMLibraryUrl = "https://esm.sh/linkedom@0.14.26"
+export const DOMLibraryUrl = "npm:linkedom@0.18.5"
 
 export const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis) => {
   const dom = await import(url)

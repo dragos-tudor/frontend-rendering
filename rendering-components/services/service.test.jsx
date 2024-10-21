@@ -3,7 +3,7 @@ import { render } from "../../rendering/mod.js"
 import { registerDOMParser } from "../../rendering-html/mod.js"
 import { getServices } from "./getting.js"
 import { useService } from "./using.js"
-import { Service } from "./services.js"
+import { Service } from "./service.js"
 
 await registerDOMParser()
 

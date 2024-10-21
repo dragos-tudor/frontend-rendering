@@ -2,6 +2,7 @@
   "importMap": "./deps.map.json",
   "tasks": {
     "bundle": "deno run --allow-all --no-check ./bundling.js",
+    "bundle-jsx": "deno run --allow-all --no-check ./bundling.js ./jsx-runtime/mod.js ./jsx-runtime.js",
     "minify": "deno run --allow-all --no-check ./minifying.js",
     "test": "deno test --allow-all --no-check --parallel"
   },

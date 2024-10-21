@@ -1,5 +1,5 @@
 import "/source-map.js"
-import "/terser.ts"
+import { minify } from "/terser.ts"
 
 const minifyOptions = ({
   module: true,
@@ -7,7 +7,7 @@ const minifyOptions = ({
 });
 const indexPath = new URL("./index.js", import.meta.url)
 const fileContent = await Deno.readTextFile(indexPath)
-const minifiedContent = await Terser.minify({"index.js": fileContent}, minifyOptions)
+const minifiedContent = await minify({"index.js": fileContent}, minifyOptions)
 
 const indexMinPath = indexPath.pathname.replace(".js", ".min.js")
 const indexMapPath = indexPath.pathname.replace(".js", ".min.js.map")

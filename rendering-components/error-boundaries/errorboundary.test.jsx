@@ -16,7 +16,7 @@ Deno.test("handle layout errors => use error-boundaries", async (t) => {
 
   await t.step("element throwing error => render element inside error boundary => unrendered throwing error element", () => {
     const A = (_) => { throw new Error("err") }
-    const actual = render(<ErrorBoundary __log={["rendering"]}></ErrorBoundary>)
+    const actual = render(<ErrorBoundary></ErrorBoundary>)
     try { update(actual, <ErrorBoundary><A></A></ErrorBoundary>) }
     catch{
       assertNotExists(actual.querySelector("A"))

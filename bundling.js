@@ -1,10 +1,12 @@
 import { bundle } from "/emit.ts"
 
-const indexPath = new URL("./mod.js", import.meta.url)
-const bundleOptions = { compilerOptions: { sourceMap: false } }
-const bundleResult = await bundle(indexPath, bundleOptions)
+const inputRelativePath = Deno.args[0] ?? "./mod.js"
+const outputRelativePath = Deno.args[1] ?? "./index.js"
+const inputPath = new URL(inputRelativePath, import.meta.url)
+const outputPath = new URL(outputRelativePath, import.meta.url)
 
+const bundleOptions = { compilerOptions: { sourceMap: false } }
+const bundleResult = await bundle(inputPath, bundleOptions)
 const { code } = bundleResult
-const lintNonControlRegex = "// deno-lint-ignore-file no-control-regex\n"
-// const typesReference = '/// <reference types="./index.d.ts"/>\n'
-Deno.writeTextFileSync("./index.js", lintNonControlRegex + code)
+
+Deno.writeTextFileSync(outputPath, code)

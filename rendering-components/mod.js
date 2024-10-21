@@ -1,7 +1,7 @@
 export { Context } from "./contexts/context.js"
 export { ErrorBoundary } from "./error-boundaries/errorboundary.jsx"
 export { Lazy } from "./lazies/lazy.jsx"
-export { Service } from "./services/services.js"
+export { Service } from "./services/service.js"
 export { Suspense } from "./suspenses/suspense.jsx"
 
 export { getContexts } from "./contexts/getting.js"
