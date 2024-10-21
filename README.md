@@ -111,24 +111,46 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
   - encode html content.
 
 ### [Rendering jsx](./rendering-jsx/)
-- main functionality: compile jsx expressions.
-- contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
-- contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `createElement` and register `React.createElement`).
+- main functionality: manage jsx elements.
 - contains jsx factories builder `buildJsxFactory`.
 - implement jsx children sanitizing:
   - replace html fragments.
   - skip boolean, null, undefined values.
 
 ### [Rendering effects](./rendering-effects/)
-- implement `getEffects`,`useEffect`, `setInitialEffect` functions.
+- implement `setEffects`, `getEffects`,`useEffect`, `setInitialEffect` functions.
 - `useEffect` func:
   - use effect funcs for layout effects.
   - use async effect funcs for side-effects.
 - `setInitialEffect` is used to cover subscribing flows.
   - initial effect func will run before effect func.
 
-
 ### [Rendering states](./rendering-states/)
 - implement `setStates`, `useStates`, `useMemo` functions.
+
+### [Jsx runtime](./jsx-runtime/)
+- main functionality: compile jsx expressions.
+- jsx runtime is independent of rendering library.
+- contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
+- contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `jsxLegacy`).
+- usage:
+```json
+{
+  # deno.json
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "/jsx"
+  }
+}
+```
+
+```json
+{
+  # deps.map.json
+  "imports": {
+    "/jsx/jsx-runtime": "<path to jsx runtime>",
+  }
+}
+```
 
 *SIMPLE ALWAYS MEANS SIMPLE*

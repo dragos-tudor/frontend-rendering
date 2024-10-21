@@ -1,17 +1,18 @@
+// deno-lint-ignore-file no-global-assign
 /** @jsxImportSource  /react */
 import { assert } from "/asserts.ts"
 import { unstable_act as act } from "/react.js"
 import { createRoot } from "/react-dom.js"
 import { DOMLibraryUrl } from "./rendering-html/parsers/registering.js"
 
-
 const dom = await import(DOMLibraryUrl)
-Object.assign(globalThis, { ...dom, Event: globalThis.Event, EventTarget: globalThis.EventTarget})
-Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true})
+const { DOMParser } = dom
+Object.assign(globalThis, { ...dom, Event: globalThis.Event, EventTarget: globalThis.EventTarget })
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+window = globalThis
 
-
-Deno.test("use components => test rendering performance [react]", async (t) => {
-
+Deno.test("use components => test rendering performance [react]", async (t) =>
+{
   const getDocument = () => new DOMParser().parseFromString("<main></main>")
   const B = (props) => <c x={props.x} $y={props.y}>{props.z}</c>
   const A = (props) => <>{props.children}</>
