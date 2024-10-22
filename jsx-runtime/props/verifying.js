@@ -1,6 +1,6 @@
 import { getJsxPropsKey, getJsxPropsRef } from "./getting.js"
 
-const ResevedPropNames = Object.freeze({ key: undefined, ref: undefined, __self: undefined, __source: undefined })
+const ResevedPropNames = ["key", "ref", "__self", "__source"]
 
 export const existsJsxKey = (key) => key !== undefined
 
@@ -10,4 +10,4 @@ export const existsJsxPropsRef = (props) => getJsxPropsRef(props) !== undefined
 
 export const existsJsxPropValue = (props, propName) => props[propName] !== undefined
 
-export const isReservedJsxPropName = (propName) => propName in ResevedPropNames
+export const isReservedJsxPropName = (propName) => ResevedPropNames.includes(propName)

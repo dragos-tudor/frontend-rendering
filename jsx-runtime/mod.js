@@ -1,4 +1,5 @@
-import { compileJsxExpression, compileLegacyJsxExpression } from "./expressions/compiling.js"
+import { compileJsxExpression } from "./expressions/compiling.js"
+import { compileLegacyJsxExpression } from "./expressions/compiling.legacy.js"
 
 export const jsx = compileJsxExpression
 export const jsxs = compileJsxExpression
