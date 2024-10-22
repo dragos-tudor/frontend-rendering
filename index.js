@@ -136,12 +136,6 @@ const useEffect = (effects, name, func, deps)=>{
     setFuncEffect(effect, func);
     return effect;
 };
-Object.freeze({
-    key: undefined,
-    ref: undefined,
-    __self: undefined,
-    __source: undefined
-});
 const isArrayPropsChildren = (props)=>props.children instanceof Array;
 const getJsxPropsChildren = (props)=>isArrayPropsChildren(props) ? props.children : [
         props.children

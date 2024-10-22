@@ -1,4 +1,5 @@
-import { createJsxElement, resolveJsxPropsKey, resolveJsxPropsRef, resolveJsxProps } from "../../rendering-jsx/mod.js"
+import { createJsxElement } from "../../rendering-jsx/mod.js"
+import { resolveJsxPropsKey, resolveJsxPropsRef, resolveJsxProps } from "../props/resolving.js"
 import { getJsxLegacyChildren, getJsxInternals, getJsxParent } from "./getting.js"
 import { emptyLegacyJsxChildren } from "./verifying.js"
 

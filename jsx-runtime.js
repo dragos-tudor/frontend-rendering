@@ -1,17 +1,3 @@
-const ResevedPropNames = Object.freeze({
-    key: undefined,
-    ref: undefined,
-    __self: undefined,
-    __source: undefined
-});
-const existsJsxKey = (key)=>key !== undefined;
-const getJsxPropsKey = (props)=>props.key;
-const existsJsxPropsKey = (props)=>getJsxPropsKey(props) !== undefined;
-const getJsxPropNames = (props)=>Object.getOwnPropertyNames(props);
-const getJsxPropsRef = (props)=>props.ref;
-const existsJsxPropsRef = (props)=>getJsxPropsRef(props) !== undefined;
-const existsJsxPropValue = (props, propName)=>props[propName] !== undefined;
-const isReservedJsxPropName = (propName)=>propName in ResevedPropNames;
 const FragmentType = Symbol.for("react.fragment");
 const ElementType = Symbol.for("react.element");
 Object.freeze([
@@ -27,7 +13,21 @@ const createJsxElement = (type, props, key, parent, ref)=>({
         ref,
         _owner: parent
     });
+const getJsxPropsKey = (props)=>props.key;
+const getJsxPropNames = (props)=>Object.getOwnPropertyNames(props);
+const getJsxPropsRef = (props)=>props.ref;
 const setJsxPropValue = (props, propName, propValue)=>props[propName] = propValue;
+const ResevedPropNames = Object.freeze({
+    key: undefined,
+    ref: undefined,
+    __self: undefined,
+    __source: undefined
+});
+const existsJsxKey = (key)=>key !== undefined;
+const existsJsxPropsKey = (props)=>getJsxPropsKey(props) !== undefined;
+const existsJsxPropsRef = (props)=>getJsxPropsRef(props) !== undefined;
+const existsJsxPropValue = (props, propName)=>props[propName] !== undefined;
+const isReservedJsxPropName = (propName)=>propName in ResevedPropNames;
 const copyJsxProp = (sourceProps)=>(targetProps, propName)=>{
         setJsxPropValue(targetProps, propName, sourceProps[propName]);
         return targetProps;

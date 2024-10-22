@@ -1,5 +1,5 @@
-import { copyDefaultJsxProps, copyValidJsxProps } from "./copying.js"
 import { getJsxPropsRef, getJsxPropsKey } from "./getting.js"
+import { copyDefaultJsxProps, copyValidJsxProps } from "./copying.js"
 import { existsJsxKey, existsJsxPropsKey, existsJsxPropsRef } from "./verifying.js"
 
 export const resolveJsxPropsKey = (props, maybeKey) =>

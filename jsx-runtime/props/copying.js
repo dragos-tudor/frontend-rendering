@@ -1,7 +1,6 @@
-import { getJsxPropNames } from "./getting.js";
-import { setJsxPropValue } from "./setting.js";
+import { getJsxPropNames } from "./getting.js"
+import { setJsxPropValue } from "./setting.js"
 import { existsJsxPropValue, isReservedJsxPropName } from "./verifying.js"
-
 
 const copyJsxProp = (sourceProps) => (targetProps, propName) => {
   setJsxPropValue(targetProps, propName, sourceProps[propName])
