@@ -29,7 +29,7 @@ const findHtmlAscendants = (elem, func, result = [])=>{
     return findHtmlAscendants(getHtmlParentElement(elem), func, result);
 };
 const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>findStrategy(getHtmlChildren(elem), func, result);
-const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, message, "elem:", getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
+const logHtmlElement = ($elem, $parent, message, props, logger)=>logger(`${message} elem:`, getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent), $elem);
 const appendHtmlNode = (node, parent)=>parent.appendChild(node);
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);
 const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
@@ -71,7 +71,7 @@ const insertHtmlText = (text, $elem, $parent)=>{
     const $text = createHtmlText(document, text);
     return insertHtmlNode($text, $elem);
 };
-const logHtmlText = ($text, $parent, message, logger)=>logger($text, message, "text:", getHtmlText($text), "parent:", $parent && getHtmlName($parent));
+const logHtmlText = ($text, $parent, message, logger)=>logger(`${message} text:`, getHtmlText($text), "parent:", $parent && getHtmlName($parent), $text);
 const renderHtmlText = (text, $parent)=>{
     const document = getHtmlOwnerDocument($parent);
     const $text = createHtmlText(document, text);
@@ -460,9 +460,13 @@ const logElement = ($elem, message)=>logHtmlElement($elem, getHtmlParentElement(
 const logElementOrText = ($elem, message)=>isHtmlText($elem) ? logText($elem, message) : logElement($elem, message);
 const logText = ($elem, message)=>logHtmlText($elem, getHtmlParentElement($elem), message, logInfo);
 const renderElement = (elem, $parent)=>{
-    if (isJsxText(elem)) return renderHtmlText(elem, $parent);
     throwError1(validateHtmlElement($parent));
     throwError1(validateJsxElement(elem));
+    if (isJsxText(elem)) {
+        const $text = renderHtmlText(elem, $parent);
+        logText($text, "render");
+        return $text;
+    }
     throwError1(validateHtmlTagName(getJsxName(elem)));
     const props = getJsxProps(elem);
     const $elem = renderHtmlElement(getJsxName(elem), getElementNS(elem, $parent), $parent);
@@ -472,7 +476,7 @@ const renderElement = (elem, $parent)=>{
     enableIgnoring($elem, $parent);
     enableLogging($elem, $parent);
     storeJsxElement($elem, elem);
-    logElementOrText($elem, "render");
+    logElement($elem, "render");
     return $elem;
 };
 const dispatchError = (elem, error)=>dispatchEvent(elem, "error", {

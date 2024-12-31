@@ -1,8 +1,6 @@
-import { existsHtmlParentElement, existsHtmlNodeChildren, getHtmlName, getHtmlText, isHtmlText } from "../../rendering-html/mod.js"
+import { existsHtmlParentElement, existsHtmlNodeChildren, getHtmlName, getHtmlText } from "../../rendering-html/mod.js"
 import { getJsxElement, getJsxName, getJsxProps, getJsxText } from "../../rendering-jsx/mod.js"
 import { equalObjects } from "../../rendering-equalities/mod.js"
-import { isIgnoredElement } from "../ignores/verifying.js"
-
 
 export const equalElementNames = (elem, $elem) => getJsxName(elem) === getHtmlName($elem)
 
@@ -21,8 +19,5 @@ export const isUpdatedElement = (elem) => existsHtmlParentElement(elem) && exist
 
 export const isUnrenderedElement = (elem) => !existsHtmlParentElement(elem)
 
-
 export const isStyleElement = (elem) => getHtmlName(elem) === "style"
-
-export const isStyleIgnoredOrTextElement = ($elem) => isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem)
 
