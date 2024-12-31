@@ -460,14 +460,14 @@ const logElement = ($elem, message)=>logHtmlElement($elem, getHtmlParentElement(
 const logElementOrText = ($elem, message)=>isHtmlText($elem) ? logText($elem, message) : logElement($elem, message);
 const logText = ($elem, message)=>logHtmlText($elem, getHtmlParentElement($elem), message, logInfo);
 const renderElement = (elem, $parent)=>{
-    throwError1(validateHtmlElement($parent));
-    throwError1(validateJsxElement(elem));
     if (isJsxText(elem)) {
         const $text = renderHtmlText(elem, $parent);
         logText($text, "render");
         return $text;
     }
+    throwError1(validateHtmlElement($parent));
     throwError1(validateHtmlTagName(getJsxName(elem)));
+    throwError1(validateJsxElement(elem));
     const props = getJsxProps(elem);
     const $elem = renderHtmlElement(getJsxName(elem), getElementNS(elem, $parent), $parent);
     setHtmlAttrs($elem, props);
@@ -502,12 +502,15 @@ const isRenderedElement = (elem)=>existsHtmlParentElement(elem) && !existsHtmlNo
 const isUpdatedElement = (elem)=>existsHtmlParentElement(elem) && existsHtmlNodeChildren(elem);
 const isUnrenderedElement = (elem)=>!existsHtmlParentElement(elem);
 const isStyleElement = (elem)=>getHtmlName(elem) === "style";
-const isStyleIgnoredOrTextElement = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
+const shouldSkipChildren = ($elem)=>isStyleElement($elem) || isIgnoredElement($elem) || isHtmlText($elem);
 const renderElementTree = (elem, $parent = parseHtml("<main></main>"))=>{
     const $elems = [
         renderElement(elem, $parent)
     ];
-    for (const $elem of $elems)isStyleIgnoredOrTextElement($elem) || $elems.push(...renderElementChildren($elem));
+    for (const $elem of $elems){
+        if (shouldSkipChildren($elem)) continue;
+        $elems.push(...renderElementChildren($elem));
+    }
     $elems.forEach(($elem)=>runEffects(getEffects($elem)));
     return $elems;
 };
@@ -602,7 +605,7 @@ const updateElementTree = ($elem, elem = getJsxElement($elem))=>{
         updateElement(elem, $elem)
     ];
     for (const $elem of $elems){
-        if (isStyleIgnoredOrTextElement($elem)) continue;
+        if (shouldSkipChildren($elem)) continue;
         if (isRenderedElement($elem)) {
             $elems.push(...renderElementChildren($elem));
             continue;
@@ -623,7 +626,10 @@ const unrenderElementTree = ($elem)=>{
     const $elems = [
         unrenderElement($elem)
     ];
-    for (const $elem of $elems)isStyleIgnoredOrTextElement($elem) || $elems.push(...unrenderElementChildren($elem));
+    for (const $elem of $elems){
+        if (shouldSkipChildren($elem)) continue;
+        $elems.push(...unrenderElementChildren($elem));
+    }
     return $elems;
 };
 const render = (elem, $parent = parseHtml("<main></main>"))=>{
