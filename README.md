@@ -134,7 +134,7 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 - main functionality: compile jsx expressions.
 - jsx runtime is independent of rendering library.
 - contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
-- contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `jsxLegacy`).
+- contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `legacyJsx`).
 - usage:
 ```json
 {

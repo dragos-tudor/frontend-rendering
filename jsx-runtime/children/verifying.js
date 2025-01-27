@@ -1,2 +1,2 @@
 
-export const existsLegacyJsxChildren = (children) => !children || children.length === 0
+export const existsJsxChildren = (children) => children && children.length > 0

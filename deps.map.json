@@ -3,7 +3,7 @@
     "/asserts.ts": "jsr:@std/assert@1.0.6",
     "/mock.ts": "jsr:@std/testing@1.0.3/mock",
     "/emit.ts": "jsr:@deno/emit@0.45.0",
-    "/jsx/jsx-runtime": "./jsx-runtime/mod.js",
+    "/jsx/jsx-runtime": "./jsx-runtime.js",
 
     "/source-map.js": "npm:source-map@0.7.4",
     "/terser.ts": "npm:terser@5.36.0",

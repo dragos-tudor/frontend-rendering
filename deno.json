@@ -7,13 +7,8 @@
     "test": "deno test --allow-all --no-check --parallel"
   },
   "compilerOptions": {
-    "lib": [
-      "deno.ns",
-      "deno.unstable",
-      "dom",
-      "dom.iterable"
-    ],
     "jsx": "react-jsx",
-    "jsxImportSource": "/jsx"
+    "jsxImportSource": "/jsx",
+    "lib": [ "deno.ns", "deno.unstable", "dom", "dom.iterable" ]
   }
 }

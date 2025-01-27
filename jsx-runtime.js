@@ -18,7 +18,10 @@ const getJsxParent = (internals)=>internals?.ReactCurrentOwner?.current;
 const getJsxPropsKey = (props)=>props.key;
 const getJsxPropNames = (props)=>Object.getOwnPropertyNames(props);
 const getJsxPropsRef = (props)=>props.ref;
-const setJsxPropValue = (props, propName, propValue)=>props[propName] = propValue;
+const setJsxPropChildren = (props, children)=>setJsxPropValue(props, "children", children);
+const setJsxPropValue = (props, propName, propValue)=>Object.assign(props, {
+        [propName]: propValue
+    });
 const ResevedPropNames = [
     "key",
     "ref",
@@ -40,12 +43,9 @@ const resolveJsxPropsKey = (props, maybeKey)=>existsJsxPropsKey(props) && getJsx
 const resolveJsxPropsRef = (props)=>existsJsxPropsRef(props) && getJsxPropsRef(props) || null;
 const resolveJsxProps = (initialProps, type)=>type && type.defaultProps ? copyDefaultJsxProps(type.defaultProps, copyValidJsxProps(initialProps)) : copyValidJsxProps(initialProps);
 const compileJsxExpression = (type, props, maybeKey)=>createJsxElement(type, resolveJsxProps(props, type), resolveJsxPropsKey(props, maybeKey), getJsxParent(getJsxInternals(globalThis["React"])), resolveJsxPropsRef(props));
-const getJsxLegacyChildren = (children)=>children?.length == 1 ? children[0] : children;
-const existsLegacyJsxChildren = (children)=>!children || children.length === 0;
-const compileLegacyJsxExpression = (type, props, ...children)=>existsLegacyJsxChildren(children) ? compileJsxExpression(type, props ?? {}) : compileJsxExpression(type, {
-        ...props ?? {},
-        children: getJsxLegacyChildren(children)
-    });
+const toJsxChildreArray = (children)=>children?.length == 1 ? children[0] : children;
+const existsJsxChildren = (children)=>children && children.length > 0;
+const compileLegacyJsxExpression = (type, props, ...children)=>existsJsxChildren(children) ? compileJsxExpression(type, setJsxPropChildren(props ?? {}, toJsxChildreArray(children))) : compileJsxExpression(type, props ?? {});
 export { FragmentType as Fragment };
 export { compileJsxExpression as jsx };
 export { compileJsxExpression as jsxs };
