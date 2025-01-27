@@ -1,13 +1,4 @@
-import { registerDOMParser } from "./rendering-html/mod.js"
-
-try {
-  globalThis["DOMParser"] || await registerDOMParser()
-}
-catch(error) {
-  console.error(error)
-  throw error
-}
-
+export { registerDomParser, registerLinkeDomParser } from "./rendering-html/mod.js"
 export * from "./rendering/mod.js"
 export * from "./rendering-components/mod.js"
 export * from "./rendering-effects/public.js"

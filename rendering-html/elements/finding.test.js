@@ -1,9 +1,9 @@
 import { assertEquals } from "/asserts.ts"
-import { registerDOMParser } from "../parsers/registering.js"
+import { registerLinkeDomParser } from "../parsers/registering.js"
 import { parseHtml } from "../parsers/parsing.js"
 import { findHtmlAscendant, findHtmlAscendants, findHtmlDescendant, findHtmlDescendants } from "./finding.js"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use html components => find html elements", async (t) =>
 {

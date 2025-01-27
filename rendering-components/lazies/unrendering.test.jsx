@@ -1,9 +1,9 @@
 import { assertEquals } from "/asserts.ts"
 import { render, unrender } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { Lazy } from "./lazy.jsx"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use code splitting => unrender lazy components", async (t) => {
 

@@ -1,5 +1,7 @@
 import { assert } from "/asserts.ts"
-import { render, update, unrender } from "./mod.js"
+import { render, update, unrender, registerLinkeDomParser } from "./mod.js"
+
+await registerLinkeDomParser()
 
 Deno.test("use components => test rendering performance", async (t) => {
 

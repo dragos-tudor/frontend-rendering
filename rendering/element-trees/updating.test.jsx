@@ -1,6 +1,6 @@
 import { assertEquals } from "/asserts.ts"
 import { assertSpyCallArgs, assertSpyCalls, spy } from "/mock.ts"
-import { getHtmlName, registerDOMParser } from "../../rendering-html/mod.js"
+import { getHtmlName, registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { renderElementTree } from "./rendering.js"
 import { updateElementTree } from "./updating.js"
 import { setEffects, useEffect, setInitialEffect } from "../../rendering-effects/mod.js";
@@ -8,7 +8,7 @@ import { useState } from "../../rendering-states/mod.js";
 import { setStates } from "../../mod.js";
 import { dispatchEvent } from "../../rendering-events/mod.js";
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use elements => update html elements", async (t) =>
 {

@@ -1,8 +1,8 @@
 import { assertEquals, assertNotStrictEquals } from "/asserts.ts"
-import { registerDOMParser } from "../parsers/registering.js"
+import { registerLinkeDomParser } from "../parsers/registering.js"
 import { parseHtml } from "./parsing.js"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use html components => parse elements", async (t) => {
 

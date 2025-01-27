@@ -56,13 +56,15 @@ const insertHtmlNode = (node, oldNode)=>getHtmlParentNode(oldNode).insertBefore(
 const existsHtmlNodeChildren = (node)=>node.childNodes !== 0;
 const HtmlMimeType = "text/html";
 const parseHtml = (html)=>new DOMParser().parseFromString(html, HtmlMimeType).documentElement;
-const DOMLibraryUrl = "npm:linkedom@0.18.5";
-const registerDOMParser = async (url = DOMLibraryUrl, global = globalThis)=>{
-    const dom = await import(url);
-    global.DOMParser = global.DOMParser || dom.DOMParser;
-    global.CustomEvent = dom.CustomEvent;
-    return global.DOMParser;
-};
+const registerDomParser = async (url, global = globalThis)=>Object.assign(global, {
+        ...await import(url)
+    });
+const registerLinkeDomParser = async (url = "npm:linkedom@0.18.5", global = globalThis)=>Object.assign(global, {
+        ...await import(url),
+        Event: global.Event,
+        InputEvent: global.InputEvent,
+        EventTarget: global.EventTarget
+    });
 const isHtmlText = (elem)=>elem.nodeType === 3;
 const getHtmlText = ($elem)=>isHtmlText($elem) && $elem.textContent;
 const createHtmlText = (document, text)=>document.createTextNode(text);
@@ -725,12 +727,7 @@ export { useMemo as useMemo };
 export { getStates as getStates };
 export { setStates as setStates };
 export { useState as useState };
-try {
-    globalThis["DOMParser"] || await registerDOMParser();
-} catch (error) {
-    console.error(error);
-    throw error;
-}
+export { registerDomParser as registerDomParser, registerLinkeDomParser as registerLinkeDomParser };
 export { Context as Context };
 const Lazy = (props, elem)=>{
     throwError(validateHtmlElement(elem));

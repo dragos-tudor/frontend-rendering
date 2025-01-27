@@ -1,11 +1,11 @@
 import { assertEquals } from "/asserts.ts"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { getHtmlName } from "../../rendering-html/mod.js"
 import { setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { renderElementTree } from "./rendering.js"
 import { unrenderElementTree } from "./unrendering.js"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use elements => unrender html elements", async (t) =>
 {

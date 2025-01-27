@@ -5,7 +5,9 @@
 
 ### Usage
 ```javascript
-import {render, update, setEffects, setStates, useEffect, useState} from "./index.js"
+import {render, update, registerLinkeDomParser, setEffects, setStates, useEffect, useState} from "./index.js"
+
+await registerLinkeDomParser()
 
 const getData = async (fetchData) => {
   const response = await fetchData("/api/data.json", { method: "GET" });

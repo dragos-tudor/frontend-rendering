@@ -1,10 +1,10 @@
 import { assertEquals, assertExists } from "/asserts.ts"
 import { spy, assertSpyCalls } from "/mock.ts"
 import { render, update, unrender } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { Lazy } from "./lazy.jsx"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use code splitting => update lazy components", async (t) => {
 

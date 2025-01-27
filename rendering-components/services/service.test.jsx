@@ -1,11 +1,11 @@
 import { assertEquals } from "/asserts.ts"
 import { render } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { getServices } from "./getting.js"
 import { useService } from "./using.js"
 import { Service } from "./service.js"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("mock component service => use service", async (t) =>
 {

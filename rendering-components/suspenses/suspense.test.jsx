@@ -1,9 +1,9 @@
 import { assertEquals, assertExists } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { Suspense } from "./suspense.jsx"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("watch operations progress => use suspenses", async (t) =>
 {

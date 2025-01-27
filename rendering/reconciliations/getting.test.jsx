@@ -1,9 +1,9 @@
 import { assertEquals } from "/asserts.ts"
 import { getReconciliationType, ReconciliationTypes } from "./getting.js"
-import { parseHtml, registerDOMParser } from "../../rendering-html/mod.js"
+import { parseHtml, registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { storeJsxElement } from "../../rendering-jsx/mod.js";
 
-await registerDOMParser()
+await registerLinkeDomParser()
 const C = () => <></>
 
 Deno.test("use reconciliations", async (t) =>

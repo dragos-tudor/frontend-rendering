@@ -1,6 +1,6 @@
 import { assertObjectMatch as eq } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { dispatchEvent, setHtmlEventHandler } from "../../rendering-events/mod.js"
 import { Context as Producer } from "./context.js"
 import { getContexts } from "./getting.js"
@@ -8,7 +8,7 @@ import { setContexts } from "./setting.js"
 import { useContext } from "./using.js"
 
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use shared data => set contexts", async (t) => {
 

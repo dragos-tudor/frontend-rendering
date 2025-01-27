@@ -1,13 +1,13 @@
 import { assertEquals, assertNotStrictEquals, assertStrictEquals } from "/asserts.ts"
 import { assertSpyCalls, assertSpyCallArgs, spy } from "/mock.ts"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { setEffect, setEffects, useEffect } from "../../rendering-effects/mod.js"
 import { dispatchEvent } from "../../rendering-events/mod.js"
 import { getHtmlName } from "../../rendering-html/mod.js"
 import { renderElementTree } from "./rendering.js"
 
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use elements => render jsx elements", async (t) =>
 {

@@ -1,5 +1,7 @@
 import { assertEquals, assertThrows } from "/asserts.ts"
-import { render, update, setStates, useState, setEffects, useEffect } from "./mod.js"
+import { render, update, setStates, useState, setEffects, useEffect, registerLinkeDomParser } from "./mod.js"
+
+await registerLinkeDomParser()
 
 Deno.test("use components => safely render components", async (t) => {
 

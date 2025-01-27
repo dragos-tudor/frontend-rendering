@@ -1,9 +1,9 @@
 import { assertEquals, assertStringIncludes, assertExists } from "/asserts.ts"
 import { render, update } from "../../rendering/mod.js"
-import { registerDOMParser } from "../../rendering-html/mod.js"
+import { registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { ErrorBoundary } from "./errorboundary.jsx"
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("handle layout errors => use error-boundaries", async (t) => {
 

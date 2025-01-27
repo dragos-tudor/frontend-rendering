@@ -1,10 +1,10 @@
 import { assertSpyCalls, spy } from "/mock.ts"
-import { parseHtml, registerDOMParser } from "../../rendering-html/mod.js"
+import { parseHtml, registerLinkeDomParser } from "../../rendering-html/mod.js"
 import { setHtmlEventHandler } from "../handlers/setting.js"
 import { dispatchEvent } from "./dispatching.js"
 import { unsetHtmlEventHandler } from "../handlers/unsetting.js";
 
-await registerDOMParser()
+await registerLinkeDomParser()
 
 Deno.test("use html components => dispatch and handle events", async (t) => {
 
