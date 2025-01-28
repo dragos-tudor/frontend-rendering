@@ -46,7 +46,12 @@ const compileJsxExpression = (type, props, maybeKey)=>createJsxElement(type, res
 const toJsxChildreArray = (children)=>children?.length == 1 ? children[0] : children;
 const existsJsxChildren = (children)=>children && children.length > 0;
 const compileLegacyJsxExpression = (type, props, ...children)=>existsJsxChildren(children) ? compileJsxExpression(type, setJsxPropChildren(props ?? {}, toJsxChildreArray(children))) : compileJsxExpression(type, props ?? {});
-export { FragmentType as Fragment };
+const registerReact = (global = globalThis)=>global.React = global.React || Object.freeze({
+        createElement: compileLegacyJsxExpression,
+        Fragment: FragmentType
+    });
+export { registerReact as registerReact };
 export { compileJsxExpression as jsx };
 export { compileJsxExpression as jsxs };
 export { compileLegacyJsxExpression as legacyJsx };
+export { FragmentType as Fragment };

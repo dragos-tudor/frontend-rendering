@@ -63,8 +63,7 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
   - the effects run when all html elements are rendered or updated.
   - the initial effects run when each element is unrendered.
 - Performance:
-  - rendering and updating operations have similar performances.
-  - unrendering operation is 2-times slower [`rendering` library remove each tree element and clean properties, event handlers, internal data].
+  - rendering, updating, unrendering operations have similar performances with `React` library.
 
 ### Modules
 - *high-level modules*: rendering, rendering-components.
@@ -106,6 +105,7 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 - implement creating, rendering, updating, replacing, unrendering html text nodes.
 - implement appending, inserting, removing, replacing html nodes.
 - use html DOM parser to create html elements and html text nodes.
+- export `registerDomParser` and `registerLinkeDomParser` functions to manually register DOMParser.
 - security based on owasp security guidance:
   - validate html tag names.
   - validate html element urls poperties.
@@ -135,6 +135,7 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 - jsx runtime is independent of rendering library.
 - contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
 - contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `legacyJsx`).
+- export `registerReact` function to manually register React for bundled jsx components.
 - usage:
 ```json
 {
