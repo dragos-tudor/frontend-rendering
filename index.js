@@ -29,7 +29,7 @@ const findHtmlAscendants = (elem, func, result = [])=>{
     return findHtmlAscendants(getHtmlParentElement(elem), func, result);
 };
 const findHtmlDescendants = (elem, func, result = [], findStrategy = findBreadthHtmlDescendants)=>findStrategy(getHtmlChildren(elem), func, result);
-const logHtmlElement = ($elem, $parent, message, props, logger)=>logger(`${message} elem:`, getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent), $elem);
+const logHtmlElement = ($elem, $parent, message, props, logger)=>logger($elem, `${message} elem:`, getHtmlName($elem), "props:", props, "parent:", $parent && getHtmlName($parent));
 const appendHtmlNode = (node, parent)=>parent.appendChild(node);
 const createHtmlElement = (document, tagName)=>document.createElement(tagName);
 const createHtmlElementNS = (document, ns, tagName)=>document.createElementNS(ns, tagName);
@@ -73,7 +73,7 @@ const insertHtmlText = (text, $elem, $parent)=>{
     const $text = createHtmlText(document, text);
     return insertHtmlNode($text, $elem);
 };
-const logHtmlText = ($text, $parent, message, logger)=>logger(`${message} text:`, getHtmlText($text), "parent:", $parent && getHtmlName($parent), $text);
+const logHtmlText = ($text, $parent, message, logger)=>logger($text, `${message} text:`, getHtmlText($text), "parent:", $parent && getHtmlName($parent));
 const renderHtmlText = (text, $parent)=>{
     const document = getHtmlOwnerDocument($parent);
     const $text = createHtmlText(document, text);
