@@ -719,7 +719,7 @@ const Suspense = ({ suspending = true, fallback, children })=>{
 const getService = (services, name)=>services?.[name];
 const getServices = (elem)=>elem.ownerDocument.__services;
 export { getEffects as getEffects };
-export { setEffects as setEffects, setInitialEffect as setInitialEffect };
+export { setEffects as setEffects, setInitialEffect as setInitialEffect, setInitialFuncEffect as setInitialFuncEffect };
 export { useEffect as useEffect };
 export { dispatchEvent as dispatchEvent };
 export { setHtmlEventHandler as setHtmlEventHandler };
