@@ -241,6 +241,11 @@ Deno.test("use elements => update html elements", async (t) =>
 
     assertEquals($elem.querySelector("input").value, "2")
   })
+
+  await t.step("elem without content => update elem with empty string content => non-throwing error", () => {
+    const elem = renderElementTree(<a></a>)[0]
+    updateElementTree(elem, <a>{""}</a>)
+  })
 })
 
 const waitForAsyncs = () =>

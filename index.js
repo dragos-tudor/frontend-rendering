@@ -155,7 +155,7 @@ const SafeTypes = Object.freeze([
     ElementType,
     FragmentType
 ]);
-const existsJsxElement = (elem)=>!!elem;
+const existsJsxElement = (elem)=>!!elem || elem === "";
 const isJsxElement = (elem)=>typeof elem.type === 'string';
 const isJsxKeyElement = (elem)=>elem.key != undefined;
 const isJsxType = (elem)=>typeof elem.$$typeof === "symbol";
