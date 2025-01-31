@@ -15,6 +15,7 @@ Deno.test("skip updating => verify values equality", async (t) => {
     eq(equalValues([1], [1]), true)
     eq(equalValues([1, true, "a"], [1, true, "a"]), true)
     eq(equalValues({x: 1}, {x: 1}), true)
+    eq(equalValues({x: {y: 1}}, {x: {y: 1}}), true)
     eq(equalValues([{x: 1, y: true, z: "a"}], [{x: 1, y: true, z: "a"}]), true)
   })
 
@@ -42,6 +43,12 @@ Deno.test("skip updating => verify values equality", async (t) => {
     eq(equalValues(1, 2), false)
     eq(equalValues(true, false), false)
     eq(equalValues("a", "b"), false)
+    eq(equalValues([], [1]), false)
+    eq(equalValues([1], [2]), false)
+    eq(equalValues([1, true, "a"], [1, true, "b"]), false)
+    eq(equalValues({x: 1}, {x: 2}), false)
+    eq(equalValues({x: {y: 1}}, {x: {y: 2}}), false)
+    eq(equalValues([{x: 1, y: true, z: "a"}], [{x: 1, y: true, z: "b"}]), false)
   })
 
   await t.step("2 functions => verify equality => 'true'", () => {
