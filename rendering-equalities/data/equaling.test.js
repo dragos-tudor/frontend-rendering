@@ -1,0 +1,72 @@
+import { assertEquals as eq } from "/asserts.ts"
+import { equalData } from "./equaling.js"
+
+Deno.test("skip updating => verify data equality", async (t) => {
+
+  await t.step("equal data => verify equality => 'true'", () => {
+    eq(equalData(null, null), true)
+    eq(equalData(undefined, undefined), true)
+    eq(equalData("", ""), true)
+    eq(equalData(true, true), true)
+    eq(equalData(0, 0), true)
+    eq(equalData(1, 1), true)
+    eq(equalData("a", "a"), true)
+    eq(equalData([], []), true)
+    eq(equalData([1], [1]), true)
+    eq(equalData([1, true, "a"], [1, true, "a"]), true)
+    eq(equalData({x: 1}, {x: 1}), true)
+    eq(equalData({x: {y: 1}}, {x: {y: 1}}), true)
+    eq(equalData([{x: 1, y: true, z: "a"}], [{x: 1, y: true, z: "a"}]), true)
+  })
+
+  await t.step("different data => verify equality => 'false'", () => {
+    eq(equalData(null, undefined), false)
+    eq(equalData(undefined, null), false)
+    eq(equalData(null, ""), false)
+    eq(equalData("", null), false)
+    eq(equalData(undefined, ""), false)
+    eq(equalData("", undefined), false)
+    eq(equalData(null, {}), false)
+    eq(equalData({}, null), false)
+    eq(equalData(undefined, {}), false)
+    eq(equalData({}, undefined), false)
+    eq(equalData(null, []), false)
+    eq(equalData([], null), false)
+    eq(equalData(undefined, []), false)
+    eq(equalData([], undefined), false)
+    eq(equalData(0, null), false)
+    eq(equalData(0, undefined), false)
+    eq(equalData(1, true), false)
+    eq(equalData(1, "1"), false)
+    eq(equalData(1, "true"), false)
+    eq(equalData(1, true), false)
+    eq(equalData(1, 2), false)
+    eq(equalData(true, false), false)
+    eq(equalData("a", "b"), false)
+    eq(equalData([], [1]), false)
+    eq(equalData([1], [2]), false)
+    eq(equalData([1, true, "a"], [1, true, "b"]), false)
+    eq(equalData({x: 1}, {x: 2}), false)
+    eq(equalData({x: {y: 1}}, {x: {y: 2}}), false)
+    eq(equalData([{x: 1, y: true, z: "a"}], [{x: 1, y: true, z: "b"}]), false)
+  })
+
+  await t.step("2 functions => verify equality => 'true'", () => {
+    eq(equalData(() => {}, () => { }), true)
+    eq(equalData(() => {}, () => { return 1 }), true)
+  })
+
+  await t.step("function and data => verify equality => 'false'", () => {
+    eq(equalData(() => {}, 1), false)
+    eq(equalData(() => {}, true), false)
+    eq(equalData(() => {}, false), false)
+    eq(equalData(() => {}, "a"), false)
+    eq(equalData(() => {}, null), false)
+    eq(equalData(() => {}, undefined), false)
+    eq(equalData(() => {}, []), false)
+    eq(equalData(() => {}, ["a"]), false)
+    eq(equalData(() => {}, {}), false)
+    eq(equalData(() => {}, {x: 1}), false)
+  })
+
+})
