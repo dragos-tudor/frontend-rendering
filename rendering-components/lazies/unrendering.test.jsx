@@ -10,7 +10,7 @@ Deno.test("use code splitting => unrender lazy components", async (t) => {
   const A = (props) => <>{props.value}</>
 
   await t.step("rendered lazy component => unrender lazy component => lazy component unrendered", async () => {
-    const actual = render(<Lazy value={1} loader={() => Promise.resolve(A) } ></Lazy>)
+    const actual = render(<Lazy value={1} loader={(props) => <A {...props}></A> } ></Lazy>)
     await waitForAsyncs()
 
     unrender(actual.querySelector("a"))
@@ -18,7 +18,7 @@ Deno.test("use code splitting => unrender lazy components", async (t) => {
   })
 
   await t.step("rendered lazy => unrender lazy => lazy unrendered", async () => {
-    const actual = render(<Lazy value={1} loader={() => Promise.resolve(A) } ></Lazy>)
+    const actual = render(<Lazy value={1} loader={(props) => <A {...props}></A> } ></Lazy>)
     await waitForAsyncs()
 
     unrender(actual)

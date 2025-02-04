@@ -11,21 +11,21 @@ Deno.test("use code splitting => render lazy components", async (t) => {
   const B = (props) => <>{props.children}</>
 
   await t.step("lazy component with props values => render lazy => lazy component rendered with values", async () => {
-    const actual = render(<Lazy value={1} loader={() => Promise.resolve(A)} ></Lazy>)
+    const actual = render(<Lazy value={1} loader={(props) =><A {...props}></A>}></Lazy>)
 
     await waitForAsyncs()
     assertEquals(actual.querySelector("lazy a").innerText, "1")
   })
 
   await t.step("lazy component with children => render lazy => lazy component rendered with children", async () => {
-    const actual = render(<Lazy loader={() => Promise.resolve(B)} ><c></c></Lazy>)
+    const actual = render(<Lazy loader={(props) => <B>{props.children}</B>}><c></c></Lazy>)
 
     await waitForAsyncs()
     assertExists(actual.querySelector("lazy b c"))
   })
 
   await t.step("nested lazy component with props values => render lazy => lazy component rendered with values", async () => {
-    const actual = render(<c><Lazy value={1} loader={() => Promise.resolve(A)} ></Lazy></c>)
+    const actual = render(<c><Lazy value={1} loader={(props) => <A {...props}></A>} ></Lazy></c>)
 
     await waitForAsyncs()
     assertEquals(actual.querySelector("lazy a").innerText, "1")
