@@ -1,9 +1,9 @@
-import { setElementPropsHidden, setElementsPropsHiodden } from "./setting.js"
+import { setElementPropsHidden, setElementsPropsHidden } from "./setting.js"
 
 export const Suspense = ({suspending = true, fallback, children}) =>
 {
   setElementPropsHidden(fallback, !suspending)
-  setElementsPropsHiodden(children, suspending)
+  setElementsPropsHidden(children, suspending)
 
   return <>
     {fallback}
