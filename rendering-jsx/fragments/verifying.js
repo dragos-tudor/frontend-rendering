@@ -1,3 +1,3 @@
-import { FragmentType } from "./FragmentType.js"
+import { JsxFragmentType } from "../elements/types.js";
 
-export const isJsxFragment = (elem) => elem?.type === FragmentType
+export const isJsxFragment = (elem) => elem?.type === JsxFragmentType

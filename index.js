@@ -149,67 +149,6 @@ const useEffect = (effects, name, func, deps)=>{
     setFuncEffect(effect, func);
     return effect;
 };
-const isArrayPropsChildren = (props)=>props.children instanceof Array;
-const getJsxPropsChildren = (props)=>isArrayPropsChildren(props) ? props.children : [
-        props.children
-    ];
-const FragmentType = Symbol.for("react.fragment");
-const isJsxFragment = (elem)=>elem?.type === FragmentType;
-const replaceJsxFragments = (elems, firstElem = elems[0])=>isJsxFragment(firstElem) ? getJsxPropsChildren(firstElem.props) : elems;
-const isBoolean = (value)=>typeof value === "boolean";
-const isNull = (value)=>value === null;
-const isUndefined = (value)=>typeof value === "undefined";
-const isJsxText = (value)=>value?.$$typeof === undefined;
-const isValidJsxText = (value)=>!isBoolean(value) && !isNull(value) && !isUndefined(value);
-const ElementType = Symbol.for("react.element");
-const SafeTypes = Object.freeze([
-    ElementType,
-    FragmentType
-]);
-const existsJsxElement = (elem)=>!!elem || elem === "";
-const isJsxElement = (elem)=>typeof elem.type === 'string';
-const isJsxKeyElement = (elem)=>elem.key != undefined;
-const isJsxType = (elem)=>typeof elem.$$typeof === "symbol";
-const isSafeJsxElement = (elem)=>typeof elem.$$typeof === "symbol" ? SafeTypes.includes(elem.$$typeof) : true;
-const sanitizeJsxChildren = (elem)=>sanitizeJsxElements(getJsxPropsChildren(elem.props));
-const sanitizeJsxElements = (elems)=>replaceJsxFragments(elems).filter((elem)=>isValidJsxText(elem) && isSafeJsxElement(elem));
-const getJsxFactoryName = (elem)=>elem.type.name.toLowerCase().replace("_", "-");
-const isJsxArrayElems = (elems)=>elems instanceof Array;
-const isJsxFactory = (elem)=>typeof elem.type === "function";
-const getJsxFragmentName = ()=>"fragment";
-const getJsxText = (value)=>isJsxText(value) && value?.toString();
-const getJsxTextName = ()=>"text";
-const getJsxElement = (store)=>store.__elem;
-const getJsxElementKey = (elem)=>elem.key;
-const getJsxElementName = (elem)=>elem.type;
-const getJsxElementProps = (elem)=>elem.props;
-const getJsxElementType = (type)=>typeof type === 'symbol' ? type : ElementType;
-const getJsxName = (elem)=>isJsxFactory(elem) && getJsxFactoryName(elem) || isJsxElement(elem) && getJsxElementName(elem) || isJsxFragment(elem) && getJsxFragmentName() || getJsxTextName();
-const getJsxProps = getJsxElementProps;
-const getJsxKey = getJsxElementKey;
-const createJsxElement = (type, props, key, parent, ref)=>({
-        $$typeof: getJsxElementType(type),
-        type,
-        props,
-        key,
-        ref,
-        _owner: parent
-    });
-const storeJsxElement = (store, elem)=>store.__elem = elem;
-const validateJsxElement = (elem)=>isJsxType(elem) ? "" : "Element should be jsx element.";
-const sanitizeJsxPropsChildren = (props, children)=>({
-        ...props,
-        children: sanitizeJsxElements(children)
-    });
-const runJsxFactory = (elem, $elem, props)=>elem.type(Object.freeze(props), $elem);
-const buildJsxFactoryChildren = (elem, $elem)=>{
-    const children = getJsxPropsChildren(elem.props);
-    const sanitizeProps = sanitizeJsxPropsChildren(elem.props, children);
-    const factoryElems = runJsxFactory(elem, $elem, sanitizeProps);
-    return sanitizeJsxElements(isJsxArrayElems(factoryElems) ? factoryElems : [
-        factoryElems
-    ]);
-};
 const isFunctionLazyLoader = (loader)=>typeof loader === "function";
 const validateLazyLoader = (loader)=>isFunctionLazyLoader(loader) ? "" : "Lazy loader should be function.";
 const throwError = (message)=>{
@@ -292,6 +231,58 @@ const getProducerContextValue = (name, fallbackValue, elem)=>{
     return context.value;
 };
 const findConsumer = (elem, name)=>findHtmlDescendants(elem, (elem)=>isContextConsumer(elem, name));
+const isJsxPropsChildrenArray = (props)=>props.children instanceof Array;
+const toJsxPropsChildrenArray = (props)=>isJsxPropsChildrenArray(props) ? props.children : [
+        props.children
+    ];
+const JsxElementType = Symbol.for("react.element");
+const JsxFragmentType = Symbol.for("react.fragment");
+const JsxTypes = Object.freeze([
+    JsxElementType,
+    JsxFragmentType
+]);
+const isJsxFragment = (elem)=>elem?.type === JsxFragmentType;
+const replaceJsxFragments = (elems)=>isJsxFragment(elems[0]) ? toJsxPropsChildrenArray(elems[0].props) : elems;
+const InvalidValues = [
+    true,
+    false,
+    null,
+    undefined
+];
+const isJsxText = (value)=>value?.$$typeof === undefined;
+const isValidJsxText = (value)=>!InvalidValues.includes(value);
+const existsJsxElement = (elem)=>!!elem || elem === "";
+const isJsxElement = (elem)=>typeof elem.type === 'string';
+const isJsxElementsArray = (elems)=>elems instanceof Array;
+const isJsxKeyElement = (elem)=>elem.key != undefined;
+const isJsxType = (elem)=>typeof elem.$$typeof === "symbol" ? JsxTypes.includes(elem.$$typeof) : true;
+const sanitizeJsxElements = (elems)=>replaceJsxFragments(elems).filter((elem)=>isValidJsxText(elem) && isJsxType(elem));
+const getJsxFactoryName = (elem)=>elem.type.name.toLowerCase().replace("_", "-");
+const isJsxFactory = (elem)=>typeof elem.type === "function";
+const getJsxFragmentName = ()=>"fragment";
+const getJsxText = (value)=>isJsxText(value) && value?.toString();
+const getJsxTextName = ()=>"text";
+const getJsxElement = (store)=>store.__elem;
+const getJsxElementKey = (elem)=>elem.key;
+const getJsxElementName = (elem)=>elem.type;
+const getJsxElementProps = (elem)=>elem.props;
+const getJsxName = (elem)=>isJsxFactory(elem) && getJsxFactoryName(elem) || isJsxElement(elem) && getJsxElementName(elem) || isJsxFragment(elem) && getJsxFragmentName() || getJsxTextName();
+const getJsxProps = getJsxElementProps;
+const getJsxKey = getJsxElementKey;
+const storeJsxElement = (store, elem)=>store.__elem = elem;
+const validateJsxElement = (elem)=>isJsxType(elem) ? "" : "Element should be jsx element.";
+const runJsxFactory = (elem, $elem, props)=>elem.type(Object.freeze(props), $elem);
+const buildJsxFactoryChildren = (elem, $elem)=>{
+    const props = getJsxElementProps(elem);
+    const children = sanitizeJsxElements(toJsxPropsChildrenArray(props));
+    const elems = runJsxFactory(elem, $elem, {
+        ...props,
+        children
+    });
+    return sanitizeJsxElements(isJsxElementsArray(elems) ? elems : [
+        elems
+    ]);
+};
 const JavaScriptProtocolRegex = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
 const UnsafeHtmlPropNames = Object.freeze([
     "innerHTML",
@@ -504,7 +495,7 @@ const handleError = (func, elem)=>{
         throw error;
     }
 };
-const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && handleError(()=>buildJsxFactoryChildren(elem, $elem), $elem) || isJsxElement(elem) && sanitizeJsxChildren(elem) || [];
+const resolveJsxChildren = (elem, $elem)=>isJsxFactory(elem) && handleError(()=>buildJsxFactoryChildren(elem, $elem), $elem) || isJsxElement(elem) && sanitizeJsxElements(toJsxPropsChildrenArray(elem.props)) || [];
 const renderElementChildren = ($elem)=>resolveJsxChildren(getJsxElement($elem), $elem).map((child)=>renderElement(child, $elem));
 const equalElementNames = (elem, $elem)=>getJsxName(elem) === getHtmlName($elem);
 const equalElementProps = (elem, $elem)=>equalObjects(getJsxProps(elem), getJsxProps(getJsxElement($elem)));
@@ -721,10 +712,10 @@ const Service = (props, elem)=>{
     return props.children;
 };
 const setElementPropsHidden = (elem, value)=>(elem.props.hidden = value, elem);
-const setElementsPropsHiodden = (elems, value)=>elems.map((elem)=>setElementPropsHidden(elem, value));
+const setElementsPropsHidden = (elems, value)=>elems.map((elem)=>setElementPropsHidden(elem, value));
 const Suspense = ({ suspending = true, fallback, children })=>{
     setElementPropsHidden(fallback, !suspending);
-    setElementsPropsHiodden(children, suspending);
+    setElementsPropsHidden(children, suspending);
     return React.createElement(React.Fragment, null, fallback, ...children);
 };
 const getService = (services, name)=>services?.[name];
@@ -743,14 +734,16 @@ export { Context as Context };
 const Lazy = (props, elem)=>{
     throwError(validateHtmlElement(elem));
     throwError(validateLazyLoader(props.loader));
-    const [factory, setFactory] = useState(setStates(elem), "factory", undefined, []);
-    useEffect(setEffects(elem), "load", async ()=>{
-        const factory = await props.loader();
-        setFactory(factory);
-        render(createJsxElement(factory, props), elem);
-    }, []);
-    if (factory) return createJsxElement(factory, props);
-    return React.createElement(React.Fragment, null);
+    const [child, setChild] = useState(setStates(elem), "child", undefined, []);
+    useEffect(setEffects(elem), "load child", async ()=>{
+        const child = await props.loader(props);
+        setChild(child);
+        const $child = getHtmlChildren(elem)[0];
+        return $child ? updateElementTree($child, child) : render(child, elem);
+    }, [
+        props
+    ]);
+    return child ?? React.createElement(React.Fragment, null);
 };
 export { ErrorBoundary as ErrorBoundary };
 export { Lazy as Lazy };

@@ -1,6 +1,7 @@
 import { assertEquals } from "/asserts.ts"
 import { getHtmlName, parseHtml, registerLinkeDomParser } from "../../rendering-html/mod.js"
-import { getJsxKey, getJsxElement, createJsxElement } from "../../rendering-jsx/mod.js"
+import { getJsxKey, getJsxElement } from "../../rendering-jsx/mod.js"
+import { createJsxElement } from "../../jsx-runtime/elements/creating.js"
 import { render } from "../mod.js"
 import { orderKeyElements } from "./ordering.js"
 

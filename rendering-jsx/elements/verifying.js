@@ -1,14 +1,11 @@
-import { ElementType } from "./ElementType.js"
-import { FragmentType } from "../fragments/FragmentType.js"
-
-const SafeTypes = Object.freeze([ElementType, FragmentType])
+import { JsxTypes } from "./types.js"
 
 export const existsJsxElement = (elem) => !!elem || elem === ""
 
 export const isJsxElement = (elem) => typeof elem.type === 'string'
 
+export const isJsxElementsArray = (elems) => elems instanceof Array
+
 export const isJsxKeyElement = (elem) => elem.key != undefined
 
-export const isJsxType = (elem) => typeof elem.$$typeof === "symbol"
-
-export const isSafeJsxElement = (elem) => typeof elem.$$typeof === "symbol"? SafeTypes.includes(elem.$$typeof): true
+export const isJsxType = (elem) => typeof elem.$$typeof === "symbol"? JsxTypes.includes(elem.$$typeof): true

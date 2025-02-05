@@ -1,2 +1,2 @@
 
-export const isArrayPropsChildren = (props) => props.children instanceof Array
+export const isJsxPropsChildrenArray = (props) => props.children instanceof Array
