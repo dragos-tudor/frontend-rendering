@@ -1,2 +1,2 @@
 
-export const existsJsxChildren = (children) => children && children.length > 0
+export const existsSingleJsxChild = (children) => children?.length === 1

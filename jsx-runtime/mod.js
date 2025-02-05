@@ -1,14 +1,13 @@
-import { FragmentType } from "../rendering-jsx/mod.js"
-import { compileJsxExpression } from "./expressions/compiling.js"
-import { compileLegacyJsxExpression } from "./expressions/compiling.legacy.js"
+import { createJsxElement, createLegacyJsxElement } from "./elements/creating.js"
+import { JsxFragmentType } from "./elements/types.js"
 
 export const registerReact = (global = globalThis) =>
   global.React = global.React || Object.freeze({
-    createElement: compileLegacyJsxExpression,
-    Fragment: FragmentType
+    createElement: createLegacyJsxElement,
+    Fragment: JsxFragmentType
   })
 
-export const jsx = compileJsxExpression
-export const jsxs = compileJsxExpression
-export const legacyJsx = compileLegacyJsxExpression
-export const Fragment = FragmentType
+export const jsx = createJsxElement
+export const jsxs = createJsxElement
+export const legacyJsx = createLegacyJsxElement
+export const Fragment = JsxFragmentType
