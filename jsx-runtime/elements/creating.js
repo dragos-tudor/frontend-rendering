@@ -11,7 +11,7 @@ export const createJsxElement = (type, props, maybeKey = null) =>
     type,
     key: maybeKey ?? getJsxPropsKey(props),
     ref: getJsxPropsRef(props),
-    props: deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props)),
+    props: deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props ?? {})),
     _owner: getJsxParent(getJsxInternals(globalThis["React"])),
   })
 
@@ -21,6 +21,6 @@ export const createLegacyJsxElement = (type, props, ...children) =>
     type,
     key: getJsxPropsKey(props),
     ref: getJsxPropsRef(props),
-    props: { ...deleteJsxPropsKeyAndRef(setJsxDefaultProps(props)), children: resolveJsxChildren(children)},
+    props: { ...deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props ?? {})), children: resolveJsxChildren(children)},
     _owner: getJsxParent(getJsxInternals(globalThis["React"])),
   })

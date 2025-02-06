@@ -16,7 +16,7 @@ const createJsxElement = (type, props, maybeKey = null)=>Object.freeze({
         type,
         key: maybeKey ?? getJsxPropsKey(props),
         ref: getJsxPropsRef(props),
-        props: deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props)),
+        props: deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props ?? {})),
         _owner: getJsxParent(getJsxInternals(globalThis["React"]))
     });
 const createLegacyJsxElement = (type, props, ...children)=>Object.freeze({
@@ -25,7 +25,7 @@ const createLegacyJsxElement = (type, props, ...children)=>Object.freeze({
         key: getJsxPropsKey(props),
         ref: getJsxPropsRef(props),
         props: {
-            ...deleteJsxPropsKeyAndRef(setJsxDefaultProps(props)),
+            ...deleteJsxPropsKeyAndRef(setJsxDefaultProps(type, props ?? {})),
             children: resolveJsxChildren(children)
         },
         _owner: getJsxParent(getJsxInternals(globalThis["React"]))
