@@ -114,7 +114,7 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 
 ### [Rendering jsx](./rendering-jsx/)
 - main functionality: manage jsx elements.
-- contains jsx factories builder `buildJsxFactory`.
+- contains jsx factories builder `buildJsxFactoryChildren`.
 - implement jsx children sanitizing:
   - replace html fragments.
   - skip boolean, null, undefined values.
@@ -133,8 +133,8 @@ render(<App fetch-data={() => Promise.resolve(createJsonResponse(data))}></App>,
 ### [Jsx runtime](./jsx-runtime/)
 - main functionality: compile jsx expressions.
 - jsx runtime is independent of rendering library.
-- contains jsx expressions compiler `compileJsxExpression` (export `jsx`, `jsxs`, `Fragment`).
-- contains jsx legacy expressions compiler `compileLegacyJsxExpression` (export `legacyJsx`).
+- implement `createJsxElement` func (export `jsx`, `jsxs`, `Fragment`).
+- implement `createLegacyJsxElement` func registred as `React.createElement` (export `legacyJsx`).
 - export `registerReact` function to manually register React for bundled jsx components.
 - usage:
 ```json
