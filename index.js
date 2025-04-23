@@ -251,7 +251,7 @@ const InvalidValues = [
 ];
 const isJsxText = (value)=>value?.$$typeof === undefined;
 const isValidJsxText = (value)=>!InvalidValues.includes(value);
-const existsJsxElement = (elem)=>!!elem || elem === "";
+const existsJsxElement = (elem)=>elem !== undefined || elem === "" || elem === 0;
 const isJsxElement = (elem)=>typeof elem.type === 'string';
 const isJsxElementsArray = (elems)=>elems instanceof Array;
 const isJsxKeyElement = (elem)=>elem.key != undefined;

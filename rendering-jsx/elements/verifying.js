@@ -1,6 +1,6 @@
 import { JsxTypes } from "./types.js"
 
-export const existsJsxElement = (elem) => !!elem || elem === ""
+export const existsJsxElement = (elem) => elem !== undefined || elem === "" || elem === 0
 
 export const isJsxElement = (elem) => typeof elem.type === 'string'
 

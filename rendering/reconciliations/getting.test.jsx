@@ -13,7 +13,7 @@ Deno.test("use reconciliations", async (t) =>
   })
 
   await t.step("html elem and no jsx elem => get reconciliation type => unrender", () => {
-    assertEquals(getReconciliationType(null, parseHtml("<a></a>")), ReconciliationTypes.unrender)
+    assertEquals(getReconciliationType(undefined, parseHtml("<a></a>")), ReconciliationTypes.unrender)
   })
 
   await t.step("different html and jsx elem names => get reconciliation type => replace", () => {

@@ -14,16 +14,22 @@ Deno.test("use elements => render jsx elements", async (t) =>
   await t.step("jsx elements => render elements => rendered html", () => {
     const renderHtml = (jsx) => renderElementTree(jsx)[0].outerHTML
 
+    assertEquals(renderHtml(<a>{0}</a>), "<a>0</a>")
+    assertEquals(renderHtml(<a>{"0"}</a>), "<a>0</a>")
     assertEquals(renderHtml(<a>123</a>), "<a>123</a>")
     assertEquals(renderHtml(<a>{123}.</a>), "<a>123.</a>")
-    assertEquals(renderHtml(<a>{null}</a>), "<a></a>")
-    assertEquals(renderHtml(<a>{undefined}</a>), "<a></a>")
     assertEquals(renderHtml(<a><b>123</b></a>), "<a><b>123</b></a>")
     assertEquals(renderHtml(<a><b><c></c></b></a>), "<a><b><c></c></b></a>")
     assertEquals(renderHtml(<a><b></b><c></c></a>), "<a><b></b><c></c></a>")
     assertEquals(renderHtml(<a><b></b>123</a>), "<a><b></b>123</a>")
     assertEquals(renderHtml(<a>123<b></b></a>), "<a>123<b></b></a>")
     assertEquals(renderHtml(<a><b>1<c></c>2</b></a>), "<a><b>1<c></c>2</b></a>")
+
+    assertEquals(renderHtml(<a>{""}</a>), "<a></a>")
+    assertEquals(renderHtml(<a>{true}</a>), "<a></a>")
+    assertEquals(renderHtml(<a>{false}</a>), "<a></a>")
+    assertEquals(renderHtml(<a>{null}</a>), "<a></a>")
+    assertEquals(renderHtml(<a>{undefined}</a>), "<a></a>")
   })
 
   await t.step("jsx factories => render factories => rendered html", () => {

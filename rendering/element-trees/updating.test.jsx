@@ -30,6 +30,10 @@ Deno.test("use elements => update html elements", async (t) =>
   await t.step("elements with text content => update elements => updated html", () => {
     const updateHtml = (oldJsx, newJsx) => updateElementTree(renderElementTree(oldJsx)[0], newJsx)[0].outerHTML
 
+    assertEquals(updateHtml(<a></a>, <a>{0}</a>), "<a>0</a>")
+    assertEquals(updateHtml(<a></a>, <a>{"0"}</a>), "<a>0</a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{0}</a>), "<a>0</a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{"0"}</a>), "<a>0</a>")
     assertEquals(updateHtml(<a>1</a>, <a>2</a>), "<a>2</a>")
     assertEquals(updateHtml(<a>{1}.</a>, <a>{2}.</a>), "<a>2.</a>")
     assertEquals(updateHtml(<a>_{1}.</a>, <a>_{2}.</a>), "<a>_2.</a>")
@@ -38,6 +42,17 @@ Deno.test("use elements => update html elements", async (t) =>
     assertEquals(updateHtml(<a><b>1</b></a> ,<a><b>{[2, 3]}</b></a>), "<a><b>23</b></a>")
     assertEquals(updateHtml(<a><b>1</b></a>, <a><b>2<c>3</c></b></a>), "<a><b>2<c>3</c></b></a>")
     assertEquals(updateHtml(<a>1<b></b>2</a>, <a><b><c>3</c>2</b></a>), "<a><b><c>3</c>2</b></a>")
+
+    assertEquals(updateHtml(<a></a>, <a>{""}</a>), "<a></a>")
+    assertEquals(updateHtml(<a></a>, <a>{true}</a>), "<a></a>")
+    assertEquals(updateHtml(<a></a>, <a>{false}</a>), "<a></a>")
+    assertEquals(updateHtml(<a></a>, <a>{null}</a>), "<a></a>")
+    assertEquals(updateHtml(<a></a>, <a>{undefined}</a>), "<a></a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{""}</a>), "<a></a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{true}</a>), "<a></a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{false}</a>), "<a></a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{null}</a>), "<a></a>")
+    assertEquals(updateHtml(<a>1</a>, <a>{undefined}</a>), "<a></a>")
   })
 
   await t.step("key-elements => update elements => updated html", () => {
